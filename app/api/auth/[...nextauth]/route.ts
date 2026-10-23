@@ -1,8 +1,17 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { db } from "@/db";
+import { accounts, sessions, users, verificationTokens } from "@/db/schema";
 
 export const authOptions: AuthOptions = {
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }),
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || 'placeholder-id',

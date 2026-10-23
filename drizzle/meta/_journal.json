@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1792768730462,
+      "tag": "0000_phase1_identity_workspaces",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1792775008493,
+      "tag": "0001_agent_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792776694006,
+      "tag": "0002_agent_foundation",
+      "breakpoints": true
+    }
+  ]
+}
