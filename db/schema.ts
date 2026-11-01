@@ -1,25 +1,150 @@
+
 import { sql } from "drizzle-orm";
 import {
   check,
   index,
   integer,
+  jsonb,
   pgTable,
   primaryKey,
   serial,
   text,
   timestamp,
-  jsonb,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
+
+// ─── Agent Types ──────────────────────────────────────────────
+
 export type AgentStatus = "active" | "archived";
+
+export type WorkspaceRole = "owner" | "admin" | "member";
+
+// ─── Users ────────────────────────────────────────────────────                            
+
+export const users = pgTable("users", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+  name: text("name"),
+  email: text("email").notNull().unique(),
+  emailVerified: timestamp("email_verified", { mode: "date" }),
+  image: text("image"),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
+// ─── OAuth Accounts ───────────────────────────────────────────
+
+export const accounts = pgTable(
+  "accounts",
+  {
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: text("type").$type<AdapterAccount["type"]>().notNull(),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: text("token_type"),
+    scope: text("scope"),
+    id_token: text("id_token"),
+    session_state: text("session_state"),
+  },
+  (table) => ({
+    providerAccountPk: primaryKey({
+      columns: [table.provider, table.providerAccountId],
+    }),
+    userIdIndex: index("accounts_user_id_idx").on(table.userId),
+  }),
+);
+
+// ─── Database Sessions ────────────────────────────────────────
+
+export const sessions = pgTable("sessions", {
+  sessionToken: text("session_token").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expires: timestamp("expires", { mode: "date" }).notNull(),
+});
+
+// ─── Verification Tokens ─────────────────────────────────────
+
+export const verificationTokens = pgTable(
+  "verification_tokens",
+  {
+    identifier: text("identifier").notNull(),
+    token: text("token").notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (table) => ({
+    tokenPk: primaryKey({
+      columns: [table.identifier, table.token],
+    }),
+  }),
+);
+
+// ─── Workspaces ───────────────────────────────────────────────
+
+export const workspaces = pgTable(
+  "workspaces",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    ownerUserId: text("owner_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "restrict" }),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    ownerUserIdIndex: index("workspaces_owner_user_id_idx").on(
+      table.ownerUserId,
+    ),
+  }),
+);
+
+// ─── Workspace Membership ─────────────────────────────────────
+
+export const workspaceMembers = pgTable(
+  "workspace_members",
+  {
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").$type<WorkspaceRole>().notNull().default("member"),
+    joinedAt: timestamp("joined_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    memberPk: primaryKey({
+      columns: [table.workspaceId, table.userId],
+    }),
+    roleCheck: check(
+      "workspace_members_role_check",
+      sql`${table.role} in ('owner', 'admin', 'member')`,
+    ),
+    userIdIndex: index("workspace_members_user_id_idx").on(table.userId),
+  }),
+);
+
+// ─── Agents ───────────────────────────────────────────────────
 
 export const agents = pgTable(
   "agents",
   {
-    id: text("id")
-      .primaryKey()
-      .default(sql`gen_random_uuid()::text`),
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
 
     workspaceId: text("workspace_id")
       .notNull()
@@ -46,9 +171,7 @@ export const agents = pgTable(
       .notNull(),
   },
   (table) => ({
-    workspaceIndex: index("agents_workspace_id_idx").on(
-      table.workspaceId,
-    ),
+    workspaceIndex: index("agents_workspace_id_idx").on(table.workspaceId),
     statusCheck: check(
       "agents_status_check",
       sql`${table.status} in ('active', 'archived')`,
@@ -56,12 +179,12 @@ export const agents = pgTable(
   }),
 );
 
+// ─── Agent Versions ───────────────────────────────────────────
+
 export const agentVersions = pgTable(
   "agent_versions",
   {
-    id: text("id")
-      .primaryKey()
-      .default(sql`gen_random_uuid()::text`),
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
 
     agentId: text("agent_id")
       .notNull()
@@ -91,9 +214,7 @@ export const agentVersions = pgTable(
       "agent_versions_agent_version_unique",
     ).on(table.agentId, table.version),
 
-    agentIndex: index("agent_versions_agent_id_idx").on(
-      table.agentId,
-    ),
+    agentIndex: index("agent_versions_agent_id_idx").on(table.agentId),
 
     versionCheck: check(
       "agent_versions_version_check",
@@ -102,105 +223,7 @@ export const agentVersions = pgTable(
   }),
 );
 
-export type Agent = typeof agents.$inferSelect;
-export type NewAgent = typeof agents.$inferInsert;
-
-export type AgentVersion = typeof agentVersions.$inferSelect;
-export type NewAgentVersion = typeof agentVersions.$inferInsert;
-export const users = pgTable("users", {
-  id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
-  name: text("name"),
-  email: text("email").notNull().unique(),
-  emailVerified: timestamp("email_verified", { mode: "date" }),
-  image: text("image"),
-  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-});
-
-export const accounts = pgTable(
-  "accounts",
-  {
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    type: text("type").$type<AdapterAccount["type"]>().notNull(),
-    provider: text("provider").notNull(),
-    providerAccountId: text("provider_account_id").notNull(),
-    refresh_token: text("refresh_token"),
-    access_token: text("access_token"),
-    expires_at: integer("expires_at"),
-    token_type: text("token_type"),
-    scope: text("scope"),
-    id_token: text("id_token"),
-    session_state: text("session_state"),
-  },
-  (table) => ({
-    providerAccountPk: primaryKey({
-      columns: [table.provider, table.providerAccountId],
-    }),
-    userIdIndex: index("accounts_user_id_idx").on(table.userId),
-  }),
-);
-
-export const sessions = pgTable("sessions", {
-  sessionToken: text("session_token").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-});
-
-export const verificationTokens = pgTable(
-  "verification_tokens",
-  {
-    identifier: text("identifier").notNull(),
-    token: text("token").notNull(),
-    expires: timestamp("expires", { mode: "date" }).notNull(),
-  },
-  (table) => ({
-    tokenPk: primaryKey({ columns: [table.identifier, table.token] }),
-  }),
-);
-
-export const workspaces = pgTable(
-  "workspaces",
-  {
-    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
-    name: text("name").notNull(),
-    slug: text("slug").notNull().unique(),
-    ownerUserId: text("owner_user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "restrict" }),
-    createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
-    updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
-  },
-  (table) => ({
-    ownerUserIdIndex: index("workspaces_owner_user_id_idx").on(table.ownerUserId),
-  }),
-);
-
-export type WorkspaceRole = "owner" | "admin" | "member";
-
-export const workspaceMembers = pgTable(
-  "workspace_members",
-  {
-    workspaceId: text("workspace_id")
-      .notNull()
-      .references(() => workspaces.id, { onDelete: "cascade" }),
-    userId: text("user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
-    role: text("role").$type<WorkspaceRole>().notNull().default("member"),
-    joinedAt: timestamp("joined_at", { mode: "date" }).defaultNow().notNull(),
-  },
-  (table) => ({
-    memberPk: primaryKey({ columns: [table.workspaceId, table.userId] }),
-    roleCheck: check(
-      "workspace_members_role_check",
-      sql`${table.role} in ('owner', 'admin', 'member')`,
-    ),
-    userIdIndex: index("workspace_members_user_id_idx").on(table.userId),
-  }),
-);
+// ─── Existing Posts Table ─────────────────────────────────────
 
 export const posts = pgTable("posts", {
   id: serial("id").primaryKey(),
@@ -209,16 +232,30 @@ export const posts = pgTable("posts", {
   authorId: text("author_id")
     .notNull()
     .references(() => users.id),
-  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
 });
+
+// ─── Inferred Types ───────────────────────────────────────────
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
 export type Account = typeof accounts.$inferSelect;
 export type NewAccount = typeof accounts.$inferInsert;
+
 export type Workspace = typeof workspaces.$inferSelect;
 export type NewWorkspace = typeof workspaces.$inferInsert;
+
 export type WorkspaceMember = typeof workspaceMembers.$inferSelect;
 export type NewWorkspaceMember = typeof workspaceMembers.$inferInsert;
+
+export type Agent = typeof agents.$inferSelect;
+export type NewAgent = typeof agents.$inferInsert;
+
+export type AgentVersion = typeof agentVersions.$inferSelect;
+export type NewAgentVersion = typeof agentVersions.$inferInsert;
+
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
