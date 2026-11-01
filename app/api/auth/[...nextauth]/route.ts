@@ -1,8 +1,24 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
+
+import { db } from "@/db";
+import {
+  accounts,
+  sessions,
+  users,
+  verificationTokens,
+} from "@/db/schema";
+import { ensurePersonalWorkspace } from "@/lib/workspace/provision-workspace";
 
 export const authOptions: AuthOptions = {
+  adapter: DrizzleAdapter(db, {
+    usersTable: users,
+    accountsTable: accounts,
+    sessionsTable: sessions,
+    verificationTokensTable: verificationTokens,
+  }),
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || 'placeholder-id',
@@ -20,10 +36,35 @@ export const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
   },
+  events: {
+    async createUser({ user }) {
+      if (user?.id) {
+        try {
+          await ensurePersonalWorkspace({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          });
+        } catch (error) {
+          console.error("Failed to provision workspace in createUser event:", error);
+        }
+      }
+    },
+  },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
+      if (user && user.id) {
         token.id = user.id;
+
+        try {
+          await ensurePersonalWorkspace({
+            id: user.id,
+            name: user.name,
+            email: user.email,
+          });
+        } catch (error) {
+          console.error("Failed to provision workspace in jwt callback:", error);
+        }
       }
 
       return token;
