@@ -207,6 +207,40 @@ A persistent record of software engineering concepts, design decisions, architec
 - **TypeScript Check**: `npx tsc --noEmit` passed with **0 errors**.
 - **Deliverable**: Full 3-tier memory engine (short-term conversation history, long-term cross-thread preferences, and enterprise pgvector RAG document search).
 
+---
+
+## Phase 6: Durable Background Workers & Task Queues
+- **Concepts Learned**: Asynchronous event dispatching, Inngest durable workflows, non-blocking agent operations, cron job definitions, graceful offline/local dev fallback.
+- **Implementations**:
+  - `db/schema.ts` & `scripts/migrate-phase6.ts`: `background_jobs` table tracking async worker execution, cron schedules, and lifecycle states.
+  - `lib/inngest.ts`: Inngest SDK initialization and `scheduleBackgroundJob` helper.
+  - `lib/tools/builtin/background-task.ts`: Dangerous-tier `background_task` tool with human approval, persisting to database and staging to Inngest.
+  - `lib/tools/registry.ts`: Tool registration in the central registry.
+- **Verification**: `scripts/verify-phase6-background.ts` passed **10 / 10 tests**.
+
+---
+
+## Phase 7: Role-Based Access Control (RBAC) & Audit Trails
+- **Concepts Learned**: Workspace-scoped roles, granular permission matrices, multi-tenant permission verification, immutable audit logging with JSONB change tracking.
+- **Implementations**:
+  - `db/schema.ts` & `scripts/migrate-phase7.ts`: Added `roles`, `permissions`, `role_permissions`, `user_roles`, and `audit_logs` tables.
+  - `lib/audit.ts`: Global `logAction` helper for compliance recording across all privileged operations.
+  - `lib/auth/require-permission.ts`: Route guard validating user roles and permissions with automatic owner bypass.
+- **Verification**: `scripts/verify-phase7-rbac.ts` passed **10 / 10 tests**.
+
+---
+
+## Phase 8: Plugin Marketplace & Extensibility Ecosystem
+- **Concepts Learned**: Dynamic integration architecture, third-party connector cataloging, workspace plugin enablement, UI-driven toggle switches, and strict cross-tenant isolation.
+- **Implementations**:
+  - `db/schema.ts` & `scripts/migrate-phase8.ts`: Added `workspace_plugins` and `plugin_manifests` tables.
+  - `lib/plugins/manager.ts`: Core `PluginManager` handling catalog sync, installation, enable/disable toggling, and uninstall with audit logging.
+  - `app/api/plugins/route.ts` & `app/api/plugins/[id]/route.ts`: REST API endpoints for marketplace catalog, installation, and toggling.
+  - `app/api/workspaces/[id]/plugins/route.ts`: Endpoint listing installed plugins for a specific workspace.
+  - `app/(dashboard)/plugins/page.tsx`: Full interactive Marketplace UI with catalog search, category filters, and installation management.
+  - `components/dashboard/sidebar-nav.tsx`: Added Plugins navigation entry in persistent sidebar.
+- **Verification**: `scripts/verify-phase8-plugins.ts` passed **16 / 16 tests**.
+
 
 
 
