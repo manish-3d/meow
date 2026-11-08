@@ -12,6 +12,7 @@ import {
   text,
   timestamp,
   uniqueIndex,
+  vector,
 } from "drizzle-orm/pg-core";
 import type { AdapterAccount } from "next-auth/adapters";
 
@@ -34,6 +35,8 @@ export type ToolCallStatus =
 export type ToolExecutionType = "native" | "integration" | "sandbox";
 
 export type PermissionLevel = "read" | "write" | "dangerous";
+
+export type MemoryType = "fact" | "preference" | "instruction" | "summary";
 
 // ─── Users ────────────────────────────────────────────────────                            
 
@@ -436,6 +439,115 @@ export const agentTools = pgTable(
   }),
 );
 
+// ─── Agent Memories (Domain B - Tier 2 Long-Term Cross-Thread) ─
+
+export const agentMemories = pgTable(
+  "agent_memories",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+
+    agentId: text("agent_id")
+      .notNull()
+      .references(() => agents.id, { onDelete: "cascade" }),
+
+    memoryType: text("memory_type")
+      .$type<MemoryType>()
+      .notNull(),
+
+    content: text("content").notNull(),
+
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    agentIdIdx: index("agent_memories_agent_id_idx").on(table.agentId),
+    memoryTypeIdx: index("agent_memories_memory_type_idx").on(table.memoryType),
+    memoryTypeCheck: check(
+      "agent_memories_memory_type_check",
+      sql`${table.memoryType} IN ('fact', 'preference', 'instruction', 'summary')`,
+    ),
+  }),
+);
+
+// ─── Files (Domain G - Workspace File Storage) ────────────────
+
+export const files = pgTable(
+  "files",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+
+    storageKey: text("storage_key").notNull().unique(),
+
+    originalFilename: text("original_filename").notNull(),
+
+    mimeType: text("mime_type").notNull(),
+
+    sizeBytes: integer("size_bytes").notNull(),
+
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index("files_workspace_id_idx").on(table.workspaceId),
+  }),
+);
+
+// ─── Document Chunks (Domain G - Vector Embeddings for RAG) ───
+
+export const documentChunks = pgTable(
+  "document_chunks",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+
+    fileId: text("file_id")
+      .notNull()
+      .references(() => files.id, { onDelete: "cascade" }),
+
+    chunkIndex: integer("chunk_index").notNull(),
+
+    content: text("content").notNull(),
+
+    embedding: vector("embedding", { dimensions: 1536 }).notNull(),
+
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    workspaceIdIdx: index("document_chunks_workspace_id_idx").on(table.workspaceId),
+    fileIdIdx: index("document_chunks_file_id_idx").on(table.fileId),
+    embeddingHnswIdx: index("document_chunks_embedding_hnsw_idx").using(
+      "hnsw",
+      table.embedding.op("vector_cosine_ops"),
+    ),
+  }),
+);
+
 // ─── Existing Posts Table ─────────────────────────────────────
 
 export const posts = pgTable("posts", {
@@ -487,3 +599,12 @@ export type NewAgentTool = typeof agentTools.$inferInsert;
 
 export type Post = typeof posts.$inferSelect;
 export type NewPost = typeof posts.$inferInsert;
+
+export type AgentMemory = typeof agentMemories.$inferSelect;
+export type NewAgentMemory = typeof agentMemories.$inferInsert;
+
+export type FileRecord = typeof files.$inferSelect;
+export type NewFileRecord = typeof files.$inferInsert;
+
+export type DocumentChunk = typeof documentChunks.$inferSelect;
+export type NewDocumentChunk = typeof documentChunks.$inferInsert;
