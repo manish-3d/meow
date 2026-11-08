@@ -13,6 +13,7 @@ import { requireWorkspaceAccess } from "@/lib/auth/require-workspace-access";
 import { AgentRunner } from "@/lib/ai/runner";
 import { ModelMessage } from "@/lib/ai/types";
 import { ToolRegistry } from "@/lib/tools/registry";
+import { MemoryManager } from "@/lib/memory/manager";
 
 interface ChatRequestBody {
   conversationId: string;
@@ -117,13 +118,15 @@ export async function POST(request: NextRequest) {
       content: m.content,
     }));
 
-    // 7. Fetch enabled tools for this agent and execute the autonomous reasoning loop
+    // 7. Fetch enabled tools and compiled long-term memories for this agent
     const activeTools = await ToolRegistry.getActiveToolsForAgent(conversation.agentId, {
       workspaceId: workspace.id,
       userId: auth.userId,
       agentId: conversation.agentId,
       conversationId: conversation.id,
     });
+
+    const memories = await MemoryManager.getCompiledMemories(conversation.agentId);
 
     const runnerResult = await AgentRunner.executeTurn({
       agentVersion: {
@@ -137,6 +140,7 @@ export async function POST(request: NextRequest) {
       },
       history: modelHistory,
       activeTools,
+      memories,
     });
 
     // 8. Commit the assistant's final response to database
