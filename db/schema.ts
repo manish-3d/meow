@@ -634,6 +634,11 @@ export type FileRecord = typeof files.$inferSelect;
 export type NewFileRecord = typeof files.$inferInsert;
 
 export type DocumentChunk = typeof documentChunks.$inferSelect;
+export type NewDocumentChunk = typeof documentChunks.$inferInsert;
+
+export type BackgroundJob = typeof backgroundJobs.$inferSelect;
+export type NewBackgroundJob = typeof backgroundJobs.$inferInsert;
+
 // ─── RBAC: Roles, Permissions, Assignments ────────────────────────────────────────
 export const roles = pgTable(
   "roles",
@@ -739,3 +744,61 @@ export type UserRole = typeof userRoles.$inferSelect;
 export type NewUserRole = typeof userRoles.$inferInsert;
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type NewAuditLog = typeof auditLogs.$inferInsert;
+
+// ─── Workspace Plugins (Phase 8 - Plugin Marketplace) ────────────
+
+export const workspacePlugins = pgTable(
+  "workspace_plugins",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    pluginId: text("plugin_id").notNull(),
+    enabled: boolean("enabled").notNull().default(false),
+    config: jsonb("config")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    installedAt: timestamp("installed_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("workspace_plugins_workspace_id_idx").on(t.workspaceId),
+    pluginUnique: uniqueIndex("workspace_plugins_workspace_plugin_unique").on(
+      t.workspaceId,
+      t.pluginId,
+    ),
+  }),
+);
+
+export const pluginManifests = pgTable(
+  "plugin_manifests",
+  {
+    pluginId: text("plugin_id").primaryKey(),
+    name: text("name").notNull(),
+    description: text("description").notNull(),
+    version: text("version").notNull().default("1.0.0"),
+    category: text("category").notNull().default("productivity"),
+    manifest: jsonb("manifest")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    categoryIdx: index("plugin_manifests_category_idx").on(t.category),
+  }),
+);
+
+export type WorkspacePlugin = typeof workspacePlugins.$inferSelect;
+export type NewWorkspacePlugin = typeof workspacePlugins.$inferInsert;
+export type PluginManifest = typeof pluginManifests.$inferSelect;
+export type NewPluginManifest = typeof pluginManifests.$inferInsert;
+
