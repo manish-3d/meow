@@ -16,10 +16,6 @@ import { readFileTool, writeFileTool } from "./builtin/file-ops";
 import { executeCodeTool } from "./builtin/execute-code";
 import { searchKnowledgeTool } from "./builtin/search-knowledge";
 import { backgroundTaskTool } from "./builtin/background-task";
-import { readUrlTool } from "./builtin/read-url";
-import { readFileTool, writeFileTool } from "./builtin/file-ops";
-import { executeCodeTool } from "./builtin/execute-code";
-import { searchKnowledgeTool } from "./builtin/search-knowledge";
 
 export class ToolRegistry {
   private static registeredTools = new Map<string, RegisteredTool>();
