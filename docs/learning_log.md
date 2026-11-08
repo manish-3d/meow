@@ -170,6 +170,43 @@ A persistent record of software engineering concepts, design decisions, architec
 - **TypeScript Check**: `npx tsc --noEmit` passed with **0 errors**.
 - **Deliverable**: A complete, modern, multi-tenant UI dashboard allowing users to view workspaces, provision agents, edit system prompts with version history, toggle tool permissions, and chat with autonomous agents.
 
+---
+
+## Phase 5: Memory, Context Windows & Document Retrieval (RAG)
+
+### Module 5.1: Database Schema & Migration 0005 (`agent_memories`, `files`, `document_chunks`)
+- **Concepts Learned**: PostgreSQL `pgvector` C-extension, 1,536-dimensional vector columns, HNSW (Hierarchical Navigable Small World) graph indexing with `vector_cosine_ops`, ACID cascade deletion for vector records.
+- **Implementations**:
+  - `db/schema.ts`: Added `agentMemories`, `files`, and `documentChunks` tables with `vector(1536)` embedding column and HNSW index.
+  - `scripts/migrate-phase5.ts`: Migration 0005 applying extension, tables, constraints, and indexes to Neon PostgreSQL.
+
+### Module 5.2: Tier 2 Long-Term Agent Memory & Dynamic Prompt Injection
+- **Concepts Learned**: Cross-conversation user facts and preferences, in-memory deduplication, Layer 3 Prompt Compiler memory assembly (`[PREFERENCE]`, `[FACT]`, `[INSTRUCTION]`).
+- **Implementations**:
+  - `lib/memory/manager.ts`: Core `MemoryManager` class providing `addMemory`, `getMemoriesForAgent`, deduplication checks, and prompt compilation formatting.
+  - `app/api/agents/[id]/memories/route.ts`: Secure REST endpoints (`GET`, `POST`, `DELETE`) with multi-tenant RBAC validation.
+  - `app/api/chat/route.ts` & `app/api/chat/approve/route.ts`: Automatically injects stored agent memories into the active conversational ReAct turn.
+
+### Module 5.3: Tier 3 Recursive Text Chunker & Semantic Search Pipeline
+- **Concepts Learned**: Semantic document boundaries, Sliding-window overlap to prevent sentence fragmentation, Unit vector L2 normalization, Cosine Distance (`<=>`) in SQL.
+- **Implementations**:
+  - `lib/knowledge/chunker.ts`: Recursive character chunker splitting by Markdown headers, paragraphs, and punctuation with configurable chunk size and overlap.
+  - `lib/knowledge/embeddings.ts`: 1,536-dimensional vector generator connecting to OpenAI `text-embedding-3-small` with deterministic L2-normalized semantic vector fallback for offline testing.
+  - `lib/knowledge/retriever.ts`: Document ingestion pipeline and SQL cosine distance retriever (`ORDER BY embedding <=> query_vector ASC LIMIT K`).
+
+### Module 5.4: Autonomous RAG Tool (`search_knowledge`)
+- **Concepts Learned**: Autonomous capability delegation, Parameter validation via JSON Schema, Safe read tier classification.
+- **Implementations**:
+  - `lib/tools/builtin/search-knowledge.ts`: Native tool allowing autonomous agents to query workspace document chunks during chat turns.
+  - `lib/tools/registry.ts`: Registered `search_knowledge` tool into the central catalog.
+
+---
+
+## Phase 5 Completion Milestone
+- **Total Tests Passed in Phase 5**: **24 / 24 Tests Passed** ([`scripts/verify-phase5-memory.ts`](../scripts/verify-phase5-memory.ts))
+- **TypeScript Check**: `npx tsc --noEmit` passed with **0 errors**.
+- **Deliverable**: Full 3-tier memory engine (short-term conversation history, long-term cross-thread preferences, and enterprise pgvector RAG document search).
+
 
 
 
