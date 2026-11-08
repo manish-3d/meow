@@ -1,5 +1,6 @@
 
 import { sql } from "drizzle-orm";
+import { uuid } from "drizzle-orm/pg-core";
 import {
   boolean,
   check,
@@ -546,6 +547,32 @@ export const documentChunks = pgTable(
       table.embedding.op("vector_cosine_ops"),
     ),
   }),
+);
+
+// ─── Background Jobs Table – stores async tasks (Phase 6)
+export const backgroundJobs = pgTable(
+  "background_jobs",
+  {
+    id: uuid("id").primaryKey().default(sql`gen_random_uuid()`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    payload: jsonb("payload").$type<Record<string, unknown>>().notNull(),
+    cron: text("cron"),
+    nextRunAt: timestamp("next_run_at", { mode: "date" }),
+    status: text("status").notNull().default("pending"),
+    description: text("description"),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("background_jobs_workspace_id_idx").on(t.workspaceId),
+  })
 );
 
 // ─── Existing Posts Table ─────────────────────────────────────
