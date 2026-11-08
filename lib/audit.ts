@@ -1,7 +1,5 @@
 import { db } from "@/db";
 import { auditLogs } from "@/db/schema";
-import { sql } from "drizzle-orm";
-import type { Record } from "@/lib/types";
 
 /**
  * Helper to insert an audit log entry.
@@ -29,3 +27,4 @@ export async function logAction(params: {
     })
     .execute();
 }
+
