@@ -13,6 +13,7 @@ import { requireWorkspaceAccess } from "@/lib/auth/require-workspace-access";
 import { AgentRunner } from "@/lib/ai/runner";
 import { ModelMessage } from "@/lib/ai/types";
 import { ToolRegistry } from "@/lib/tools/registry";
+import { MemoryManager } from "@/lib/memory/manager";
 
 interface ApproveRequestBody {
   toolCallId: string;
@@ -200,6 +201,8 @@ export async function POST(request: NextRequest) {
       conversationId: conversation.id,
     });
 
+    const memories = await MemoryManager.getCompiledMemories(conversation.agentId);
+
     // 8. Resume agent reasoning loop
     const runnerResult = await AgentRunner.executeTurn({
       agentVersion: {
@@ -213,6 +216,7 @@ export async function POST(request: NextRequest) {
       },
       history: modelHistory,
       activeTools,
+      memories,
     });
 
     // 9. Commit the assistant's continuation response
