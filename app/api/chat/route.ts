@@ -14,6 +14,7 @@ import { AgentRunner } from "@/lib/ai/runner";
 import { ModelMessage } from "@/lib/ai/types";
 import { ToolRegistry } from "@/lib/tools/registry";
 import { MemoryManager } from "@/lib/memory/manager";
+import { TelemetryService } from "@/lib/observability/telemetry";
 
 interface ChatRequestBody {
   conversationId: string;
@@ -126,8 +127,18 @@ export async function POST(request: NextRequest) {
       conversationId: conversation.id,
     });
 
+    // 7. Check workspace budget quota before running turn
+    const quotaCheck = await TelemetryService.checkBudgetQuota(workspace.id);
+    if (!quotaCheck.allowed) {
+      return NextResponse.json(
+        { error: quotaCheck.reason ?? "Workspace token quota exceeded" },
+        { status: 429 },
+      );
+    }
+
     const memories = await MemoryManager.getCompiledMemories(conversation.agentId);
 
+    const turnStartTime = Date.now();
     const runnerResult = await AgentRunner.executeTurn({
       agentVersion: {
         model: agentVersion.model,
@@ -142,6 +153,7 @@ export async function POST(request: NextRequest) {
       activeTools,
       memories,
     });
+    const turnDurationMs = Date.now() - turnStartTime;
 
     // 8. Commit the assistant's final response to database
     const [assistantMessageRecord] = await db
@@ -154,11 +166,24 @@ export async function POST(request: NextRequest) {
           usage: runnerResult.totalUsage,
           steps: runnerResult.totalSteps,
           finishReason: runnerResult.finishReason,
+          durationMs: turnDurationMs,
         },
       })
       .returning();
 
-    // 9. Commit any tool calls that were executed during reasoning steps
+    // 9. Asynchronously record usage telemetry and costs
+    await TelemetryService.recordUsage({
+      workspaceId: workspace.id,
+      agentId: conversation.agentId,
+      conversationId: conversation.id,
+      model: agentVersion.model,
+      promptTokens: runnerResult.totalUsage.promptTokens,
+      completionTokens: runnerResult.totalUsage.completionTokens,
+      durationMs: turnDurationMs,
+      status: runnerResult.finishReason === "error" ? "error" : "success",
+    });
+
+    // 10. Commit any tool calls that were executed during reasoning steps
     for (const step of runnerResult.steps) {
       if (step.toolCalls && step.toolCalls.length > 0) {
         for (const tc of step.toolCalls) {
