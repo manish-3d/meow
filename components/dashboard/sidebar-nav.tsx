@@ -11,6 +11,7 @@ import {
   Sparkles,
   ExternalLink,
   Package,
+  Activity,
 } from "lucide-react";
 
 interface NavItem {
@@ -45,6 +46,12 @@ const navItems: NavItem[] = [
     href: "/plugins",
     icon: Package,
     badge: "Phase 8",
+  },
+  {
+    title: "Observability",
+    href: "/observability",
+    icon: Activity,
+    badge: "Phase 10",
   },
   {
     title: "Settings",
