@@ -7,6 +7,7 @@ import {
   index,
   integer,
   jsonb,
+  numeric,
   pgTable,
   primaryKey,
   serial,
@@ -801,4 +802,59 @@ export type WorkspacePlugin = typeof workspacePlugins.$inferSelect;
 export type NewWorkspacePlugin = typeof workspacePlugins.$inferInsert;
 export type PluginManifest = typeof pluginManifests.$inferSelect;
 export type NewPluginManifest = typeof pluginManifests.$inferInsert;
+
+// ─── Usage, Metering & Observability (Phase 10) ──────────────────
+
+export const usageRecords = pgTable(
+  "usage_records",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    agentId: text("agent_id").references(() => agents.id, { onDelete: "set null" }),
+    conversationId: text("conversation_id").references(() => conversations.id, { onDelete: "set null" }),
+    model: text("model").notNull(),
+    promptTokens: integer("prompt_tokens").notNull(),
+    completionTokens: integer("completion_tokens").notNull(),
+    totalTokens: integer("total_tokens").notNull(),
+    estimatedCostUsd: numeric("estimated_cost_usd", { precision: 10, scale: 6 }).notNull(),
+    durationMs: integer("duration_ms").notNull().default(0),
+    status: text("status").notNull().default("success"),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("usage_records_workspace_id_idx").on(t.workspaceId),
+    agentIdx: index("usage_records_agent_id_idx").on(t.agentId),
+    createdAtIdx: index("usage_records_created_at_idx").on(t.createdAt),
+  }),
+);
+
+export const workspaceLimits = pgTable(
+  "workspace_limits",
+  {
+    workspaceId: text("workspace_id")
+      .primaryKey()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    monthlyTokenBudget: integer("monthly_token_budget").notNull().default(2000000),
+    monthlySpendLimitUsd: numeric("monthly_spend_limit_usd", { precision: 10, scale: 2 })
+      .notNull()
+      .default("50.00"),
+    currentMonthTokens: integer("current_month_tokens").notNull().default(0),
+    currentMonthSpendUsd: numeric("current_month_spend_usd", { precision: 10, scale: 6 })
+      .notNull()
+      .default("0.000000"),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+);
+
+export type UsageRecord = typeof usageRecords.$inferSelect;
+export type NewUsageRecord = typeof usageRecords.$inferInsert;
+export type WorkspaceLimit = typeof workspaceLimits.$inferSelect;
+export type NewWorkspaceLimit = typeof workspaceLimits.$inferInsert;
+
 
