@@ -159,11 +159,11 @@ async function run() {
 
     const overBudget = await TelemetryService.checkBudgetQuota(workspaceA.id);
     assert(overBudget.allowed === false, "Enforced block when spend limit is exceeded");
-    assert(overBudget.reason?.includes("Monthly spend limit"), "Returned explicit budget violation reason");
+    assert(Boolean(overBudget.reason?.includes("Monthly spend limit")), "Returned explicit budget violation reason");
 
     // Suite 6: Structured Logging Verification
     console.log("\nSuite 6: Structured Telemetry Output");
-    let logged = false;
+    let logged: boolean = false;
     const originalLog = console.log;
     console.log = (msg: string) => {
       try {
@@ -177,7 +177,7 @@ async function run() {
 
     TelemetryService.emitStructuredLog({ event: "unit_test_event", test: true });
     console.log = originalLog;
-    assert(logged === true, "Emitted valid JSON structured telemetry log");
+    assert(logged, "Emitted valid JSON structured telemetry log");
 
     console.log(`\nResults: ${passed} passed, ${failed} failed`);
     if (failed > 0) process.exit(1);
