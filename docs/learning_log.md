@@ -241,6 +241,19 @@ A persistent record of software engineering concepts, design decisions, architec
   - `components/dashboard/sidebar-nav.tsx`: Added Plugins navigation entry in persistent sidebar.
 - **Verification**: `scripts/verify-phase8-plugins.ts` passed **16 / 16 tests**.
 
+---
+
+## Phase 10: Production Hardening, Metering & Observability
+- **Concepts Learned**: Real-time token metering, per-model inference pricing matrices ($/1M tokens), atomic workspace spend budgets, automated quota violation enforcement, latency telemetry, and structured JSON logs.
+- **Implementations**:
+  - `db/schema.ts` & `scripts/migrate-phase10.ts`: Added `usage_records` and `workspace_limits` tables with indexes on `workspace_id`, `agent_id`, and `created_at`.
+  - `lib/observability/telemetry.ts`: `TelemetryService` with `recordUsage`, `checkBudgetQuota`, `getWorkspaceTelemetry`, and `emitStructuredLog`.
+  - `app/api/chat/route.ts`: Integrated quota verification before turn execution and asynchronous usage/cost recording with wall-clock latency measurement.
+  - `app/api/workspaces/[id]/observability/route.ts`: REST endpoint delivering workspace summaries and recent execution traces.
+  - `app/(dashboard)/observability/page.tsx`: Production Observability Dashboard with token/spend cards, quota progress bar, model breakdown, agent leaderboard, and live trace inspection table.
+  - `components/dashboard/sidebar-nav.tsx`: Added Observability navigation item in persistent sidebar.
+- **Verification**: `scripts/verify-phase10-observability.ts` passed **20 / 20 tests**.
+
 
 
 
