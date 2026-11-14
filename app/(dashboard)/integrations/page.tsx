@@ -313,30 +313,22 @@ export default function IntegrationsPage() {
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </>
-              ) : item.provider === "github" ? (
+              ) : (
                 <div className="flex flex-col gap-2 w-full">
                   <button
-                    onClick={() => signIn("github", { callbackUrl: "/integrations" })}
-                    className="w-full py-2.5 px-4 rounded-xl bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-2"
+                    onClick={() => signIn(item.provider, { callbackUrl: "/integrations" })}
+                    className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-2"
                   >
-                    <Github className="h-4 w-4" />
-                    1-Click Connect (OAuth)
+                    <Plus className="h-3.5 w-3.5" />
+                    1-Click Connect with {item.name} (OAuth)
                   </button>
                   <button
                     onClick={() => openConnectModal(item)}
                     className="w-full py-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors text-center"
                   >
-                    Or configure Personal Access Token
+                    Or enter Custom API Keys / Tokens
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => openConnectModal(item)}
-                  className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold shadow-xs transition-colors flex items-center justify-center gap-2"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  Connect {item.name}
-                </button>
               )}
             </div>
           </div>

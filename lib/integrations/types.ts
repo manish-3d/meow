@@ -193,5 +193,26 @@ export const SUPPORTED_INTEGRATIONS: Record<IntegrationProvider, IntegrationMani
       "linkedin_get_profile (Read - Profile data)",
     ],
   },
+  google: {
+    provider: "google",
+    name: "Google Workspace & Gmail",
+    category: "productivity",
+    description: "Search inbox, inspect message threads, and draft/send emails via Gmail API.",
+    icon: "Mail",
+    fields: [
+      {
+        key: "accessToken",
+        label: "OAuth Access Token",
+        placeholder: "ya29...",
+        type: "password",
+        required: true,
+      },
+    ],
+    capabilities: [
+      "gmail_search_emails (Read - Search inbox by query)",
+      "gmail_read_thread (Read - Read message body)",
+      "gmail_send_email (Write - Requires Approval)",
+    ],
+  },
 };
 

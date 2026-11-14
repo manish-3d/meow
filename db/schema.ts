@@ -938,7 +938,7 @@ export type NewWorkspaceSettings = typeof workspaceSettings.$inferInsert;
 
 // ─── Workspace Integrations (Social Media & Dev Platforms) ────
 
-export type IntegrationProvider = "twitter" | "instagram" | "reddit" | "github" | "linkedin";
+export type IntegrationProvider = "twitter" | "instagram" | "reddit" | "github" | "linkedin" | "google";
 
 export const workspaceIntegrations = pgTable(
   "workspace_integrations",

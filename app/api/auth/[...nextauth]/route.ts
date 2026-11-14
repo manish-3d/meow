@@ -1,6 +1,9 @@
 import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
+import TwitterProvider from "next-auth/providers/twitter";
+import RedditProvider from "next-auth/providers/reddit";
+import InstagramProvider from "next-auth/providers/instagram";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 
 import { db } from "@/db";
@@ -40,6 +43,30 @@ export const authOptions: AuthOptions = {
           prompt: "consent",
         },
       },
+    }),
+    TwitterProvider({
+      clientId: process.env.TWITTER_CLIENT_ID || "placeholder-id",
+      clientSecret: process.env.TWITTER_CLIENT_SECRET || "placeholder-secret",
+      version: "2.0",
+      authorization: {
+        params: {
+          scope: "users.read tweet.read tweet.write offline.access",
+        },
+      },
+    }),
+    RedditProvider({
+      clientId: process.env.REDDIT_CLIENT_ID || "placeholder-id",
+      clientSecret: process.env.REDDIT_CLIENT_SECRET || "placeholder-secret",
+      authorization: {
+        params: {
+          duration: "permanent",
+          scope: "identity submit read mysubreddits",
+        },
+      },
+    }),
+    InstagramProvider({
+      clientId: process.env.INSTAGRAM_CLIENT_ID || "placeholder-id",
+      clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || "placeholder-secret",
     }),
   ],
   pages: {
