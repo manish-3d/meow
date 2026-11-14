@@ -63,7 +63,10 @@ export default function ObservabilityPage() {
       const wsRes = await fetch("/api/workspaces");
       if (!wsRes.ok) throw new Error("Failed to load workspace");
       const wsData = await wsRes.json();
-      const primaryWsId = wsData.workspaces?.[0]?.id;
+      const primaryWsId =
+        wsData.activeWorkspace?.id ||
+        wsData.workspaces?.[0]?.id ||
+        wsData.workspaces?.[0]?.workspaceId;
 
       if (!primaryWsId) {
         throw new Error("No active workspace found");
@@ -97,9 +100,9 @@ export default function ObservabilityPage() {
       <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-r from-card via-card to-primary/5 p-8 shadow-xs">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
               <Activity className="h-3.5 w-3.5" />
-              <span>Phase 10 Production Telemetry</span>
+              <span>Live Agent Telemetry</span>
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight">
               Observability & Cost Metering

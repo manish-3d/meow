@@ -62,7 +62,10 @@ export default function PluginsPage() {
       const wsRes = await fetch("/api/workspaces");
       if (wsRes.ok) {
         const wsData = await wsRes.json();
-        const primaryWs = wsData.workspaces?.[0]?.id;
+        const primaryWs =
+          wsData.activeWorkspace?.id ||
+          wsData.workspaces?.[0]?.id ||
+          wsData.workspaces?.[0]?.workspaceId;
         if (primaryWs) {
           setCurrentWorkspaceId(primaryWs);
           // Fetch installed plugins for primary workspace

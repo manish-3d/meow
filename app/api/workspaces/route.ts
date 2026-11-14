@@ -27,6 +27,7 @@ export async function GET() {
     // Query all workspaces where user is owner or member
     const memberships = await db
       .select({
+        id: workspaces.id,
         workspaceId: workspaceMembers.workspaceId,
         role: workspaceMembers.role,
         workspaceName: workspaces.name,
