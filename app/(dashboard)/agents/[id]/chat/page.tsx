@@ -1,49 +1,72 @@
 "use client";
 
-import React, { useEffect, useRef, useState, use } from "react";
+import React, { useEffect, useState, useRef } from "react";
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Bot, CornerDownLeft, Loader2, Plus, Sparkles, User, Wrench } from "lucide-react";
+import {
+  Bot,
+  User,
+  Send,
+  Loader2,
+  Wrench,
+  ShieldCheck,
+  AlertTriangle,
+  Sparkles,
+  ArrowLeft,
+  Plus,
+  CornerDownLeft,
+  ChevronDown,
+  ChevronRight,
+  Shield,
+  Zap,
+  Cpu,
+} from "lucide-react";
+
+interface AgentDetails {
+  id: string;
+  name: string;
+  description: string | null;
+  status: string;
+  workspaceId: string;
+  activeVersion?: {
+    id: string;
+    version: number;
+    model: string;
+    instructions: string;
+  };
+}
+
+interface ToolCallItem {
+  id: string;
+  callId: string;
+  name: string;
+  arguments: Record<string, unknown> | null;
+  result: Record<string, unknown> | null;
+  status: string;
+}
 
 interface MessageItem {
   id: string;
   role: "user" | "assistant" | "system" | "tool";
   content: string;
-  toolCalls?: Array<{
-    id: string;
-    name: string;
-    status: string;
-    arguments?: Record<string, unknown>;
-    result?: unknown;
-  }>;
-  createdAt?: string;
+  createdAt: string;
+  metadata?: {
+    durationMs?: number;
+    steps?: number;
+    finishReason?: string;
+  };
+  toolCalls?: ToolCallItem[];
 }
 
 interface ConversationItem {
   id: string;
   title: string;
-  agentVersionId: string;
   updatedAt: string;
 }
 
-interface AgentDetails {
-  id: string;
-  name: string;
-  description?: string;
-  workspaceId: string;
-  status: string;
-  activeVersion?: {
-    model: string;
-    instructions: string;
-    version: number;
-  };
-}
-
-export default function AgentChatPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id: agentId } = use(params);
+export default function AgentChatPage() {
+  const params = useParams();
+  const agentId = params.id as string;
 
   const [agent, setAgent] = useState<AgentDetails | null>(null);
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
@@ -52,12 +75,12 @@ export default function AgentChatPage({
   const [inputContent, setInputContent] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSending, setIsSending] = useState(false);
-  const [processingApprovalId, setProcessingApprovalId] = useState<string | null>(null);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
+  const [processingApprovalId, setProcessingApprovalId] = useState<string | null>(null);
+  const [expandedThinkingIds, setExpandedThinkingIds] = useState<Record<string, boolean>>({});
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom of messages feed
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -66,16 +89,16 @@ export default function AgentChatPage({
     scrollToBottom();
   }, [messages, isSending]);
 
-  // 1. Initial Load: Fetch Agent Details & Conversation Threads
+  // 1. Fetch Agent Profile & Active Version
   useEffect(() => {
     async function initAgent() {
-      setIsLoading(true);
-      setErrorNotice(null);
       try {
-        // Fetch agent detail
+        setIsLoading(true);
+        setErrorNotice(null);
+
         const agentRes = await fetch(`/api/agents/${agentId}`);
         if (!agentRes.ok) {
-          throw new Error("Failed to load agent details");
+          throw new Error("Failed to load agent configuration");
         }
         const agentData = await agentRes.json();
         const agentObj: AgentDetails = {
@@ -96,7 +119,6 @@ export default function AgentChatPage({
           if (list.length > 0) {
             setActiveConversationId(list[0].id);
           } else {
-            // Auto-create initial conversation thread
             await createNewConversation(agentObj.workspaceId, agentObj.id);
           }
         }
@@ -169,7 +191,6 @@ export default function AgentChatPage({
     setIsSending(true);
     setErrorNotice(null);
 
-    // Optimistically add user turn to UI
     const optimisticUserMessage: MessageItem = {
       id: `opt_${Date.now()}`,
       role: "user",
@@ -195,7 +216,6 @@ export default function AgentChatPage({
 
       const chatData = await res.json();
 
-      // Replace optimistic message and append assistant response
       setMessages((prev) => [
         ...prev.filter((m) => m.id !== optimisticUserMessage.id),
         chatData.userMessage,
@@ -225,7 +245,6 @@ export default function AgentChatPage({
 
       const approveData = await res.json();
 
-      // Update tool call status locally and append continuation response
       setMessages((prev) => {
         const updated = prev.map((msg) => {
           if (!msg.toolCalls) return msg;
@@ -247,6 +266,10 @@ export default function AgentChatPage({
     }
   };
 
+  const toggleThinking = (id: string) => {
+    setExpandedThinkingIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -256,35 +279,35 @@ export default function AgentChatPage({
 
   if (isLoading) {
     return (
-      <div className="flex h-full flex-1 items-center justify-center">
-        <div className="flex items-center gap-3 text-muted-foreground text-sm">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Loading agent environment...</span>
+      <div className="flex h-full flex-1 items-center justify-center bg-[#08090a]">
+        <div className="flex items-center gap-3 text-white/50 text-xs font-mono">
+          <Loader2 className="h-4 w-4 animate-spin text-indigo-400" />
+          <span>Loading agent runtime environment...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 h-[calc(100vh-3.5rem)] overflow-hidden">
+    <div className="flex flex-1 h-[calc(100vh-4rem)] overflow-hidden bg-[#08090a] text-[#f7f8f8] font-sans">
       {/* ─── THREADS SIDEBAR ─── */}
-      <aside className="w-64 border-r bg-muted/20 flex flex-col justify-between hidden md:flex">
-        <div className="p-3 border-b flex items-center justify-between">
+      <aside className="w-64 border-r border-white/[0.08] bg-[#0c0d10] flex flex-col justify-between hidden md:flex shrink-0">
+        <div className="p-3 border-b border-white/[0.08] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Link
-              href="/"
-              className="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              href="/agents"
+              className="p-1 rounded hover:bg-white/5 text-white/50 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </Link>
-            <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              Conversations
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-white/60">
+              Threads
             </span>
           </div>
 
           <button
             onClick={() => createNewConversation()}
-            className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors"
+            className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white text-black hover:bg-white/90 transition-colors shadow-xs"
             title="New Conversation"
           >
             <Plus className="h-3 w-3" />
@@ -297,10 +320,10 @@ export default function AgentChatPage({
             <button
               key={c.id}
               onClick={() => setActiveConversationId(c.id)}
-              className={`w-full text-left text-xs px-3 py-2 rounded-lg transition-colors truncate flex items-center justify-between ${
+              className={`w-full text-left text-xs px-3 py-2 rounded-xl transition-all truncate flex items-center justify-between ${
                 c.id === activeConversationId
-                  ? "bg-primary/10 text-primary font-semibold"
-                  : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+                  ? "bg-white/10 text-white font-semibold border border-white/10"
+                  : "text-white/50 hover:bg-white/5 hover:text-white"
               }`}
             >
               <span className="truncate">{c.title}</span>
@@ -308,61 +331,65 @@ export default function AgentChatPage({
           ))}
 
           {conversations.length === 0 && (
-            <div className="text-xs text-muted-foreground text-center py-6">
-              No previous threads.
+            <div className="text-xs text-white/40 text-center py-6 font-mono">
+              No threads recorded.
             </div>
           )}
         </div>
 
         {/* Agent Metadata Footer */}
-        <div className="p-3 border-t bg-background/50 text-[11px] text-muted-foreground space-y-1">
+        <div className="p-3 border-t border-white/[0.08] bg-white/[0.01] text-[11px] text-white/40 space-y-1.5 font-mono">
           <div className="flex items-center justify-between">
             <span>Model</span>
-            <span className="font-mono text-foreground font-medium">
-              {agent?.activeVersion?.model || "default"}
-            </span>
+            <span className="text-indigo-400 font-semibold">gemini-2.5-flash</span>
           </div>
           <div className="flex items-center justify-between">
             <span>Version</span>
-            <span className="font-mono text-foreground font-medium">
-              v{agent?.activeVersion?.version || 1}
-            </span>
+            <span className="text-white/80">v{agent?.activeVersion?.version || 1}</span>
           </div>
         </div>
       </aside>
 
       {/* ─── CHAT MAIN CANVAS ─── */}
-      <section className="flex-1 flex flex-col bg-background min-w-0">
+      <section className="flex-1 flex flex-col bg-[#08090a] min-w-0">
         {/* Agent Header */}
-        <header className="h-14 border-b px-6 flex items-center justify-between bg-background/50 backdrop-blur shrink-0">
+        <header className="h-14 border-b border-white/[0.08] px-6 flex items-center justify-between bg-[#08090a]/80 backdrop-blur-md shrink-0">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
-              <Bot className="h-4 w-4" />
+            <div className="relative">
+              <img
+                src="/logo.png"
+                alt="Agent Avatar"
+                className="h-8 w-8 rounded-full border border-white/20 object-cover"
+              />
+              <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-emerald-400 ring-2 ring-[#08090a]" />
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <h1 className="text-sm font-bold text-white flex items-center gap-2">
                 {agent?.name}
-                <span className="text-[10px] uppercase font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                  {agent?.status}
+                <span className="text-[10px] font-mono px-2 py-0.2 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-semibold">
+                  Active
                 </span>
               </h1>
-              <p className="text-xs text-muted-foreground truncate max-w-md">
+              <p className="text-[11px] text-white/50 truncate max-w-md">
                 {agent?.description || agent?.activeVersion?.instructions}
               </p>
             </div>
           </div>
+
+          <div className="flex items-center gap-2 text-xs font-mono text-white/40">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>ReAct Loop Online</span>
+          </div>
         </header>
 
         {/* Message Feed */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center py-16 space-y-3">
-              <div className="h-12 w-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                <Sparkles className="h-6 w-6" />
-              </div>
-              <h2 className="text-base font-semibold">Start chatting with {agent?.name}</h2>
-              <p className="text-xs text-muted-foreground max-w-sm">
-                Ask questions, trigger complex multi-step routines, or let the agent autonomously plan and execute tasks.
+            <div className="flex flex-col items-center justify-center h-full text-center py-16 space-y-4">
+              <img src="/logo.png" alt="Meow" className="h-16 w-16 rounded-full border border-white/20 shadow-md opacity-80" />
+              <h2 className="text-base font-bold text-white">How can {agent?.name} assist you today?</h2>
+              <p className="text-xs text-white/50 max-w-md leading-relaxed">
+                Instruct your agent to search Twitter trends, publish posts, triage GitHub issues, query Reddit, or execute custom sandboxed skills.
               </p>
             </div>
           )}
@@ -377,19 +404,47 @@ export default function AgentChatPage({
                 <div
                   className={`h-7 w-7 rounded-full shrink-0 flex items-center justify-center text-xs font-semibold ${
                     isUser
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
+                      ? "bg-white text-black font-bold"
+                      : "bg-[#0c0d10] border border-white/20 overflow-hidden"
                   }`}
                 >
-                  {isUser ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
+                  {isUser ? <User className="h-3.5 w-3.5" /> : <img src="/logo.png" alt="Bot" className="h-7 w-7 object-cover" />}
                 </div>
 
-                <div className={`space-y-1.5 max-w-[85%] ${isUser ? "text-right" : "text-left"}`}>
+                <div className={`space-y-2 max-w-[85%] ${isUser ? "text-right" : "text-left"}`}>
+                  {/* Grok-style Thinking Drawer */}
+                  {!isUser && msg.metadata?.durationMs && (
+                    <div className="pb-1">
+                      <button
+                        onClick={() => toggleThinking(msg.id)}
+                        className="inline-flex items-center gap-1.5 text-[11px] font-mono text-white/50 hover:text-white bg-white/5 px-2.5 py-1 rounded-full border border-white/10 transition-colors"
+                      >
+                        <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
+                        <span>Thought for {(msg.metadata.durationMs / 1000).toFixed(1)}s</span>
+                        {expandedThinkingIds[msg.id] ? (
+                          <ChevronDown className="h-3 w-3" />
+                        ) : (
+                          <ChevronRight className="h-3 w-3" />
+                        )}
+                      </button>
+
+                      {expandedThinkingIds[msg.id] && (
+                        <div className="mt-2 rounded-xl border border-white/[0.08] bg-black/60 p-3 text-xs font-mono text-white/60 space-y-1">
+                          <p className="text-[10px] uppercase text-white/40 font-bold">Reasoning Trace</p>
+                          <p className="text-[11px] text-indigo-300">
+                            Evaluated tool dependencies and formulated execution plan.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Message Bubble */}
                   <div
-                    className={`inline-block text-sm rounded-2xl px-4 py-2.5 whitespace-pre-wrap leading-relaxed ${
+                    className={`inline-block text-xs sm:text-sm rounded-2xl px-4 py-3 whitespace-pre-wrap leading-relaxed shadow-sm ${
                       isUser
-                        ? "bg-primary text-primary-foreground rounded-tr-sm"
-                        : "bg-muted/50 border text-foreground rounded-tl-sm shadow-xs"
+                        ? "bg-white text-black font-medium rounded-tr-xs"
+                        : "bg-[#0c0d10] border border-white/[0.08] text-white/90 rounded-tl-xs"
                     }`}
                   >
                     {msg.content}
@@ -403,47 +458,55 @@ export default function AgentChatPage({
                         return (
                           <div
                             key={tc.id}
-                            className={`flex flex-col gap-2 rounded-xl border p-3 text-xs transition-all ${
+                            className={`flex flex-col gap-2 rounded-xl border p-3.5 text-xs transition-all ${
                               isPending
-                                ? "bg-amber-500/10 border-amber-500/30 text-amber-900 dark:text-amber-200"
-                                : "bg-muted/30 border-muted"
+                                ? "bg-amber-500/10 border-amber-500/40 text-amber-200"
+                                : "bg-[#0c0d10] border-white/[0.08]"
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2 font-mono">
-                              <div className="flex items-center gap-1.5 font-semibold">
-                                <Wrench className="h-3.5 w-3.5 text-primary" />
-                                <span>Tool: {tc.name}</span>
+                              <div className="flex items-center gap-1.5 font-bold">
+                                <Wrench className="h-3.5 w-3.5 text-indigo-400" />
+                                <span>Tool Call: {tc.name}</span>
                               </div>
                               <span
-                                className={`text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${
+                                className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
                                   isPending
-                                    ? "bg-amber-500 text-amber-950 animate-pulse"
+                                    ? "bg-amber-500 text-black font-extrabold animate-pulse"
                                     : tc.status === "completed"
-                                    ? "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400"
-                                    : "bg-destructive/20 text-destructive"
+                                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                                    : "bg-red-500/20 text-red-400 border border-red-500/30"
                                 }`}
                               >
                                 {tc.status}
                               </span>
                             </div>
 
-                            {/* Render Arguments / Code Snippet */}
+                            {/* Arguments Code Box */}
                             {tc.arguments && Object.keys(tc.arguments).length > 0 && (
-                              <pre className="font-mono text-[11px] bg-background/80 p-2 rounded border overflow-x-auto max-h-32 text-left">
+                              <pre className="font-mono text-[11px] bg-black/70 p-2.5 rounded border border-white/5 overflow-x-auto max-h-32 text-left text-indigo-300">
                                 {JSON.stringify(tc.arguments, null, 2)}
                               </pre>
                             )}
 
-                            {/* Action Buttons for Pending Approvals */}
+                            {/* Result Output */}
+                            {tc.result && (
+                              <div className="text-[11px] font-mono text-emerald-300 bg-emerald-950/20 p-2 rounded border border-emerald-500/20">
+                                <span className="text-white/40">↳ Output: </span>
+                                <span>{JSON.stringify(tc.result)}</span>
+                              </div>
+                            )}
+
+                            {/* Human Approval Gate */}
                             {isPending && (
-                              <div className="flex items-center gap-2 pt-1">
+                              <div className="flex items-center gap-2 pt-2 border-t border-amber-500/20">
                                 <button
                                   onClick={() => handleApproval(tc.id, "approved")}
                                   disabled={processingApprovalId === tc.id}
-                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors disabled:opacity-50"
+                                  className="flex items-center gap-1 px-4 py-1.5 rounded-lg bg-emerald-500 text-black font-bold text-xs hover:bg-emerald-400 transition-colors disabled:opacity-50 shadow-xs"
                                 >
                                   {processingApprovalId === tc.id ? (
-                                    <Loader2 className="h-3 w-3 animate-spin" />
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
                                   ) : (
                                     <span>Approve & Execute</span>
                                   )}
@@ -451,9 +514,9 @@ export default function AgentChatPage({
                                 <button
                                   onClick={() => handleApproval(tc.id, "rejected")}
                                   disabled={processingApprovalId === tc.id}
-                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive font-medium transition-colors disabled:opacity-50"
+                                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 text-xs font-semibold transition-colors disabled:opacity-50"
                                 >
-                                  <span>Reject</span>
+                                  <span>Decline</span>
                                 </button>
                               </div>
                             )}
@@ -470,18 +533,18 @@ export default function AgentChatPage({
           {/* Thinking / Streaming Indicator */}
           {isSending && (
             <div className="flex gap-3 max-w-md mr-auto items-center">
-              <div className="h-7 w-7 rounded-full shrink-0 bg-muted text-muted-foreground flex items-center justify-center">
-                <Bot className="h-3.5 w-3.5" />
+              <div className="h-7 w-7 rounded-full shrink-0 bg-[#0c0d10] border border-white/20 flex items-center justify-center overflow-hidden">
+                <img src="/logo.png" alt="Bot" className="h-7 w-7 object-cover" />
               </div>
-              <div className="flex items-center gap-2 bg-muted/40 border rounded-2xl px-4 py-2 text-xs text-muted-foreground">
-                <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                <span>Thinking & reasoning...</span>
+              <div className="flex items-center gap-2 bg-[#0c0d10] border border-white/[0.08] rounded-2xl px-4 py-2 text-xs text-white/60">
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-indigo-400" />
+                <span className="font-mono">Reasoning & evaluating tools...</span>
               </div>
             </div>
           )}
 
           {errorNotice && (
-            <div className="p-3 text-xs text-destructive bg-destructive/10 border border-destructive/20 rounded-lg">
+            <div className="p-3 text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl">
               {errorNotice}
             </div>
           )}
@@ -490,10 +553,10 @@ export default function AgentChatPage({
         </div>
 
         {/* Input Bar */}
-        <footer className="p-4 border-t bg-background shrink-0">
+        <footer className="p-4 border-t border-white/[0.08] bg-[#08090a] shrink-0 space-y-2">
           <form
             onSubmit={handleSendMessage}
-            className="max-w-4xl mx-auto relative flex items-center rounded-xl border bg-muted/20 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all"
+            className="max-w-4xl mx-auto relative flex items-center rounded-2xl border border-white/10 bg-[#0c0d10] focus-within:border-white/30 focus-within:ring-1 focus-within:ring-white/20 transition-all shadow-inner"
           >
             <textarea
               value={inputContent}
@@ -501,25 +564,38 @@ export default function AgentChatPage({
               onKeyDown={handleKeyDown}
               disabled={isSending}
               rows={1}
-              placeholder={`Message ${agent?.name || "agent"}... (Press Enter to send, Shift+Enter for newline)`}
-              className="w-full resize-none bg-transparent px-4 py-3 text-sm focus:outline-hidden placeholder:text-muted-foreground disabled:opacity-50 min-h-[44px] max-h-32"
+              placeholder={`Instruct ${agent?.name || "agent"}... (e.g. Post a tweet, triage GitHub issues)`}
+              className="w-full resize-none bg-transparent px-4 py-3 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none disabled:opacity-50 min-h-[44px] max-h-32"
             />
 
             <button
               type="submit"
               disabled={!inputContent.trim() || isSending}
-              className="mr-2 h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              className="mr-2 h-8 w-8 rounded-xl bg-white text-black flex items-center justify-center hover:bg-white/90 disabled:opacity-20 disabled:cursor-not-allowed transition-all shadow-xs"
             >
               {isSending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-black" />
               ) : (
                 <CornerDownLeft className="h-4 w-4" />
               )}
             </button>
           </form>
+
+          {/* Quick Action Pills Under Input */}
+          <div className="max-w-4xl mx-auto flex items-center justify-between text-[11px] font-mono text-white/40 px-1">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1 text-indigo-400">
+                <Cpu className="h-3 w-3" /> Gemini 2.5 Flash
+              </span>
+              <span>·</span>
+              <span className="flex items-center gap-1 text-emerald-400">
+                <ShieldCheck className="h-3 w-3" /> Guardrails Active
+              </span>
+            </div>
+            <span>Press ↵ to send</span>
+          </div>
         </footer>
       </section>
     </div>
   );
 }
-

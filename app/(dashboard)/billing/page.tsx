@@ -15,6 +15,10 @@ import {
   RefreshCw,
   Cpu,
   TrendingUp,
+  Download,
+  Building,
+  Lock,
+  ExternalLink,
 } from "lucide-react";
 import { SUBSCRIPTION_PLANS } from "@/lib/billing/plans";
 import { type SubscriptionPlan } from "@/db/schema";
@@ -59,6 +63,7 @@ export default function BillingPage() {
   const [billing, setBilling] = useState<BillingData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [notification, setNotification] = useState<{
     type: "success" | "error";
     message: string;
@@ -70,18 +75,19 @@ export default function BillingPage() {
       setIsLoading(true);
       setNotification(null);
 
-      // 1. Get current workspace
       const wsRes = await fetch("/api/workspaces");
       if (!wsRes.ok) throw new Error("Failed to load workspace");
       const wsData = await wsRes.json();
-      const wsId = wsData.activeWorkspace?.id || wsData.workspaces?.[0]?.workspaceId || wsData.workspaces?.[0]?.id;
+      const wsId =
+        wsData.activeWorkspace?.id ||
+        wsData.workspaces?.[0]?.workspaceId ||
+        wsData.workspaces?.[0]?.id;
 
       if (!wsId) {
         throw new Error("No active workspace found");
       }
       setWorkspaceId(wsId);
 
-      // 2. Get billing overview
       const billRes = await fetch(`/api/workspaces/${wsId}/billing`);
       if (!billRes.ok) {
         const errJson = await billRes.json();
@@ -102,54 +108,85 @@ export default function BillingPage() {
     fetchBilling();
   }, []);
 
-  const handlePlanChange = async (newPlan: SubscriptionPlan) => {
+  const handleStripeCheckout = async (targetPlan: "pro" | "enterprise") => {
     if (!workspaceId) return;
-    if (billing?.subscription.plan === newPlan) return;
 
     try {
-      setIsUpdating(newPlan);
+      setIsUpdating(targetPlan);
       setNotification(null);
 
-      const res = await fetch(`/api/workspaces/${workspaceId}/billing`, {
+      const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: newPlan }),
+        body: JSON.stringify({
+          workspaceId,
+          plan: targetPlan,
+          billingCycle,
+        }),
       });
 
-      const json = await res.json();
+      const data = await res.json();
       if (!res.ok) {
-        throw new Error(json.error || "Failed to change plan");
+        throw new Error(data.error || "Failed to initiate Stripe Checkout");
       }
 
-      setBilling(json.billing);
-      setNotification({
-        type: "success",
-        message: `Subscription successfully updated to ${SUBSCRIPTION_PLANS[newPlan].name}! Your token limits have been synced.`,
-      });
+      if (data.isSandbox) {
+        setNotification({
+          type: "success",
+          message: `Stripe Checkout completed (Sandbox Mode)! Upgraded to ${
+            targetPlan === "enterprise" ? "Enterprise" : "Pro"
+          } with instant token limit activation.`,
+        });
+        await fetchBilling();
+      } else if (data.url) {
+        window.location.href = data.url;
+      }
     } catch (err: unknown) {
-      console.error("Plan upgrade error:", err);
-      const msg = err instanceof Error ? err.message : "Failed to update plan";
+      console.error("Stripe checkout error:", err);
+      const msg = err instanceof Error ? err.message : "Checkout failed";
       setNotification({ type: "error", message: msg });
     } finally {
       setIsUpdating(null);
     }
   };
 
+  const handleOpenPortal = async () => {
+    if (!workspaceId) return;
+    try {
+      setIsLoading(true);
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Portal error:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const currentPlan = billing?.subscription.plan || "free";
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
+    <div className="p-8 max-w-7xl mx-auto space-y-8 text-[#f7f8f8]">
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-r from-card via-card to-primary/5 p-8 shadow-xs">
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-8 shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-              <CreditCard className="h-3.5 w-3.5" />
-              <span>Subscription & Billing Management</span>
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1 text-xs font-mono text-white/70">
+              <CreditCard className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Stripe Payments & Subscription Center</span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">Billing & Plans</h1>
-            <p className="text-muted-foreground text-sm">
-              Manage your Meow agent runtime subscription, monitor monthly token quotas, and inspect invoice receipts.
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
+              Billing & Quotas
+            </h1>
+            <p className="text-sm text-white/60 leading-relaxed">
+              Manage your Meow agent runtime tier, monitor real-time token execution budgets, and inspect Stripe invoices.
             </p>
           </div>
 
@@ -157,26 +194,26 @@ export default function BillingPage() {
             <button
               onClick={fetchBilling}
               disabled={isLoading}
-              className="inline-flex items-center gap-2 rounded-lg border bg-background px-3.5 py-2 text-sm font-medium hover:bg-muted transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-medium text-white/70 hover:bg-white/10 transition-colors disabled:opacity-50"
             >
-              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-              Refresh
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
             </button>
-            <div className="flex items-center gap-2 rounded-lg border bg-background px-3.5 py-2 text-sm">
-              <span className="text-muted-foreground">Active Plan:</span>
-              <span className="font-semibold text-primary capitalize">{currentPlan}</span>
+            <div className="flex items-center gap-2 rounded-full border border-white/10 bg-[#08090a] px-4 py-2 text-xs font-mono">
+              <span className="text-white/40">Tier:</span>
+              <span className="font-bold text-emerald-400 capitalize">{currentPlan}</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Notification Toast */}
+      {/* Notifications */}
       {notification && (
         <div
           className={`rounded-xl border p-4 flex items-start gap-3 transition-all ${
             notification.type === "success"
-              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 dark:text-emerald-300"
-              : "bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+              : "bg-red-500/10 border-red-500/30 text-red-300"
           }`}
         >
           {notification.type === "success" ? (
@@ -188,272 +225,313 @@ export default function BillingPage() {
         </div>
       )}
 
-      {/* AI Engine & Gemini Connected Banner */}
-      <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
-            <Cpu className="h-5 w-5" />
-          </div>
-          <div>
-            <div className="font-semibold text-sm flex items-center gap-2">
-              Google Gemini Live Adapter Active
-              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                Connected
-              </span>
+      {/* Quota & Usage Progress */}
+      {billing && (
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <span>Monthly Token Consumption Meter</span>
+                <span className="text-xs font-mono text-indigo-400 font-normal">
+                  ({billing.limits.percentUsed}% used)
+                </span>
+              </h3>
+              <p className="text-xs text-white/50">
+                Resets on the 1st of each billing month. Quota enforces workspace runtime budget limits.
+              </p>
             </div>
-            <div className="text-xs text-muted-foreground">
-              Direct Gemini API integration configured via GEMINI_API_KEY. All models (1.5 Flash, 1.5 Pro, 2.0 Flash) are active.
+            <div className="text-right font-mono text-xs text-white/70">
+              <span className="font-bold text-white text-base">
+                {billing.limits.currentMonthTokens.toLocaleString()}
+              </span>{" "}
+              / {billing.limits.monthlyTokenBudget.toLocaleString()} tokens
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Quota & Usage Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Token Budget Card */}
-        <div className="rounded-2xl border bg-card p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider uppercase">Monthly Token Budget</span>
-            <Zap className="h-4 w-4 text-amber-500" />
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">
-              {billing?.limits.currentMonthTokens.toLocaleString() ?? "0"}{" "}
-              <span className="text-sm font-normal text-muted-foreground">
-                / {billing?.limits.monthlyTokenBudget.toLocaleString() ?? "200,000"} tokens
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {billing?.limits.percentUsed ?? 0}% consumed this billing cycle
-            </p>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+          <div className="h-2 w-full rounded-full bg-white/5 overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-500 ${
-                (billing?.limits.percentUsed ?? 0) > 85
+              className={`h-full transition-all duration-500 rounded-full ${
+                billing.limits.percentUsed > 90
                   ? "bg-red-500"
-                  : (billing?.limits.percentUsed ?? 0) > 60
+                  : billing.limits.percentUsed > 75
                   ? "bg-amber-500"
-                  : "bg-primary"
+                  : "bg-indigo-500"
               }`}
-              style={{ width: `${Math.min(100, Math.max(2, billing?.limits.percentUsed ?? 0))}%` }}
+              style={{ width: `${Math.max(3, billing.limits.percentUsed)}%` }}
             />
           </div>
         </div>
+      )}
 
-        {/* Monthly Spend Limit Card */}
-        <div className="rounded-2xl border bg-card p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider uppercase">Monthly Spend Cap</span>
-            <TrendingUp className="h-4 w-4 text-emerald-500" />
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold">
-              ${billing?.limits.currentMonthSpendUsd.toFixed(2) ?? "0.00"}{" "}
-              <span className="text-sm font-normal text-muted-foreground">
-                / ${billing?.limits.monthlySpendLimitUsd.toFixed(2) ?? "5.00"} USD
-              </span>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Soft limit protection to prevent runaway LLM costs
-            </p>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
-            <div
-              className="bg-emerald-500 h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${Math.min(
-                  100,
-                  Math.max(
-                    2,
-                    ((billing?.limits.currentMonthSpendUsd ?? 0) /
-                      Math.max(1, billing?.limits.monthlySpendLimitUsd ?? 1)) *
-                      100,
-                  ),
-                )}%`,
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Current Plan Overview Card */}
-        <div className="rounded-2xl border bg-card p-6 shadow-xs space-y-4">
-          <div className="flex items-center justify-between text-muted-foreground">
-            <span className="text-xs font-semibold tracking-wider uppercase">Active Tier</span>
-            <Shield className="h-4 w-4 text-primary" />
-          </div>
-          <div className="space-y-1">
-            <div className="text-2xl font-bold capitalize">
-              Meow {currentPlan}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {currentPlan === "free"
-                ? "Free tier with 200k monthly tokens"
-                : currentPlan === "pro"
-                ? "$29/month • 5M tokens • Priority SLA"
-                : "$199/month • 50M tokens • Enterprise SLA"}
-            </p>
-          </div>
-          <div className="text-xs text-muted-foreground pt-1 border-t">
-            Status: <span className="text-emerald-500 font-medium">Active</span>
-            {billing?.subscription.currentPeriodEnd && (
-              <span className="ml-2">
-                • Renews: {new Date(billing.subscription.currentPeriodEnd).toLocaleDateString()}
-              </span>
-            )}
-          </div>
+      {/* Billing Cycle Switch */}
+      <div className="flex items-center justify-between pt-2">
+        <h2 className="text-lg font-bold tracking-tight text-white">Choose Your Plan</h2>
+        <div className="flex items-center gap-2 bg-[#0c0d10] border border-white/10 p-1 rounded-xl">
+          <button
+            onClick={() => setBillingCycle("monthly")}
+            className={`px-3 py-1 text-xs rounded-lg font-medium transition-all ${
+              billingCycle === "monthly" ? "bg-white text-black font-semibold shadow-xs" : "text-white/50 hover:text-white"
+            }`}
+          >
+            Monthly
+          </button>
+          <button
+            onClick={() => setBillingCycle("annual")}
+            className={`px-3 py-1 text-xs rounded-lg font-medium transition-all flex items-center gap-1.5 ${
+              billingCycle === "annual" ? "bg-white text-black font-semibold shadow-xs" : "text-white/50 hover:text-white"
+            }`}
+          >
+            <span>Annual</span>
+            <span className="text-[10px] bg-emerald-500/20 text-emerald-400 font-bold px-1.5 py-0.2 rounded">
+              -20%
+            </span>
+          </button>
         </div>
       </div>
 
-      {/* Plan Tiers Grid */}
-      <div className="space-y-4">
-        <div>
-          <h2 className="text-xl font-bold tracking-tight">Available Subscription Plans</h2>
-          <p className="text-sm text-muted-foreground">
-            Select the plan that matches your AI agent orchestration and token throughput needs.
+      {/* Plan Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Free Plan */}
+        <div
+          className={`rounded-2xl border p-6 flex flex-col justify-between space-y-6 ${
+            currentPlan === "free"
+              ? "border-emerald-500/50 bg-[#0c0d10] ring-1 ring-emerald-500/20"
+              : "border-white/[0.08] bg-[#0c0d10]"
+          }`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-base font-bold text-white">Hobbyist</h3>
+                <p className="text-xs text-white/50">Local testing and dev runtimes.</p>
+              </div>
+              {currentPlan === "free" && (
+                <span className="text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  Current
+                </span>
+              )}
+            </div>
+            <div className="text-3xl font-extrabold font-mono text-white">$0</div>
+            <ul className="space-y-2 text-xs text-white/70 pt-4 border-t border-white/[0.06]">
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>50,000 monthly tokens</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>Up to 3 active agents</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>OAuth Socials (Sandbox)</span>
+              </li>
+            </ul>
+          </div>
+
+          <button
+            disabled={currentPlan === "free"}
+            className="w-full py-2.5 rounded-xl border border-white/10 text-xs font-semibold text-white/40 cursor-default"
+          >
+            {currentPlan === "free" ? "Active Free Tier" : "Downgrade to Free"}
+          </button>
+        </div>
+
+        {/* Pro Plan */}
+        <div
+          className={`rounded-2xl border-2 p-6 flex flex-col justify-between space-y-6 relative ${
+            currentPlan === "pro"
+              ? "border-indigo-500 bg-[#0f1117] ring-2 ring-indigo-500/30"
+              : "border-indigo-500/50 bg-[#0c0d10]"
+          }`}
+        >
+          <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-indigo-600 text-white px-3 py-1 rounded-full shadow-sm">
+            Recommended
+          </span>
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-base font-bold text-white">Pro</h3>
+                <p className="text-xs text-white/50">For production autonomy & social bots.</p>
+              </div>
+              {currentPlan === "pro" && (
+                <span className="text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  Current
+                </span>
+              )}
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-extrabold font-mono text-white">
+                ${billingCycle === "annual" ? "24" : "29"}
+              </span>
+              <span className="text-xs text-white/50 font-mono">/month</span>
+            </div>
+            <ul className="space-y-2 text-xs text-white/70 pt-4 border-t border-white/[0.06]">
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-indigo-400 shrink-0" />
+                <span className="font-semibold text-white">500,000 monthly tokens</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-indigo-400 shrink-0" />
+                <span>Unlimited agents</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-indigo-400 shrink-0" />
+                <span>Live Twitter & Reddit publishing</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-indigo-400 shrink-0" />
+                <span>Custom Skills & Tool Studio</span>
+              </li>
+            </ul>
+          </div>
+
+          <button
+            onClick={() => handleStripeCheckout("pro")}
+            disabled={isUpdating === "pro" || currentPlan === "pro"}
+            className="w-full py-2.5 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 transition-all flex items-center justify-center gap-2 shadow-md disabled:opacity-50"
+          >
+            {isUpdating === "pro" ? (
+              <RefreshCw className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <CreditCard className="h-3.5 w-3.5" />
+            )}
+            <span>{currentPlan === "pro" ? "Current Active Plan" : "Upgrade with Stripe"}</span>
+          </button>
+        </div>
+
+        {/* Enterprise Plan */}
+        <div
+          className={`rounded-2xl border p-6 flex flex-col justify-between space-y-6 ${
+            currentPlan === "enterprise"
+              ? "border-emerald-500/50 bg-[#0c0d10] ring-1 ring-emerald-500/20"
+              : "border-white/[0.08] bg-[#0c0d10]"
+          }`}
+        >
+          <div className="space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="text-base font-bold text-white">Enterprise</h3>
+                <p className="text-xs text-white/50">Dedicated Neon VPC & custom limits.</p>
+              </div>
+              {currentPlan === "enterprise" && (
+                <span className="text-[10px] font-mono font-bold uppercase bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                  Current
+                </span>
+              )}
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-extrabold font-mono text-white">
+                ${billingCycle === "annual" ? "79" : "99"}
+              </span>
+              <span className="text-xs text-white/50 font-mono">/month</span>
+            </div>
+            <ul className="space-y-2 text-xs text-white/70 pt-4 border-t border-white/[0.06]">
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span className="font-semibold text-white">2,500,000 monthly tokens</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>Dedicated Neon cloud tenancy</span>
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="h-4 w-4 text-emerald-400 shrink-0" />
+                <span>Priority agent loop queue</span>
+              </li>
+            </ul>
+          </div>
+
+          <button
+            onClick={() => handleStripeCheckout("enterprise")}
+            disabled={isUpdating === "enterprise" || currentPlan === "enterprise"}
+            className="w-full py-2.5 rounded-xl border border-white/20 bg-white/5 text-xs font-bold text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {isUpdating === "enterprise" && <RefreshCw className="h-3.5 w-3.5 animate-spin" />}
+            <span>{currentPlan === "enterprise" ? "Current Active Plan" : "Upgrade to Enterprise"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Payment Methods & Stripe Customer Portal */}
+      <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h3 className="text-sm font-bold text-white flex items-center gap-2">
+            <Lock className="h-4 w-4 text-emerald-400" />
+            <span>Accepted Payment Methods</span>
+          </h3>
+          <p className="text-xs text-white/50">
+            Powered securely by Stripe. We accept Visa, Mastercard, American Express, Apple Pay, Google Pay, and bank transfers.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {(["free", "pro", "enterprise"] as const).map((planKey) => {
-            const plan = SUBSCRIPTION_PLANS[planKey];
-            const isCurrent = currentPlan === planKey;
-            const isPopular = planKey === "pro";
-
-            return (
-              <div
-                key={planKey}
-                className={`relative flex flex-col rounded-2xl border p-6 transition-all duration-200 ${
-                  isCurrent
-                    ? "border-primary bg-primary/5 shadow-md ring-1 ring-primary"
-                    : isPopular
-                    ? "border-primary/50 bg-card shadow-sm hover:border-primary"
-                    : "border-border bg-card shadow-xs hover:border-muted-foreground/30"
-                }`}
-              >
-                {isPopular && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-primary px-3 py-0.5 text-[11px] font-semibold text-primary-foreground shadow-xs">
-                    Most Popular
-                  </div>
-                )}
-
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold">{plan.name}</h3>
-                  <div className="mt-2 flex items-baseline gap-1">
-                    <span className="text-3xl font-extrabold tracking-tight">
-                      ${plan.priceMonthlyUsd}
-                    </span>
-                    <span className="text-sm text-muted-foreground">/ month</span>
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {plan.monthlyTokenBudget.toLocaleString()} tokens / month
-                  </p>
-                </div>
-
-                <div className="space-y-2.5 my-6 flex-1 border-t pt-4">
-                  {plan.features.map((feature, idx) => (
-                    <div key={idx} className="flex items-start gap-2.5 text-xs text-muted-foreground">
-                      <Check className="h-4 w-4 shrink-0 text-emerald-500 mt-0.5" />
-                      <span className="text-foreground">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <button
-                  onClick={() => handlePlanChange(planKey)}
-                  disabled={isCurrent || isUpdating !== null}
-                  className={`w-full py-2.5 px-4 rounded-xl text-sm font-semibold transition-all ${
-                    isCurrent
-                      ? "bg-muted text-muted-foreground cursor-default"
-                      : isPopular
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
-                      : "border border-input bg-background hover:bg-muted text-foreground"
-                  } disabled:opacity-50`}
-                >
-                  {isUpdating === planKey ? (
-                    <span className="inline-flex items-center gap-2">
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                      Updating...
-                    </span>
-                  ) : isCurrent ? (
-                    "Current Plan"
-                  ) : plan.priceMonthlyUsd > 0 ? (
-                    `Upgrade to ${plan.name}`
-                  ) : (
-                    "Switch to Free"
-                  )}
-                </button>
-              </div>
-            );
-          })}
-        </div>
+        <button
+          onClick={handleOpenPortal}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-white/10 bg-white/5 text-xs font-semibold text-white hover:bg-white/10 transition-colors shrink-0"
+        >
+          <ExternalLink className="h-3.5 w-3.5" />
+          <span>Stripe Customer Portal</span>
+        </button>
       </div>
 
-      {/* Invoice Receipts & Billing History Table */}
-      <div className="space-y-4">
+      {/* Invoice History Table */}
+      <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold tracking-tight">Invoices & Payment History</h2>
-            <p className="text-sm text-muted-foreground">
-              Review and download receipts for subscription renewals and tier upgrades.
-            </p>
-          </div>
-          <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-            <Receipt className="h-4 w-4" />
-            <span>Automated Billing</span>
-          </div>
+          <h2 className="text-base font-bold text-white flex items-center gap-2">
+            <Receipt className="h-4 w-4 text-indigo-400" />
+            <span>Invoices & Billing History</span>
+          </h2>
+          <span className="text-xs font-mono text-white/40">
+            {billing?.invoices?.length || 0} records
+          </span>
         </div>
 
-        <div className="rounded-2xl border bg-card shadow-xs overflow-hidden">
-          {billing?.invoices && billing.invoices.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b bg-muted/40 text-xs text-muted-foreground uppercase font-semibold">
-                  <tr>
-                    <th className="px-6 py-3.5">Invoice #</th>
-                    <th className="px-6 py-3.5">Description</th>
-                    <th className="px-6 py-3.5">Date Paid</th>
-                    <th className="px-6 py-3.5">Amount</th>
-                    <th className="px-6 py-3.5">Status</th>
+        <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] overflow-hidden shadow-xs">
+          <table className="w-full text-left text-xs">
+            <thead className="border-b border-white/[0.06] bg-white/[0.02] text-white/40 font-mono">
+              <tr>
+                <th className="py-3 px-4 font-medium">Invoice Number</th>
+                <th className="py-3 px-4 font-medium">Description</th>
+                <th className="py-3 px-4 font-medium">Amount</th>
+                <th className="py-3 px-4 font-medium">Date</th>
+                <th className="py-3 px-4 font-medium">Status</th>
+                <th className="py-3 px-4 font-medium text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/[0.04] font-mono text-white/80">
+              {billing?.invoices && billing.invoices.length > 0 ? (
+                billing.invoices.map((inv) => (
+                  <tr key={inv.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="py-3 px-4 font-semibold text-white">{inv.invoiceNumber}</td>
+                    <td className="py-3 px-4 text-white/60 font-sans">{inv.description || "Meow Subscription"}</td>
+                    <td className="py-3 px-4 text-white font-bold">${Number(inv.amountUsd).toFixed(2)}</td>
+                    <td className="py-3 px-4 text-white/40">
+                      {inv.paidAt ? new Date(inv.paidAt).toLocaleDateString() : "Pending"}
+                    </td>
+                    <td className="py-3 px-4">
+                      <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                        {inv.status}
+                      </span>
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <button
+                        onClick={() => alert(`Downloaded receipt for invoice ${inv.invoiceNumber}`)}
+                        className="p-1.5 rounded-md hover:bg-white/10 text-white/40 hover:text-white transition-colors"
+                        title="Download Receipt"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </button>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {billing.invoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-muted/30 transition-colors">
-                      <td className="px-6 py-4 font-mono text-xs font-medium text-foreground">
-                        {inv.invoiceNumber}
-                      </td>
-                      <td className="px-6 py-4 text-muted-foreground text-xs">
-                        {inv.description || "Meow Subscription"}
-                      </td>
-                      <td className="px-6 py-4 text-muted-foreground text-xs">
-                        {inv.paidAt
-                          ? new Date(inv.paidAt).toLocaleDateString()
-                          : new Date(inv.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 font-semibold text-foreground">
-                        ${parseFloat(inv.amountUsd).toFixed(2)} USD
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                          <Check className="h-3 w-3" />
-                          PAID
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="p-8 text-center text-muted-foreground space-y-2">
-              <Receipt className="h-8 w-8 mx-auto opacity-30" />
-              <p className="text-sm font-medium">No invoices generated yet.</p>
-              <p className="text-xs">
-                Invoices will appear here automatically when you upgrade to a paid tier.
-              </p>
-            </div>
-          )}
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="py-8 text-center text-xs text-white/40 font-mono">
+                    No billing transactions yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

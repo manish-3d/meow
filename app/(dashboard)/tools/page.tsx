@@ -15,6 +15,14 @@ import {
   Bot,
   ExternalLink,
   Lock,
+  Plus,
+  Play,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  RefreshCw,
+  Terminal,
+  Sparkles,
 } from "lucide-react";
 
 interface CatalogTool {
@@ -36,23 +44,40 @@ export default function ToolCatalogPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [errorNotice, setErrorNotice] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadTools() {
-      setIsLoading(true);
-      setErrorNotice(null);
-      try {
-        const res = await fetch("/api/tools");
-        if (!res.ok) throw new Error("Failed to load tools catalog");
-        const data = await res.json();
-        setTools(data.tools || []);
-      } catch (err: unknown) {
-        console.error("Tools directory error:", err);
-        setErrorNotice("Unable to load tools catalog");
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  // New Skill Modal State
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [skillId, setSkillId] = useState("");
+  const [skillName, setSkillName] = useState("");
+  const [skillDesc, setSkillDesc] = useState("");
+  const [skillType, setSkillType] = useState<"sandbox" | "integration" | "native">("sandbox");
+  const [skillTier, setSkillTier] = useState<"read" | "write" | "dangerous">("write");
+  const [skillParamName, setSkillParamName] = useState("query");
+  const [skillParamDesc, setSkillParamDesc] = useState("The input parameter for the skill");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Live Test Runner State
+  const [testingTool, setTestingTool] = useState<CatalogTool | null>(null);
+  const [testArgs, setTestArgs] = useState<string>('{"query": "latest AI news"}');
+  const [testRunning, setTestRunning] = useState(false);
+  const [testResult, setTestResult] = useState<any>(null);
+
+  const loadTools = async () => {
+    setIsLoading(true);
+    setErrorNotice(null);
+    try {
+      const res = await fetch("/api/tools");
+      if (!res.ok) throw new Error("Failed to load tools catalog");
+      const data = await res.json();
+      setTools(data.tools || []);
+    } catch (err: unknown) {
+      console.error("Tools directory error:", err);
+      setErrorNotice("Unable to load tools catalog");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     loadTools();
   }, []);
 
@@ -64,7 +89,6 @@ export default function ToolCatalogPage() {
         tool.id.toLowerCase().includes(searchQuery.toLowerCase());
 
       const matchesTier = tierFilter === "all" ? true : tool.permissionLevel === tierFilter;
-
       return matchesSearch && matchesTier;
     });
   }, [tools, searchQuery, tierFilter]);
@@ -73,182 +97,426 @@ export default function ToolCatalogPage() {
     setExpandedSchemaId((prev) => (prev === id ? null : id));
   };
 
-  return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8">
-      {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-r from-card via-card to-primary/5 p-8 shadow-xs">
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-            <Wrench className="h-3.5 w-3.5" />
-            <span>Central Tool Registry & Sandboxing</span>
-          </div>
-          <h1 className="text-3xl font-extrabold tracking-tight">Tool Catalog & Security Tiers</h1>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            Every capability exposed to an autonomous agent is registered here. Tools execute
-            through strict server-side permission gates with isolated directory sandboxing
-            and human-in-the-loop approvals.
-          </p>
+  const handleCreateSkill = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!skillId || !skillName || !skillDesc) return;
 
-          {/* Security Tiers Legend */}
-          <div className="pt-2 flex flex-wrap items-center gap-3 text-xs">
-            <span className="inline-flex items-center gap-1.5 rounded-lg border bg-blue-500/5 px-2.5 py-1 font-medium text-blue-600 border-blue-500/20">
-              <ShieldCheck className="h-3.5 w-3.5" />
-              <span>Read (Safe Data Retrieval)</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border bg-amber-500/5 px-2.5 py-1 font-medium text-amber-600 border-amber-500/20">
-              <Shield className="h-3.5 w-3.5" />
-              <span>Write (Sandboxed Workspace State)</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5 rounded-lg border bg-rose-500/5 px-2.5 py-1 font-medium text-rose-600 border-rose-500/20">
-              <ShieldAlert className="h-3.5 w-3.5" />
-              <span>Dangerous (Human Approval Required)</span>
-            </span>
+    try {
+      setIsSubmitting(true);
+      setErrorNotice(null);
+
+      const inputSchema = {
+        type: "object",
+        properties: {
+          [skillParamName || "input"]: {
+            type: "string",
+            description: skillParamDesc || "Input value",
+          },
+        },
+        required: [skillParamName || "input"],
+      };
+
+      const res = await fetch("/api/tools", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: skillId,
+          name: skillName,
+          description: skillDesc,
+          executionType: skillType,
+          permissionLevel: skillTier,
+          requiresApproval: skillTier === "dangerous",
+          inputSchema,
+          bindToAllAgents: true,
+        }),
+      });
+
+      if (!res.ok) {
+        const json = await res.json();
+        throw new Error(json.error || "Failed to create skill");
+      }
+
+      setIsCreateOpen(false);
+      setSkillId("");
+      setSkillName("");
+      setSkillDesc("");
+      await loadTools();
+    } catch (err: unknown) {
+      setErrorNotice(err instanceof Error ? err.message : "Creation failed");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleRunTest = async () => {
+    if (!testingTool) return;
+    try {
+      setTestRunning(true);
+      setTestResult(null);
+
+      let parsedArgs = {};
+      try {
+        parsedArgs = JSON.parse(testArgs);
+      } catch {
+        parsedArgs = { input: testArgs };
+      }
+
+      const res = await fetch("/api/tools/test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toolId: testingTool.id,
+          args: parsedArgs,
+        }),
+      });
+
+      const json = await res.json();
+      setTestResult(json);
+    } catch (err: unknown) {
+      setTestResult({ error: err instanceof Error ? err.message : String(err) });
+    } finally {
+      setTestRunning(false);
+    }
+  };
+
+  const openTestDrawer = (tool: CatalogTool) => {
+    setTestingTool(tool);
+    setTestResult(null);
+    const props = (tool.inputSchema?.properties as Record<string, any>) || {};
+    const sampleObj: Record<string, string> = {};
+    for (const key of Object.keys(props)) {
+      sampleObj[key] = key.includes("query")
+        ? "#AI trends"
+        : key.includes("text")
+        ? "Hello from Meow Agent!"
+        : "sample_value";
+    }
+    setTestArgs(JSON.stringify(sampleObj, null, 2));
+  };
+
+  return (
+    <div className="p-8 max-w-7xl mx-auto space-y-8 text-[#f7f8f8]">
+      {/* Header Banner */}
+      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-8 shadow-xl">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-3xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/5 border border-white/10 px-3 py-1 text-xs font-mono text-white/70">
+              <Sparkles className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Extensible Agent Capability Matrix</span>
+            </div>
+            <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
+              Agent Skills & Custom Tool Hub
+            </h1>
+            <p className="text-sm text-white/60 leading-relaxed">
+              Every tool and skill exposed to autonomous agents executes through strict permission gates, sandboxing, and human-in-the-loop approvals.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsCreateOpen(true)}
+              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-5 py-2.5 text-xs font-bold shadow-md hover:bg-white/90 transition-all hover:scale-[1.02]"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Create New Skill</span>
+            </button>
+            <button
+              onClick={loadTools}
+              disabled={isLoading}
+              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-medium text-white/70 hover:bg-white/10 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-3.5 w-3.5 ${isLoading ? "animate-spin" : ""}`} />
+              <span>Refresh</span>
+            </button>
           </div>
         </div>
       </div>
 
-      {/* Toolbar */}
-      <div className="flex flex-col sm:flex-row items-center gap-3">
-        <div className="relative flex-1 w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      {/* Error notification */}
+      {errorNotice && (
+        <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 flex items-center gap-3 text-xs text-red-300">
+          <AlertCircle className="h-4 w-4 shrink-0 text-red-400" />
+          <span>{errorNotice}</span>
+        </div>
+      )}
+
+      {/* Controls Bar: Search & Filter Tabs */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-80">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white/40" />
           <input
             type="text"
+            placeholder="Search skills & tools..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tools by name, description, or ID..."
-            className="w-full rounded-xl border bg-card pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-hidden focus:ring-2 focus:ring-primary/20"
+            className="w-full rounded-xl border border-white/10 bg-[#0c0d10] pl-10 pr-4 py-2 text-xs text-white placeholder-white/40 shadow-xs focus:outline-none focus:border-white/30"
           />
         </div>
 
-        {/* Tier Filter Pills */}
-        <div className="flex items-center gap-1.5 self-start sm:self-auto rounded-xl border bg-card p-1">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           {(["all", "read", "write", "dangerous"] as const).map((tier) => (
             <button
               key={tier}
               onClick={() => setTierFilter(tier)}
-              className={`rounded-lg px-3 py-1 text-xs font-medium capitalize transition-all ${
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono capitalize transition-all ${
                 tierFilter === tier
-                  ? "bg-primary text-primary-foreground shadow-xs font-semibold"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-white text-black font-semibold shadow-xs"
+                  : "text-white/50 hover:text-white bg-white/5"
               }`}
             >
-              {tier}
+              {tier === "all" ? "All Tiers" : tier}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Grid */}
-      {isLoading ? (
-        <div className="rounded-2xl border bg-card p-16 text-center text-sm text-muted-foreground">
-          Loading tool catalog...
-        </div>
-      ) : errorNotice ? (
-        <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-8 text-center text-sm text-destructive">
-          {errorNotice}
-        </div>
-      ) : filteredTools.length === 0 ? (
-        <div className="rounded-2xl border border-dashed bg-card/50 p-16 text-center text-sm text-muted-foreground">
-          No tools match your query.
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTools.map((tool) => {
-            const isExpanded = expandedSchemaId === tool.id;
-            return (
-              <div
-                key={tool.id}
-                className="group flex flex-col justify-between rounded-2xl border bg-card p-6 shadow-xs hover:border-primary/40 hover:shadow-md transition-all"
-              >
+      {/* Tools Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        {filteredTools.map((tool) => (
+          <div
+            key={tool.id}
+            className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 shadow-xs flex flex-col justify-between hover:border-white/20 transition-all space-y-5"
+          >
+            <div className="space-y-3">
+              <div className="flex items-start justify-between">
                 <div>
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold">
-                        <Wrench className="h-5 w-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
-                          {tool.name}
-                        </h3>
-                        <span className="font-mono text-[11px] text-muted-foreground">
-                          {tool.id}
-                        </span>
-                      </div>
-                    </div>
-
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${
-                        tool.permissionLevel === "dangerous"
-                          ? "bg-rose-500/10 text-rose-600 border border-rose-500/20"
-                          : tool.permissionLevel === "write"
-                          ? "bg-amber-500/10 text-amber-600 border border-amber-500/20"
-                          : "bg-blue-500/10 text-blue-600 border border-blue-500/20"
-                      }`}
-                    >
-                      {tool.permissionLevel}
-                    </span>
-                  </div>
-
-                  <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                    {tool.description}
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <span className="inline-flex items-center gap-1 rounded bg-muted/60 px-2 py-0.5 text-[10px] font-mono text-foreground">
-                      <Cpu className="h-3 w-3 text-muted-foreground" />
-                      Target: {tool.executionType}
-                    </span>
-
-                    {tool.requiresApproval && (
-                      <span className="inline-flex items-center gap-1 rounded bg-rose-500/10 px-2 py-0.5 text-[10px] font-medium text-rose-600 border border-rose-500/20">
-                        <Lock className="h-3 w-3" />
-                        Approval Gate Active
-                      </span>
-                    )}
-                  </div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    {tool.name}
+                  </h3>
+                  <span className="text-[11px] font-mono text-indigo-400 font-semibold">{tool.id}</span>
                 </div>
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full font-bold uppercase ${
+                    tool.permissionLevel === "dangerous"
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+                      : tool.permissionLevel === "write"
+                      ? "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+                      : "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                  }`}
+                >
+                  {tool.permissionLevel}
+                </span>
+              </div>
 
-                {/* Collapsible Parameter Schema Inspector */}
-                <div className="mt-6 pt-4 border-t border-border/50 space-y-2">
-                  <button
-                    onClick={() => toggleSchema(tool.id)}
-                    className="w-full flex items-center justify-between text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Code2 className="h-3.5 w-3.5" />
-                      <span>Parameter Schema</span>
-                    </div>
-                    {isExpanded ? (
-                      <ChevronUp className="h-3.5 w-3.5" />
-                    ) : (
-                      <ChevronDown className="h-3.5 w-3.5" />
-                    )}
-                  </button>
+              <p className="text-xs text-white/60 leading-relaxed line-clamp-3">
+                {tool.description}
+              </p>
 
-                  {isExpanded && (
-                    <div className="rounded-xl bg-muted/40 p-3 border border-border/60">
-                      <pre className="font-mono text-[11px] text-foreground overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-48">
-                        {JSON.stringify(tool.inputSchema, null, 2)}
-                      </pre>
-                    </div>
-                  )}
+              {tool.requiresApproval && (
+                <div className="flex items-center gap-1.5 text-[11px] text-amber-400 font-mono bg-amber-500/10 p-2 rounded-lg border border-amber-500/20">
+                  <ShieldAlert className="h-3.5 w-3.5 shrink-0" />
+                  <span>Human-in-the-loop authorization required</span>
+                </div>
+              )}
+            </div>
 
-                  <div className="pt-2 flex items-center justify-between">
-                    <Link
-                      href="/agents"
-                      className="text-[11px] font-semibold text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      <span>Assign to Agent Fleet</span>
-                      <ExternalLink className="h-3 w-3" />
-                    </Link>
-                  </div>
+            <div className="pt-4 border-t border-white/[0.06] flex items-center gap-2">
+              <button
+                onClick={() => openTestDrawer(tool)}
+                className="flex-1 py-2 px-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 transition-all flex items-center justify-center gap-1.5 shadow-xs"
+              >
+                <Play className="h-3 w-3" />
+                <span>Test Skill</span>
+              </button>
+              <button
+                onClick={() => toggleSchema(tool.id)}
+                className="py-2 px-3 rounded-xl border border-white/10 text-xs font-mono text-white/60 hover:text-white hover:bg-white/5 transition-colors"
+              >
+                Schema
+              </button>
+            </div>
+
+            {/* Collapsible Input Schema Viewer */}
+            {expandedSchemaId === tool.id && (
+              <div className="rounded-xl border border-white/[0.08] bg-black/60 p-3 text-[11px] font-mono text-indigo-300 overflow-x-auto space-y-1">
+                <span className="text-[10px] uppercase text-white/40">Parameter Schema</span>
+                <pre>{JSON.stringify(tool.inputSchema, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* ─── CREATE SKILL MODAL ─── */}
+      {isCreateOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-lg rounded-2xl border border-white/[0.12] bg-[#0c0d10] p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+              <div>
+                <h3 className="text-lg font-bold text-white">Create Custom Agent Skill</h3>
+                <p className="text-xs text-white/50">Define and register a new tool for your agent runtime.</p>
+              </div>
+              <button
+                onClick={() => setIsCreateOpen(false)}
+                className="p-1 rounded text-white/50 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateSkill} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-white/70">Skill ID (Slug)</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="slack_post_message"
+                    value={skillId}
+                    onChange={(e) => setSkillId(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-xs font-mono text-white"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-white/70">Display Title</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Post Slack Message"
+                    value={skillName}
+                    onChange={(e) => setSkillName(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-xs text-white"
+                  />
                 </div>
               </div>
-            );
-          })}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-white/70">Description & Agent Guidance</label>
+                <textarea
+                  required
+                  rows={2}
+                  placeholder="Explains to the LLM when and how to call this skill..."
+                  value={skillDesc}
+                  onChange={(e) => setSkillDesc(e.target.value)}
+                  className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-xs text-white"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-white/70">Execution Type</label>
+                  <select
+                    value={skillType}
+                    onChange={(e) => setSkillType(e.target.value as any)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-xs text-white"
+                  >
+                    <option value="sandbox">Sandboxed JavaScript</option>
+                    <option value="integration">External Webhook / API</option>
+                    <option value="native">Native Runtime</option>
+                  </select>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-white/70">Permission Tier</label>
+                  <select
+                    value={skillTier}
+                    onChange={(e) => setSkillTier(e.target.value as any)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-2 text-xs text-white"
+                  >
+                    <option value="read">Safe Read</option>
+                    <option value="write">Workspace Write</option>
+                    <option value="dangerous">Dangerous (Human Approval Required)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2 border-t border-white/[0.08]">
+                <label className="text-xs font-semibold text-white/70">Primary Parameter</label>
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    placeholder="Parameter name (e.g. channel)"
+                    value={skillParamName}
+                    onChange={(e) => setSkillParamName(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-1.5 text-xs font-mono text-white"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Description"
+                    value={skillParamDesc}
+                    onChange={(e) => setSkillParamDesc(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-black/50 px-3 py-1.5 text-xs text-white"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/[0.08]">
+                <button
+                  type="button"
+                  onClick={() => setIsCreateOpen(false)}
+                  className="px-4 py-2 rounded-xl border border-white/10 text-xs font-semibold text-white/70 hover:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="px-5 py-2.5 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 disabled:opacity-50"
+                >
+                  {isSubmitting ? "Registering..." : "Save & Bind Skill"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── TEST RUNNER DRAWER ─── */}
+      {testingTool && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-md">
+          <div className="w-full max-w-xl rounded-2xl border border-white/[0.12] bg-[#0c0d10] p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-white/[0.08]">
+              <div>
+                <h3 className="text-base font-bold text-white flex items-center gap-2">
+                  <Play className="h-4 w-4 text-emerald-400" />
+                  <span>Test Skill Execution: {testingTool.name}</span>
+                </h3>
+                <span className="text-xs font-mono text-indigo-400">{testingTool.id}</span>
+              </div>
+              <button
+                onClick={() => setTestingTool(null)}
+                className="p-1 rounded text-white/50 hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-xs font-semibold text-white/70">Execution Arguments (JSON)</label>
+              <textarea
+                rows={4}
+                value={testArgs}
+                onChange={(e) => setTestArgs(e.target.value)}
+                className="w-full rounded-xl border border-white/10 bg-black/60 p-3 text-xs font-mono text-indigo-300 shadow-inner focus:outline-none focus:border-white/30"
+              />
+            </div>
+
+            <div className="flex items-center justify-between">
+              <button
+                onClick={handleRunTest}
+                disabled={testRunning}
+                className="px-5 py-2.5 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 flex items-center gap-2 shadow-md disabled:opacity-50"
+              >
+                {testRunning ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <Play className="h-3.5 w-3.5" />}
+                <span>Execute In Sandbox</span>
+              </button>
+              {testResult?.durationMs && (
+                <span className="text-xs font-mono text-emerald-400">
+                  Latency: {testResult.durationMs}ms
+                </span>
+              )}
+            </div>
+
+            {testResult && (
+              <div className="space-y-2 pt-3 border-t border-white/[0.08]">
+                <span className="text-xs font-semibold text-white/70 font-mono uppercase">Execution Response</span>
+                <div className="rounded-xl border border-white/[0.08] bg-black/70 p-3 text-xs font-mono text-emerald-300 max-h-60 overflow-y-auto">
+                  <pre>{JSON.stringify(testResult, null, 2)}</pre>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
   );
 }
-

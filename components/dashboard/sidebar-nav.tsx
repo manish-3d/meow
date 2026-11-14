@@ -27,7 +27,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   {
     title: "Overview",
-    href: "/",
+    href: "/overview",
     icon: LayoutDashboard,
     exact: true,
   },
@@ -38,34 +38,34 @@ const navItems: NavItem[] = [
     badge: "Runtime",
   },
   {
-    title: "Tool Catalog",
+    title: "Skills & Tools",
     href: "/tools",
     icon: Wrench,
-    badge: "Phase 4",
+    badge: "14 Active",
   },
   {
     title: "Plugins",
     href: "/plugins",
     icon: Package,
-    badge: "Phase 8",
+    badge: "Hub",
   },
   {
     title: "Observability",
     href: "/observability",
     icon: Activity,
-    badge: "Phase 10",
+    badge: "Telemetry",
   },
   {
     title: "Billing & Plans",
     href: "/billing",
     icon: CreditCard,
-    badge: "Pro",
+    badge: "Stripe",
   },
   {
     title: "Integrations",
     href: "/integrations",
     icon: Share2,
-    badge: "Social",
+    badge: "OAuth",
   },
   {
     title: "Settings",
