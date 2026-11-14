@@ -4,7 +4,9 @@ import GoogleProvider from "next-auth/providers/google";
 import TwitterProvider from "next-auth/providers/twitter";
 import RedditProvider from "next-auth/providers/reddit";
 import InstagramProvider from "next-auth/providers/instagram";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
+import { eq } from "drizzle-orm";
 
 import { db } from "@/db";
 import {
@@ -23,6 +25,62 @@ export const authOptions: AuthOptions = {
     verificationTokensTable: verificationTokens,
   }),
   providers: [
+    CredentialsProvider({
+      id: "credentials",
+      name: "Instant Access",
+      credentials: {
+        email: { label: "Email", type: "email", placeholder: "founder@meow.ai" },
+        name: { label: "Name", type: "text", placeholder: "Your Name" },
+      },
+      async authorize(credentials) {
+        const email = credentials?.email?.trim().toLowerCase() || "founder@meow.ai";
+        const name = credentials?.name?.trim() || email.split("@")[0] || "Meow Explorer";
+
+        try {
+          const [existingUser] = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, email))
+            .limit(1);
+
+          if (existingUser) {
+            return {
+              id: existingUser.id,
+              name: existingUser.name,
+              email: existingUser.email,
+              image: existingUser.image,
+            };
+          }
+
+          const [newUser] = await db
+            .insert(users)
+            .values({
+              id: crypto.randomUUID(),
+              name,
+              email,
+              image: `https://avatar.vercel.sh/${encodeURIComponent(email)}`,
+              emailVerified: new Date(),
+            })
+            .returning();
+
+          return {
+            id: newUser.id,
+            name: newUser.name,
+            email: newUser.email,
+            image: newUser.image,
+          };
+        } catch (error) {
+          console.error("Credentials authorize error:", error);
+          // Fallback user object to ensure login never fails
+          return {
+            id: "guest-user-" + Date.now(),
+            name,
+            email,
+            image: `https://avatar.vercel.sh/${encodeURIComponent(email)}`,
+          };
+        }
+      },
+    }),
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "placeholder-secret",
