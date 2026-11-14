@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JEV — Cinematic Tech Noir Motion Comic Reel</title>
+  
+  <!-- Premium Graphic Novel Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Chakra+Petch:ital,wght@0,400;0,600;0,700;1,700&family=JetBrains+Mono:wght@400;600;700;800&family=Rajdhani:wght@500;600;700;800&family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Master Application Container -->
+  <div id="app-container">
+    
+    <!-- Top HUD Navigation -->
+    <header id="top-hud">
+      <div class="hud-left">
+        <span class="hud-badge pulse">TYPESAFE AI // TECH NOIR COMIC</span>
+        <span class="hud-title">JEV: BEYOND THE CHATBOT</span>
+      </div>
+      <div class="hud-right">
+        <span class="hud-meta" id="time-display">00:00.00 / 01:02.64</span>
+        <button id="btn-export" class="hud-btn highlight" title="Render or Export MP4 Video">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><circle cx="12" cy="12" r="8" fill="#ff3b30"/></svg>
+          <span id="export-btn-text">Download MP4 Reel</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 9:16 Instagram Reel Stage Container -->
+    <main id="reel-stage">
+      <div id="reel-viewport">
+        
+        <!-- SVG Filters for Comic Ink, Halftone, and Glow -->
+        <svg id="svg-filters" class="hidden-svg">
+          <defs>
+            <filter id="comic-ink" x="-20%" y="-20%" width="140%" height="140%">
+              <feColorMatrix type="matrix" values="
+                1.15 0 0 0 -0.05
+                0 1.15 0 0 -0.05
+                0 0 1.15 0 -0.05
+                0 0 0 1 0" />
+            </filter>
+            <!-- Halftone Dot Pattern -->
+            <pattern id="halftone-gold" width="12" height="12" patternUnits="userSpaceOnUse">
+              <circle cx="6" cy="6" r="2.2" fill="#d4af37" opacity="0.18"/>
+            </pattern>
+            <pattern id="halftone-cyan" width="10" height="10" patternUnits="userSpaceOnUse">
+              <circle cx="5" cy="5" r="1.8" fill="#1e88e5" opacity="0.15"/>
+            </pattern>
+            <!-- Diagonal Hatching Pattern -->
+            <pattern id="comic-hatch" width="12" height="12" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+              <line x1="0" y1="0" x2="0" y2="12" stroke="#d4af37" stroke-width="1.2" opacity="0.12" />
+            </pattern>
+          </defs>
+        </svg>
+
+        <!-- Canvas Background Layer (Particles, Speed Lines, Dust Motes, Chiaroscuro Light Beams) -->
+        <canvas id="bg-canvas" width="1080" height="1920"></canvas>
+
+        <!-- Comic Halftone & Grain Overlays -->
+        <div class="comic-halftone-overlay"></div>
+        <div class="crt-scanlines"></div>
+        <div class="film-grain"></div>
+
+        <!-- Master Comic Border Frame -->
+        <div class="comic-outer-frame">
+          <div class="frame-corner top-left"></div>
+          <div class="frame-corner top-right"></div>
+          <div class="frame-corner bottom-left"></div>
+          <div class="frame-corner bottom-right"></div>
+          <div class="frame-stamp top">TYPESAFE AI // GRAPHIC BRIEF</div>
+          <div class="frame-stamp bottom">CASE FILE #JEV-2026-DECIDE</div>
+        </div>
+
+        <!-- ==============================================
+             DYNAMIC SCENE CONTAINER (SYNCHRONIZED TIMELINE)
+             ============================================== -->
+        <div id="scene-container">
+
+          <!-- -----------------------------------------------------------------
+               SCENE 1: THE AI THAT TALKS (0.00s - 2.80s)
+               Narration: "Everyone's building AI that talks."
+          ------------------------------------------------------------------ -->
+          <section id="scene-1" class="scene active">
+            <div class="bg-layer tech-studio-night">
+              <div class="studio-window-bars"></div>
+              <div class="rain-streaks"></div>
+              <div class="chiaroscuro-cone cone-gold"></div>
+            </div>
+
+            <!-- Floating Conversational Chat Bubbles Simulation -->
+            <div class="chat-cloud-container">
+              <div class="comic-chat-bubble bubble-1 float-item">
+                <span class="bubble-sender">AI BOT // v4.0</span>
+                <p>Hello! How can I assist your writing today?</p>
+              </div>
+              <div class="comic-chat-bubble bubble-2 float-item">
+                <span class="bubble-sender">ASSISTANT</span>
+                <p>Here is an essay on 18th-century economics...</p>
+              </div>
+              <div class="comic-chat-bubble bubble-3 float-item">
+                <span class="bubble-sender">CONVERSATION</span>
+                <p>Let's brainstorm endless text possibilities...</p>
+              </div>
+              <div class="comic-chat-bubble bubble-4 float-item">
+                <div class="typing-indicator"><span></span><span></span><span></span></div>
+              </div>
+            </div>
+
+            <!-- Recurring Character: Talking / Gesturing pose -->
+            <div class="character-wrapper char-scene-1">
+              <div class="char-rim-light"></div>
+              <img src="assets/character/p05.png" alt="Hero Character" class="char-img">
+              <div class="char-contact-shadow"></div>
+            </div>
+
+            <!-- Editorial Comic Typography -->
+            <div class="kinetic-text-wrap text-scene-1">
+              <div class="tag-label">PARADIGM 2024–2026</div>
+              <h1 class="comic-headline">EVERYONE'S BUILDING<br><span class="highlight-gold">AI THAT TALKS.</span></h1>
+            </div>
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 2: THE UNEXPECTED QUESTION (2.80s - 8.00s)
+               Narration: "But what if I told you there's a new AI model designed to do something completely different?"
+          ------------------------------------------------------------------ -->
+          <section id="scene-2" class="scene">
+            <div class="bg-layer abstract-aperture">
+              <div class="aperture-grid"></div>
+              <div class="chiaroscuro-cone cone-center"></div>
+              <!-- Diagonal Comic Cut Lines -->
+              <div class="comic-slash-line slash-1"></div>
+              <div class="comic-slash-line slash-2"></div>
+            </div>
+
+            <!-- Shattering Chat Fragments -->
+            <div class="shatter-fragments">
+              <div class="fragment f1"></div>
+              <div class="fragment f2"></div>
+              <div class="fragment f3"></div>
+            </div>
+
+            <!-- Recurring Character: Pointing finger up / Eureka -->
+            <div class="character-wrapper char-scene-2">
+              <div class="char-rim-light"></div>
+              <img src="assets/character/p09.png" alt="Hero Character" class="char-img">
+              <div class="char-contact-shadow"></div>
+            </div>
+
+            <!-- Mysterious Vector Aperture -->
+            <div class="vector-aperture-ring">
+              <svg viewBox="0 0 200 200" class="ring-svg">
+                <circle cx="100" cy="100" r="88" stroke="#d4af37" stroke-width="2" fill="none" stroke-dasharray="8 6"/>
+                <circle cx="100" cy="100" r="70" stroke="#1e88e5" stroke-width="1.5" fill="none" stroke-dasharray="4 4"/>
+                <polygon points="100,20 120,40 80,40" fill="#d4af37"/>
+                <polygon points="100,180 120,160 80,160" fill="#d4af37"/>
+              </svg>
+            </div>
+
+            <div class="kinetic-text-wrap text-scene-2">
+              <div class="comic-caption-box">
+                <span class="box-tag">QUERY // UNEXPECTED</span>
+                <p class="caption-lead">BUT WHAT IF I TOLD YOU...</p>
+                <h2 class="comic-subhead">A NEW AI MODEL DESIGNED FOR<br><span class="gold-stencil">SOMETHING COMPLETELY DIFFERENT?</span></h2>
+              </div>
+            </div>
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 3: MEET JEV — FROM TYPESAFE AI (8.00s - 16.56s)
+               Narration: "Meet Jev, from TypeSafe AI. Unlike ChatGPT or Claude, Jev isn't designed to write essays, generate code, or hold conversations."
+          ------------------------------------------------------------------ -->
+          <section id="scene-3" class="scene">
+            <div class="bg-layer editorial-split">
+              <div class="split-left"></div>
+              <div class="split-right"></div>
+            </div>
+
+            <!-- Hero Title Lockup: JEV -->
+            <div class="hero-title-lockup">
+              <div class="brand-sub">TYPESAFE AI PRESENTS</div>
+              <div class="hero-title">
+                <span class="letter-j">J</span>
+                <span class="letter-e">E</span>
+                <span class="letter-v">V</span>
+              </div>
+              <div class="hero-rule">
+                <span class="rule-line"></span>
+                <span class="rule-diamond">◆</span>
+                <span class="rule-line"></span>
+              </div>
+              <div class="hero-desc">THE DETERMINISTIC DECISION MODEL</div>
+            </div>
+
+            <!-- Split Panel: Conversational vs JEV -->
+            <div class="comic-split-comparison">
+              <!-- Left: Crossed out tasks -->
+              <div class="compare-panel panel-conv">
+                <div class="panel-header">GENERATIVE MODELS</div>
+                <ul class="task-list">
+                  <li class="crossed-out"><span class="strike-bar"></span>WRITE ESSAYS</li>
+                  <li class="crossed-out"><span class="strike-bar"></span>GENERATE CODE</li>
+                  <li class="crossed-out"><span class="strike-bar"></span>HOLD CONVERSATIONS</li>
+                </ul>
+                <div class="comic-stamp reject-stamp">NOT JEV'S JOB</div>
+              </div>
+
+              <!-- Right: Character shrugging -->
+              <div class="character-wrapper char-scene-3">
+                <div class="char-rim-light"></div>
+                <img src="assets/character/p10.png" alt="Hero Character Shrug" class="char-img">
+                <div class="char-contact-shadow"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 4: JEV MAKES DECISIONS (16.56s - 35.50s)
+               The Grand Technical Motion Graphic & Comic Impact!
+               Narration: "It makes decisions. You give it information and specific questions... No paragraphs to interpret. JUST DECISIONS!"
+          ------------------------------------------------------------------ -->
+          <section id="scene-4" class="scene">
+            <div class="bg-layer tech-cockpit">
+              <div class="cockpit-grid"></div>
+              <div class="circuit-traces"></div>
+            </div>
+
+            <!-- Lead Stencil -->
+            <div class="scene-heading-banner">
+              <span class="badge-mini">CORE ENGINE</span>
+              <h2 class="banner-title">IT MAKES DECISIONS.</h2>
+            </div>
+
+            <!-- Character Working / Steepled Hands -->
+            <div class="character-wrapper char-scene-4-lap">
+              <div class="char-rim-light"></div>
+              <img src="assets/character/p14.png" alt="Hero Steepled Hands" class="char-img">
+              <div class="char-contact-shadow"></div>
+            </div>
+
+            <!-- Technical Dashboard: 3 Synchronized Decisions -->
+            <div class="decision-board">
+              
+              <!-- Input Packet -->
+              <div class="board-card input-packet">
+                <div class="card-header">
+                  <span class="dot-green"></span>
+                  <span class="card-title">INCOMING REQUEST PAYLOAD</span>
+                  <span class="meta-tag">ID: #REQ-8842</span>
+                </div>
+                <div class="packet-body">
+                  <code>"Customer DB latency > 2400ms on shard 3. Automated failover did not resolve."</code>
+                </div>
+              </div>
+
+              <!-- 3 Decision Cards -->
+              <div class="decisions-grid">
+                
+                <!-- Decision 1: Escalation Probability (20.16s - 22.24s) -->
+                <div class="decision-card card-escalate" id="card-q1">
+                  <div class="q-label">QUESTION 01</div>
+                  <div class="q-text">Should request be escalated?</div>
+                  <div class="gauge-wrap">
+                    <svg viewBox="0 0 160 80" class="gauge-svg">
+                      <path d="M 15 75 A 65 65 0 0 1 145 75" fill="none" stroke="#222733" stroke-width="12" stroke-linecap="round"/>
+                      <path id="gauge-arc-path" d="M 15 75 A 65 65 0 0 1 145 75" fill="none" stroke="#d4af37" stroke-width="12" stroke-linecap="round" stroke-dasharray="204" stroke-dashoffset="204"/>
+                    </svg>
+                    <div class="gauge-val" id="gauge-val-text">89.4%</div>
+                  </div>
+                  <div class="status-pill resolved pulse-gold">ESCALATE: YES</div>
+                </div>
+
+                <!-- Decision 2: Category Tree (22.24s - 24.16s) -->
+                <div class="decision-card card-category" id="card-q2">
+                  <div class="q-label">QUESTION 02</div>
+                  <div class="q-text">Which category?</div>
+                  <div class="category-tree">
+                    <div class="cat-node">BILLING</div>
+                    <div class="cat-node active-cat">INFRASTRUCTURE</div>
+                    <div class="cat-node">SECURITY</div>
+                    <div class="cat-node">SUPPORT</div>
+                  </div>
+                  <div class="status-pill resolved-blue">CONFIDENCE: 0.998</div>
+                </div>
+
+                <!-- Decision 3: Urgency Score (24.16s - 25.28s) -->
+                <div class="decision-card card-urgency" id="card-q3">
+                  <div class="q-label">QUESTION 03</div>
+                  <div class="q-text">How urgent is it?</div>
+                  <div class="meter-bar-container">
+                    <div class="meter-fill" id="meter-fill-bar"></div>
+                  </div>
+                  <div class="urgency-score-display">
+                    <span class="score-num">9.4</span> <span class="score-max">/ 10.0</span>
+                    <span class="urgency-badge">CRITICAL</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Output JSON Structured Result (25.28s - 30.56s) -->
+              <div class="board-card output-json-block" id="output-json-box">
+                <div class="card-header">
+                  <span class="dot-gold"></span>
+                  <span class="card-title">JEV STRUCTURED OUTPUT // READY FOR SOFTWARE</span>
+                  <span class="badge-direct">DIRECT INGESTION</span>
+                </div>
+                <pre class="json-code"><code>{
+  <span class="k">"escalate"</span>: <span class="b">true</span>,
+  <span class="k">"category"</span>: <span class="s">"INFRASTRUCTURE"</span>,
+  <span class="k">"urgency_score"</span>: <span class="n">0.94</span>,
+  <span class="k">"action"</span>: <span class="s">"ROUTE_TO_ONCALL_SRE"</span>
+}</code></pre>
+              </div>
+
+              <!-- "No paragraphs to interpret" Slash (30.56s - 32.64s) -->
+              <div class="no-paragraphs-panel" id="no-paragraphs-overlay">
+                <div class="messy-paragraph-sample">
+                  <div class="sample-title">UNSTRUCTURED PARAGRAPH LLM TEXT:</div>
+                  <p>"Well, looking at the telemetry logs for shard 3, it appears that the database latency has crossed acceptable thresholds. Perhaps you might want to notify someone, though it depends on your team's escalation schedule..."</p>
+                </div>
+                <div class="slash-banner-red">
+                  <span>NO PARAGRAPHS TO INTERPRET</span>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ==============================================
+                 EXPLOSIVE IMPACT FRAME: "JUST DECISIONS!" (32.64s - 35.50s)
+                 ============================================== -->
+            <div class="impact-frame-container" id="impact-frame">
+              <div class="radial-speed-lines"></div>
+              <div class="impact-flash"></div>
+              
+              <!-- Hero Pointing Straight at Camera -->
+              <div class="character-wrapper char-scene-4-point">
+                <div class="char-rim-light-punch"></div>
+                <img src="assets/character/p06.png" alt="Hero Pointing Directly" class="char-img">
+                <div class="char-contact-shadow"></div>
+              </div>
+
+              <div class="impact-typography">
+                <div class="impact-word-just">JUST</div>
+                <div class="impact-word-decisions">DECISIONS!</div>
+                <div class="impact-sub">NO NOISE. PURE DETERMINISTIC EXECUTION.</div>
+              </div>
+            </div>
+
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 5: INSIDE AN AI AGENT (35.50s - 40.40s)
+               Narration: "And here's the interesting part. Jev isn't trying to replace ChatGPT."
+          ------------------------------------------------------------------ -->
+          <section id="scene-5" class="scene">
+            <div class="bg-layer agent-architecture">
+              <div class="blueprint-grid"></div>
+              <div class="node-mesh-lines"></div>
+            </div>
+
+            <div class="scene-heading-banner">
+              <span class="badge-mini">AI AGENT ARCHITECTURE</span>
+              <h2 class="banner-title">NOT A REPLACEMENT. AN ENGINE.</h2>
+            </div>
+
+            <!-- Agent Workflow Diagram -->
+            <div class="agent-workflow-svg-wrap">
+              <svg viewBox="0 0 900 600" class="workflow-svg">
+                <!-- Data Paths -->
+                <path d="M 120 300 L 360 300" stroke="#d4af37" stroke-width="4" stroke-dasharray="10 6" class="data-pulse-path"/>
+                <path d="M 450 250 L 680 160" stroke="#1e88e5" stroke-width="3" stroke-dasharray="8 6"/>
+                <path d="M 450 300 L 680 300" stroke="#d4af37" stroke-width="4" stroke-dasharray="8 6"/>
+                <path d="M 450 350 L 680 440" stroke="#ff5252" stroke-width="3" stroke-dasharray="8 6"/>
+
+                <!-- Request Ingest -->
+                <g class="wf-node node-request">
+                  <rect x="30" y="260" width="160" height="80" rx="8" fill="#141822" stroke="#d4af37" stroke-width="2"/>
+                  <text x="110" y="295" fill="#f5f0e6" font-family="'JetBrains Mono'" font-size="14" font-weight="700" text-anchor="middle">USER REQUEST</text>
+                  <text x="110" y="320" fill="#d4af37" font-family="'JetBrains Mono'" font-size="12" text-anchor="middle">INPUT EVENT</text>
+                </g>
+
+                <!-- JEV Decision Core (Center) -->
+                <g class="wf-node node-jev-core">
+                  <polygon points="450,180 540,300 450,420 360,300" fill="#1b202c" stroke="#d4af37" stroke-width="4"/>
+                  <circle cx="450" cy="300" r="32" fill="#d4af37" opacity="0.2"/>
+                  <text x="450" y="295" fill="#ffffff" font-family="'Bebas Neue'" font-size="32" text-anchor="middle" letter-spacing="2">JEV</text>
+                  <text x="450" y="320" fill="#d4af37" font-family="'JetBrains Mono'" font-size="11" font-weight="700" text-anchor="middle">DECISION LAYER</text>
+                </g>
+
+                <!-- 3 Action Branches -->
+                <g class="wf-node node-tool-1">
+                  <rect x="680" y="120" width="180" height="70" rx="6" fill="#161b24" stroke="#1e88e5" stroke-width="2"/>
+                  <text x="770" y="150" fill="#f5f0e6" font-family="'JetBrains Mono'" font-size="13" font-weight="700" text-anchor="middle">CONTINUE FLOW</text>
+                  <text x="770" y="172" fill="#1e88e5" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">Automated Pipeline</text>
+                </g>
+
+                <g class="wf-node node-tool-2">
+                  <rect x="680" y="265" width="180" height="70" rx="6" fill="#161b24" stroke="#d4af37" stroke-width="3"/>
+                  <text x="770" y="295" fill="#f5f0e6" font-family="'JetBrains Mono'" font-size="13" font-weight="700" text-anchor="middle">SELECT TOOL</text>
+                  <text x="770" y="317" fill="#d4af37" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">API Execution</text>
+                </g>
+
+                <g class="wf-node node-tool-3">
+                  <rect x="680" y="410" width="180" height="70" rx="6" fill="#161b24" stroke="#ff5252" stroke-width="2"/>
+                  <text x="770" y="440" fill="#f5f0e6" font-family="'JetBrains Mono'" font-size="13" font-weight="700" text-anchor="middle">ESCALATE SRE</text>
+                  <text x="770" y="462" fill="#ff5252" font-family="'JetBrains Mono'" font-size="11" text-anchor="middle">Human In The Loop</text>
+                </g>
+              </svg>
+            </div>
+
+            <!-- Character observing system thoughtfully -->
+            <div class="character-wrapper char-scene-5">
+              <div class="char-rim-light"></div>
+              <img src="assets/character/p12.png" alt="Hero with Coffee" class="char-img">
+              <div class="char-contact-shadow"></div>
+            </div>
+
+            <div class="kinetic-text-wrap text-scene-5">
+              <div class="comic-caption-box bottom-box">
+                <span class="box-tag">ARCHITECTURAL REALITY</span>
+                <p>JEV ISN'T TRYING TO REPLACE CHATGPT.</p>
+                <div class="gold-lead">IT EMPOWERS THE AGENT TO ACT.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 6: MODELS WORKING TOGETHER (40.40s - 48.88s)
+               Narration: "It's designed to work alongside models like it, handling the smaller decisions that happen inside AI-powered software."
+          ------------------------------------------------------------------ -->
+          <section id="scene-6" class="scene">
+            <div class="bg-layer dual-engine-bg">
+              <div class="dual-grid"></div>
+              <div class="synapse-waves"></div>
+            </div>
+
+            <div class="scene-heading-banner">
+              <span class="badge-mini">SYMBIOTIC INTELLIGENCE</span>
+              <h2 class="banner-title">COGNITION + DECISION</h2>
+            </div>
+
+            <!-- Dual Architecture Side-by-Side Graphic Novel Layout -->
+            <div class="dual-engine-container">
+              
+              <!-- Left Brain: Conversational / Reasoning LLM -->
+              <div class="engine-box engine-llm">
+                <div class="engine-header">
+                  <span class="eng-icon">💬</span>
+                  <div class="eng-titles">
+                    <span class="eng-type">REASONING & LANGUAGE</span>
+                    <span class="eng-name">CHATGPT / CLAUDE</span>
+                  </div>
+                </div>
+                <div class="engine-features">
+                  <div class="feat-row">◆ Deep World Knowledge</div>
+                  <div class="feat-row">◆ Creative Text Generation</div>
+                  <div class="feat-row">◆ Complex Synthesis</div>
+                </div>
+                <div class="engine-tag tag-blue">COGNITIVE LAYER</div>
+              </div>
+
+              <!-- Center Interactive Synapse Channel -->
+              <div class="synapse-bridge">
+                <div class="bridge-label">HIGH-SPEED BUS</div>
+                <div class="bridge-stream stream-down"></div>
+                <div class="bridge-stream stream-up"></div>
+                <div class="bridge-knot">⚡</div>
+              </div>
+
+              <!-- Right Brain: JEV Decision Core -->
+              <div class="engine-box engine-jev">
+                <div class="engine-header">
+                  <span class="eng-icon">⚡</span>
+                  <div class="eng-titles">
+                    <span class="eng-type">STRUCTURED DECISIONS</span>
+                    <span class="eng-name">JEV (TYPESAFE)</span>
+                  </div>
+                </div>
+                <div class="engine-features">
+                  <div class="feat-row">★ Micro-Routing & Routing</div>
+                  <div class="feat-row">★ Instant Classification</div>
+                  <div class="feat-row">★ Deterministic Confidence</div>
+                </div>
+                <div class="engine-tag tag-gold">DECISION LAYER</div>
+              </div>
+
+            </div>
+
+            <!-- Character rapidly analyzing / side laptop -->
+            <div class="character-wrapper char-scene-6">
+              <div class="char-rim-light"></div>
+              <img src="assets/character/p07.png" alt="Hero Typing Fast" class="char-img">
+              <div class="char-contact-shadow"></div>
+            </div>
+
+            <div class="kinetic-text-wrap text-scene-6">
+              <div class="comic-caption-box">
+                <span class="box-tag">COOPERATIVE ARCHITECTURE</span>
+                <p>HANDLING THE CRITICAL MICRO-DECISIONS INSIDE EVERY AI APPLICATION.</p>
+              </div>
+            </div>
+          </section>
+
+          <!-- -----------------------------------------------------------------
+               SCENE 7: CINEMATIC FINALE (48.88s - 62.64s)
+               Narration: "Because the future of AI might not just be about making models smarter. It might be about making software smarter at deciding what to do next."
+          ------------------------------------------------------------------ -->
+          <section id="scene-7" class="scene">
+            <div class="bg-layer finale-skyline">
+              <div class="city-skyline-silhouette"></div>
+              <div class="warm-window-lights"></div>
+              <div class="chiaroscuro-cone finale-gold-beam"></div>
+              <div class="comic-speed-lines-soft"></div>
+            </div>
+
+            <!-- Hero Full Standing Silhouette in Long Trench Coat -->
+            <div class="character-wrapper char-scene-7">
+              <div class="char-rim-light-epic"></div>
+              <img src="assets/character/p01.png" alt="Hero Standing Tall" class="char-img">
+              <div class="char-contact-shadow-wide"></div>
+            </div>
+
+            <!-- Kinetic Climax Typography -->
+            <div class="finale-typography">
+              <div class="climax-phrase-1" id="fin-p1">
+                <span class="fin-tag">THE FUTURE OF AI</span>
+                <h3 class="fin-headline-1">IS NOT JUST ABOUT MAKING MODELS SMARTER.</h3>
+              </div>
+
+              <div class="climax-phrase-2" id="fin-p2">
+                <div class="gold-divider"></div>
+                <h2 class="fin-headline-2">IT'S ABOUT MAKING SOFTWARE SMARTER AT</h2>
+                <div class="fin-mega-text">DECIDING WHAT TO DO NEXT.</div>
+              </div>
+
+              <!-- Final TypeSafe AI & JEV Emblem Lockup -->
+              <div class="final-emblem-lockup" id="fin-emblem">
+                <div class="emblem-shield">
+                  <div class="shield-border"></div>
+                  <div class="shield-title">JEV</div>
+                  <div class="shield-sub">TYPESAFE AI</div>
+                </div>
+                <div class="closing-url">typesafe.ai // The Decision Foundation</div>
+              </div>
+            </div>
+
+          </section>
+
+        </div><!-- /#scene-container -->
+
+        <!-- Kinetic Captions Bar (Always Synchronized with Spoken Word) -->
+        <div id="caption-bar">
+          <div class="caption-inner">
+            <span class="caption-marker">VO //</span>
+            <span id="caption-text">Everyone's building AI that talks.</span>
+          </div>
+        </div>
+
+      </div><!-- /#reel-viewport -->
+    </main>
+
+    <!-- Bottom Playback HUD Controls -->
+    <footer id="bottom-hud">
+      <div class="playback-controls">
+        <button id="btn-restart" class="ctrl-btn" title="Restart (Home)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+        </button>
+
+        <button id="btn-play-pause" class="ctrl-btn primary" title="Play / Pause (Space)">
+          <svg id="icon-play" viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" viewBox="0 0 24 24" width="20" height="20" fill="currentColor" class="hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+
+        <button id="btn-mute" class="ctrl-btn" title="Mute / Unmute (M)">
+          <svg id="icon-vol" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <svg id="icon-muted" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" class="hidden"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+        </button>
+
+        <!-- Progress Timeline Scrubber -->
+        <div class="scrubber-track" id="scrubber-track">
+          <div class="scrubber-fill" id="timeline-progress-fill"></div>
+          <!-- Scene Chapter Markers on Scrubber -->
+          <div class="chapter-pip" style="left: 0.0%" title="Scene 1: AI That Talks"></div>
+          <div class="chapter-pip" style="left: 4.5%" title="Scene 2: Unexpected Question"></div>
+          <div class="chapter-pip" style="left: 12.8%" title="Scene 3: Meet Jev"></div>
+          <div class="chapter-pip" style="left: 26.4%" title="Scene 4: Decisions"></div>
+          <div class="chapter-pip" style="left: 56.7%" title="Scene 5: Inside AI Agent"></div>
+          <div class="chapter-pip" style="left: 64.5%" title="Scene 6: Working Together"></div>
+          <div class="chapter-pip" style="left: 78.0%" title="Scene 7: Cinematic Ending"></div>
+          <input type="range" id="timeline-scrubber" min="0" max="62.64" step="0.05" value="0">
+        </div>
+
+        <button id="btn-fullscreen" class="ctrl-btn" title="Fullscreen (F)">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+        </button>
+      </div>
+    </footer>
+
+    <!-- Audio Player (Loaded with the exact 62.64s voiceover) -->
+    <audio id="voiceover-audio" preload="auto" src="assets/audio/voiceover.mp3"></audio>
+
+  </div><!-- /#app-container -->
+
+  <!-- JavaScript Animation and Sync Engine -->
+  <script src="js/app.js"></script>
+</body>
+</html>
