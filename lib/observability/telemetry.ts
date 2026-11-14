@@ -29,6 +29,7 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
   "gpt-3.5-turbo": { promptCostPerMillion: 0.5, completionCostPerMillion: 1.5 },
 
   // Google Gemini
+  "gemini-2.5-flash": { promptCostPerMillion: 0.075, completionCostPerMillion: 0.3 },
   "gemini-1.5-pro": { promptCostPerMillion: 1.25, completionCostPerMillion: 5.0 },
   "gemini-1.5-flash": { promptCostPerMillion: 0.075, completionCostPerMillion: 0.3 },
   "gemini-2.0-flash": { promptCostPerMillion: 0.1, completionCostPerMillion: 0.4 },

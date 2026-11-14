@@ -105,11 +105,35 @@ export class OpenAIAdapter implements AIProvider {
   }
 
   /**
+   * Normalizes model identifiers for compatibility with specific provider endpoints.
+   */
+  private normalizeModel(model: string): string {
+    if (this.baseUrl.includes("generativelanguage.googleapis.com")) {
+      const lower = model.toLowerCase().trim();
+      // Google Generative AI v1beta endpoints have replaced 1.5-pro/1.5-flash with gemini-2.5-flash
+      if (
+        lower === "gemini-1.5-pro" ||
+        lower === "gemini-1.5-flash" ||
+        lower === "gemini-2.0-flash" ||
+        lower === "gemini-2.5-pro" ||
+        lower === "gemini-pro" ||
+        lower === "gemini-flash" ||
+        lower === "gemini-1.0-pro" ||
+        lower === "gemini-2.5-flash-lite" ||
+        lower === "gemini"
+      ) {
+        return "gemini-2.5-flash";
+      }
+    }
+    return model;
+  }
+
+  /**
    * Static non-streaming generation
    */
   public async generate(request: ModelRequest): Promise<ModelResponse> {
     const payload: Record<string, unknown> = {
-      model: request.model,
+      model: this.normalizeModel(request.model),
       messages: this.formatMessages(request.messages),
       temperature: request.temperature ?? 0.7,
       stream: false,
@@ -201,7 +225,7 @@ export class OpenAIAdapter implements AIProvider {
    */
   public async *stream(request: ModelRequest): AsyncIterable<StreamChunk> {
     const payload: Record<string, unknown> = {
-      model: request.model,
+      model: this.normalizeModel(request.model),
       messages: this.formatMessages(request.messages),
       temperature: request.temperature ?? 0.7,
       stream: true,

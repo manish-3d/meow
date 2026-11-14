@@ -26,7 +26,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionPlan, PlanConfig> = {
     monthlyTokenBudget: 200_000,
     monthlySpendLimitUsd: 5.0,
     maxAgents: 3,
-    allowedModels: ["gemini-1.5-flash", "gpt-4o-mini"],
+    allowedModels: ["gemini-2.5-flash", "gemini-1.5-flash", "gpt-4o-mini"],
     features: [
       "200k Monthly Model Tokens",
       "Up to 3 Autonomous Agents",
@@ -45,6 +45,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionPlan, PlanConfig> = {
     monthlySpendLimitUsd: 100.0,
     maxAgents: 50,
     allowedModels: [
+      "gemini-2.5-flash",
       "gemini-1.5-pro",
       "gemini-1.5-flash",
       "gemini-2.0-flash",
