@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { SidebarNav } from "@/components/dashboard/sidebar-nav";
+import { UserProfileMenu } from "@/components/dashboard/user-profile-menu";
 import { Sparkles, ShieldCheck, ExternalLink, Zap } from "lucide-react";
 
 export default function DashboardLayout({
@@ -94,12 +95,7 @@ export default function DashboardLayout({
               <span>+ New Agent</span>
             </Link>
 
-            <Link
-              href="/sign-in"
-              className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/70 hover:bg-white/10 hover:text-white transition-colors"
-            >
-              Account
-            </Link>
+            <UserProfileMenu />
           </div>
         </header>
 

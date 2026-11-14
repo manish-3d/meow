@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import {
   Sparkles,
   ArrowRight,
@@ -22,9 +23,15 @@ import {
   Play,
   RotateCcw,
   Sliders,
+  LogOut,
 } from "lucide-react";
 
 export default function LandingPage() {
+  const { data: session } = useSession();
+  const user = session?.user;
+  const displayName = user?.name || user?.email?.split("@")[0] || "Workspace";
+  const initials = displayName.slice(0, 2).toUpperCase();
+
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
   const [activeScenario, setActiveScenario] = useState<"twitter" | "github" | "reddit">("twitter");
   const [simStep, setSimStep] = useState<number>(3); // 1 = thinking, 2 = tool execution, 3 = completed
@@ -106,19 +113,53 @@ export default function LandingPage() {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
-            <Link
-              href="/sign-in"
-              className="text-xs font-semibold text-white/70 hover:text-white px-3.5 py-2 rounded-lg hover:bg-white/5 transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/overview"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
-            >
-              <span>Launch OS</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
+            {session ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/overview"
+                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition-all"
+                >
+                  <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden">
+                    {user?.image ? (
+                      <img src={user.image} alt={displayName} className="h-full w-full object-cover" />
+                    ) : (
+                      initials
+                    )}
+                  </div>
+                  <span className="hidden sm:inline">{displayName}</span>
+                </Link>
+                <Link
+                  href="/overview"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
+                >
+                  <span>Open App</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="text-xs font-semibold text-white/50 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link
+                  href="/sign-in"
+                  className="text-xs font-semibold text-white/70 hover:text-white px-3.5 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/sign-in"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
+                >
+                  <span>Get Started</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -150,11 +191,11 @@ export default function LandingPage() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
           <Link
-            href="/agents/new"
+            href={session ? "/overview" : "/sign-in"}
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white text-black px-7 py-3 text-sm font-bold shadow-md hover:bg-white/90 transition-all hover:scale-[1.02]"
           >
             <Sparkles className="h-4 w-4 text-indigo-600" />
-            <span>Deploy Your First Agent</span>
+            <span>{session ? "Open Your Workspace" : "Get Started with Meow"}</span>
           </Link>
           <a
             href="#simulator"
@@ -452,7 +493,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <Link
-              href="/overview"
+              href={session ? "/overview" : "/sign-in"}
               className="w-full py-2.5 rounded-xl border border-white/20 text-xs font-bold hover:bg-white/10 transition-colors text-center"
             >
               Get Started Free
@@ -499,7 +540,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <Link
-              href="/billing"
+              href={session ? "/billing" : "/sign-in"}
               className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 transition-all text-center shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
             >
               <CreditCard className="h-4 w-4" />
@@ -540,7 +581,7 @@ export default function LandingPage() {
               </ul>
             </div>
             <Link
-              href="/billing"
+              href={session ? "/billing" : "/sign-in"}
               className="w-full py-2.5 rounded-xl border border-white/20 text-xs font-bold hover:bg-white/10 transition-colors text-center"
             >
               Upgrade to Enterprise

@@ -133,7 +133,7 @@ export default function BillingPage() {
       if (data.isSandbox) {
         setNotification({
           type: "success",
-          message: `Stripe Checkout completed (Sandbox Mode)! Upgraded to ${
+          message: `Stripe Checkout completed! Upgraded to ${
             targetPlan === "enterprise" ? "Enterprise" : "Pro"
           } with instant token limit activation.`,
         });
@@ -323,7 +323,7 @@ export default function BillingPage() {
               </li>
               <li className="flex items-center gap-2">
                 <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                <span>OAuth Socials (Sandbox)</span>
+                <span>OAuth Socials (Twitter, GitHub, Reddit)</span>
               </li>
             </ul>
           </div>
