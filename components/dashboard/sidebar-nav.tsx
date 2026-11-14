@@ -12,6 +12,7 @@ import {
   ExternalLink,
   Package,
   Activity,
+  CreditCard,
 } from "lucide-react";
 
 interface NavItem {
@@ -52,6 +53,12 @@ const navItems: NavItem[] = [
     href: "/observability",
     icon: Activity,
     badge: "Phase 10",
+  },
+  {
+    title: "Billing & Plans",
+    href: "/billing",
+    icon: CreditCard,
+    badge: "Pro",
   },
   {
     title: "Settings",

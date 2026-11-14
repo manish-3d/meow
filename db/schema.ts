@@ -857,4 +857,84 @@ export type NewUsageRecord = typeof usageRecords.$inferInsert;
 export type WorkspaceLimit = typeof workspaceLimits.$inferSelect;
 export type NewWorkspaceLimit = typeof workspaceLimits.$inferInsert;
 
+// ─── Billing, Subscriptions & Workspace Settings ──────────────
+
+export type SubscriptionPlan = "free" | "pro" | "enterprise";
+export type SubscriptionStatus = "active" | "past_due" | "canceled";
+
+export const subscriptions = pgTable(
+  "subscriptions",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .unique()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    plan: text("plan").$type<SubscriptionPlan>().notNull().default("free"),
+    status: text("status").$type<SubscriptionStatus>().notNull().default("active"),
+    stripeCustomerId: text("stripe_customer_id"),
+    stripeSubscriptionId: text("stripe_subscription_id"),
+    currentPeriodStart: timestamp("current_period_start", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    currentPeriodEnd: timestamp("current_period_end", { mode: "date" }),
+    cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull().default(false),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("subscriptions_workspace_id_idx").on(t.workspaceId),
+  }),
+);
+
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    invoiceNumber: text("invoice_number").notNull(),
+    amountUsd: numeric("amount_usd", { precision: 10, scale: 2 }).notNull(),
+    status: text("status").notNull().default("paid"),
+    description: text("description").notNull(),
+    paidAt: timestamp("paid_at", { mode: "date" }).defaultNow().notNull(),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("invoices_workspace_id_idx").on(t.workspaceId),
+  }),
+);
+
+export const workspaceSettings = pgTable(
+  "workspace_settings",
+  {
+    workspaceId: text("workspace_id")
+      .primaryKey()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    defaultModel: text("default_model").notNull().default("gemini-1.5-flash"),
+    enforceSafetyGuardrails: boolean("enforce_safety_guardrails").notNull().default(true),
+    allowPublicSharing: boolean("allow_public_sharing").notNull().default(false),
+    notificationEmail: text("notification_email"),
+    webhookUrl: text("webhook_url"),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+);
+
+export type Subscription = typeof subscriptions.$inferSelect;
+export type NewSubscription = typeof subscriptions.$inferInsert;
+export type Invoice = typeof invoices.$inferSelect;
+export type NewInvoice = typeof invoices.$inferInsert;
+export type WorkspaceSettings = typeof workspaceSettings.$inferSelect;
+export type NewWorkspaceSettings = typeof workspaceSettings.$inferInsert;
+
+
 

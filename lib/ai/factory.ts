@@ -24,6 +24,18 @@ export class AIProviderFactory {
       this.registry.set("openai", () => new OpenAIAdapter());
     }
 
+    // Default Gemini adapter (Google Generative AI via OpenAI-compatible endpoint)
+    if (!this.registry.has("gemini")) {
+      this.registry.set(
+        "gemini",
+        () =>
+          new OpenAIAdapter({
+            baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
+            apiKey: process.env.GEMINI_API_KEY || "",
+          }),
+      );
+    }
+
     // Default Ollama adapter (reuses OpenAI-compatible protocol)
     if (!this.registry.has("ollama")) {
       this.registry.set(
