@@ -69,11 +69,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: auth.message }, { status: auth.status });
     }
 
-    // 3. Fetch agent version bound to this conversation
+    // 3. Fetch latest active agent version for this agent
     const [agentVersion] = await db
       .select()
       .from(agentVersions)
-      .where(eq(agentVersions.id, conversation.agentVersionId))
+      .where(eq(agentVersions.agentId, conversation.agentId))
+      .orderBy(desc(agentVersions.version))
       .limit(1);
 
     if (!agentVersion) {
@@ -81,6 +82,14 @@ export async function POST(request: NextRequest) {
         { error: "Bound agent version no longer exists" },
         { status: 404 },
       );
+    }
+
+    // Keep conversation bound to latest agent version
+    if (conversation.agentVersionId !== agentVersion.id) {
+      await db
+        .update(conversations)
+        .set({ agentVersionId: agentVersion.id })
+        .where(eq(conversations.id, conversation.id));
     }
 
     // 4. Fetch workspace details
