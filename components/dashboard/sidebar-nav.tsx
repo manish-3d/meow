@@ -13,6 +13,7 @@ import {
   Package,
   Activity,
   CreditCard,
+  Globe,
   Share2,
 } from "lucide-react";
 
@@ -62,10 +63,10 @@ const navItems: NavItem[] = [
     badge: "Stripe",
   },
   {
-    title: "Integrations",
-    href: "/integrations",
-    icon: Share2,
-    badge: "OAuth",
+    title: "Web Automation",
+    href: "/automation",
+    icon: Globe,
+    badge: "Headless",
   },
   {
     title: "Settings",

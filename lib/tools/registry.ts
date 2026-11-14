@@ -16,9 +16,7 @@ import { readFileTool, writeFileTool } from "./builtin/file-ops";
 import { executeCodeTool } from "./builtin/execute-code";
 import { searchKnowledgeTool } from "./builtin/search-knowledge";
 import { backgroundTaskTool } from "./builtin/background-task";
-import { twitterPostTweetTool, twitterSearchRecentTool } from "./builtin/social-twitter";
-import { redditSubmitPostTool, redditSearchPostsTool } from "./builtin/social-reddit";
-import { instagramPublishPostTool } from "./builtin/social-instagram";
+import { browserNavigateTool, browserExtractTool, browserActionTool } from "./builtin/web-automation";
 import { githubCreateIssueTool, githubGetRepoTool } from "./builtin/social-github";
 
 export class ToolRegistry {
@@ -39,11 +37,9 @@ export class ToolRegistry {
     this.register(executeCodeTool);
     this.register(searchKnowledgeTool);
     this.register(backgroundTaskTool);
-    this.register(twitterPostTweetTool);
-    this.register(twitterSearchRecentTool);
-    this.register(redditSubmitPostTool);
-    this.register(redditSearchPostsTool);
-    this.register(instagramPublishPostTool);
+    this.register(browserNavigateTool);
+    this.register(browserExtractTool);
+    this.register(browserActionTool);
     this.register(githubCreateIssueTool);
     this.register(githubGetRepoTool);
   }

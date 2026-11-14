@@ -33,11 +33,11 @@ export default function LandingPage() {
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [activeScenario, setActiveScenario] = useState<"twitter" | "github" | "reddit">("twitter");
+  const [activeScenario, setActiveScenario] = useState<"crawler" | "monitor" | "workflow">("crawler");
   const [simStep, setSimStep] = useState<number>(3); // 1 = thinking, 2 = tool execution, 3 = completed
   const [isSimulating, setIsSimulating] = useState<boolean>(false);
 
-  const runSimulation = (scenario: "twitter" | "github" | "reddit") => {
+  const runSimulation = (scenario: "crawler" | "monitor" | "workflow") => {
     setActiveScenario(scenario);
     setIsSimulating(true);
     setSimStep(1);
@@ -52,29 +52,32 @@ export default function LandingPage() {
   };
 
   const scenarios = {
-    twitter: {
-      title: "Trend Intelligence & Social Action",
-      prompt: "Search Twitter for #AI news, summarize breakthroughs, and tweet the update to @manish_dev.",
-      toolCall: 'twitter_search_recent({ query: "#AI", maxResults: 10 })',
-      toolOutput: "Analyzed 10 recent tweets. Identified 3 core themes: autonomous agent frameworks, reasoning models, and local LLM tooling.",
-      actionCall: 'twitter_post_tweet({ text: "Just analyzed #AI trends: Autonomous agents and local reasoning models are surging in developer adoption 🚀 #MeowOS" })',
-      result: "Tweet successfully published to @manish_dev! (ID: 1857392819)",
+    crawler: {
+      name: "Web Intelligence",
+      title: "Autonomous Web Scraping & Market Intelligence",
+      prompt: "Navigate to tech publications and HackerNews, extract trending AI agent breakthroughs, and summarize insights.",
+      toolCall: 'browser_navigate({ url: "https://news.ycombinator.com", extractLinks: true })',
+      toolOutput: "HTTP 200 OK (142ms). Extracted 30 headlines, 15 discussions. Found major trends in autonomous workflows & local reasoning models.",
+      actionCall: 'browser_extract({ url: "https://news.ycombinator.com", targetTopic: "agent" })',
+      result: "Extracted 6 targeted breakthroughs with zero API fees or platform restrictions.",
     },
-    github: {
-      title: "Repository Issue Triage & Code Fix",
-      prompt: "Inspect repository 'manish/meow', find open issues related to OAuth tokens, and report resolution status.",
-      toolCall: 'github_get_repo({ owner: "manish", repo: "meow" })',
-      toolOutput: "Repository verified. Found 3 open issues: [Issue #42: Twitter OAuth token refresh].",
-      actionCall: 'github_create_issue({ owner: "manish", repo: "meow", title: "Automated OAuth PKCE integration verified" })',
-      result: "GitHub issue created: https://github.com/manish/meow/issues/43",
+    monitor: {
+      name: "Competitor Monitor",
+      title: "Competitor Price & Changelog Monitoring",
+      prompt: "Inspect competitor pricing pages, detect tier changes, and alert our team.",
+      toolCall: 'browser_extract({ url: "https://example.com/pricing", targetTopic: "enterprise" })',
+      toolOutput: "Extracted table: Standard ($29/mo), Enterprise ($99/mo). Discovered new feature add-ons.",
+      actionCall: 'github_create_issue({ owner: "manish", repo: "meow", title: "Automated Competitor Pricing Audit" })',
+      result: "Audit complete and logged directly into our repository issue tracker.",
     },
-    reddit: {
-      title: "Community Intelligence Gathering",
-      prompt: "Search r/MachineLearning for posts discussing autonomous coding agents and summarize sentiment.",
-      toolCall: 'reddit_search_posts({ subreddit: "MachineLearning", query: "autonomous agents" })',
-      toolOutput: "Retrieved 15 discussion threads. Average community score: 412 upvotes, sentiment: 88% positive.",
-      actionCall: 'reddit_submit_post({ subreddit: "MachineLearning", title: "Benchmarking Autonomous Agent Runtimes" })',
-      result: "Reddit submission published: https://reddit.com/r/MachineLearning/comments/1h8a9x",
+    workflow: {
+      name: "Form Automation",
+      title: "Headless Form & Web Action Automation",
+      prompt: "Execute automated web form interactions and lead discovery across public directories.",
+      toolCall: 'browser_action({ actionType: "search_query", targetUrl: "https://directory.com", queryOrData: "AI software founders" })',
+      toolOutput: "Submitted search query. Extracted 24 confirmed company records and verified domain links.",
+      actionCall: 'file_write({ path: "leads/ai-startups.json" })',
+      result: "Successfully saved structured lead intelligence to workspace disk.",
     },
   };
 
@@ -106,7 +109,7 @@ export default function LandingPage() {
           <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-white/60">
             <a href="#features" className="hover:text-white transition-colors">Features</a>
             <a href="#simulator" className="hover:text-white transition-colors">Simulator</a>
-            <a href="#integrations" className="hover:text-white transition-colors">Integrations</a>
+            <Link href="/automation" className="hover:text-white transition-colors">Automation</Link>
             <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
             <Link href="/agents" className="hover:text-white transition-colors">Agents</Link>
           </nav>
@@ -218,7 +221,7 @@ export default function LandingPage() {
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>1-Click OAuth Socials</span>
+            <span>Headless Web Automation ($0 Fees)</span>
           </div>
           <div className="flex items-center gap-2">
             <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -245,17 +248,17 @@ export default function LandingPage() {
 
             {/* Scenario Switcher Tabs */}
             <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
-              {(["twitter", "github", "reddit"] as const).map((sc) => (
+              {(["crawler", "monitor", "workflow"] as const).map((sc) => (
                 <button
                   key={sc}
                   onClick={() => runSimulation(sc)}
-                  className={`px-3 py-1 text-xs font-mono rounded capitalize transition-all ${
+                  className={`px-3 py-1 text-xs font-mono rounded transition-all ${
                     activeScenario === sc
                       ? "bg-white text-black font-semibold shadow-xs"
                       : "text-white/60 hover:text-white"
                   }`}
                 >
-                  {sc === "twitter" ? "X / Twitter" : sc}
+                  {scenarios[sc].name}
                 </button>
               ))}
             </div>
