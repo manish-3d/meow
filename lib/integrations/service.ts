@@ -5,6 +5,8 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import {
+  accounts,
+  workspaces,
   workspaceIntegrations,
   type IntegrationProvider,
   type WorkspaceIntegration,
@@ -18,7 +20,7 @@ import { GitHubClient } from "./clients/github";
 
 export class IntegrationsService {
   /**
-   * Retrieves all integrations configured for a workspace, masking sensitive keys.
+   * Retrieves all integrations configured for a workspace, bridging OAuth accounts automatically.
    */
   public static async listWorkspaceIntegrations(workspaceId: string) {
     const rows = await db
@@ -28,10 +30,31 @@ export class IntegrationsService {
 
     const connectedMap = new Map(rows.map((r) => [r.provider, r]));
 
-    // Return status for all supported integrations
+    // Query workspace owner's connected OAuth accounts in NextAuth accounts table
+    const [ws] = await db
+      .select({ ownerUserId: workspaces.ownerUserId })
+      .from(workspaces)
+      .where(eq(workspaces.id, workspaceId))
+      .limit(1);
+
+    const userAccounts = ws?.ownerUserId
+      ? await db.select().from(accounts).where(eq(accounts.userId, ws.ownerUserId))
+      : [];
+    const oauthMap = new Map(userAccounts.map((a) => [a.provider.toLowerCase(), a]));
+
     return (Object.keys(SUPPORTED_INTEGRATIONS) as IntegrationProvider[]).map((prov) => {
       const manifest = SUPPORTED_INTEGRATIONS[prov];
       const record = connectedMap.get(prov);
+      const oauthAccount = oauthMap.get(prov.toLowerCase());
+
+      const isConnected = Boolean(
+        (record && record.status === "connected") ||
+        (oauthAccount && oauthAccount.access_token),
+      );
+
+      const accountHandle =
+        record?.accountHandle ??
+        (oauthAccount ? `@${oauthAccount.providerAccountId}` : null);
 
       return {
         provider: prov,
@@ -41,17 +64,18 @@ export class IntegrationsService {
         icon: manifest.icon,
         capabilities: manifest.capabilities,
         fields: manifest.fields,
-        isConnected: Boolean(record && record.status === "connected"),
-        status: record?.status ?? "disconnected",
-        accountHandle: record?.accountHandle ?? null,
-        accountName: record?.accountName ?? null,
+        isConnected,
+        isOAuth: Boolean(oauthAccount && oauthAccount.access_token),
+        status: isConnected ? "connected" : "disconnected",
+        accountHandle,
+        accountName: record?.accountName ?? (oauthAccount ? `OAuth Connected (${manifest.name})` : null),
         updatedAt: record?.updatedAt ?? null,
       };
     });
   }
 
   /**
-   * Retrieves raw credentials for a specific provider in a workspace.
+   * Retrieves credentials for a specific provider, falling back to NextAuth OAuth account if available.
    */
   public static async getIntegration(
     workspaceId: string,
@@ -67,6 +91,54 @@ export class IntegrationsService {
         ),
       )
       .limit(1);
+
+    if (record && record.status === "connected" && Object.keys(record.credentials || {}).length > 0) {
+      return record;
+    }
+
+    // Check NextAuth OAuth accounts table
+    const [ws] = await db
+      .select({ ownerUserId: workspaces.ownerUserId })
+      .from(workspaces)
+      .where(eq(workspaces.id, workspaceId))
+      .limit(1);
+
+    if (ws?.ownerUserId) {
+      const [oauthAccount] = await db
+        .select()
+        .from(accounts)
+        .where(
+          and(
+            eq(accounts.userId, ws.ownerUserId),
+            eq(accounts.provider, provider),
+          ),
+        )
+        .limit(1);
+
+      if (oauthAccount && oauthAccount.access_token) {
+        return {
+          id: `oauth_${oauthAccount.providerAccountId}`,
+          workspaceId,
+          provider,
+          status: "connected",
+          accountHandle: `@${oauthAccount.providerAccountId}`,
+          accountName: `OAuth Connected (${provider})`,
+          credentials: {
+            accessToken: oauthAccount.access_token,
+            personalAccessToken: oauthAccount.access_token,
+            bearerToken: oauthAccount.access_token,
+            refreshToken: oauthAccount.refresh_token,
+            scope: oauthAccount.scope,
+          },
+          metadata: {
+            isOAuth: true,
+            providerAccountId: oauthAccount.providerAccountId,
+          },
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        };
+      }
+    }
 
     return record || null;
   }
@@ -185,3 +257,4 @@ export class IntegrationsService {
     }
   }
 }
+

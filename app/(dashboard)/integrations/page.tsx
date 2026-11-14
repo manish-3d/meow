@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { signIn } from "next-auth/react";
 import {
   Share2,
   CheckCircle2,
@@ -16,6 +17,7 @@ import {
   MessageSquare,
   Globe,
   Check,
+  Github,
 } from "lucide-react";
 
 interface IntegrationItem {
@@ -311,6 +313,22 @@ export default function IntegrationsPage() {
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </>
+              ) : item.provider === "github" ? (
+                <div className="flex flex-col gap-2 w-full">
+                  <button
+                    onClick={() => signIn("github", { callbackUrl: "/integrations" })}
+                    className="w-full py-2.5 px-4 rounded-xl bg-black dark:bg-zinc-100 text-white dark:text-zinc-900 hover:opacity-90 text-xs font-semibold shadow-xs transition-all flex items-center justify-center gap-2"
+                  >
+                    <Github className="h-4 w-4" />
+                    1-Click Connect (OAuth)
+                  </button>
+                  <button
+                    onClick={() => openConnectModal(item)}
+                    className="w-full py-1 text-[11px] text-muted-foreground hover:text-foreground transition-colors text-center"
+                  >
+                    Or configure Personal Access Token
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={() => openConnectModal(item)}
@@ -419,3 +437,4 @@ export default function IntegrationsPage() {
     </div>
   );
 }
+

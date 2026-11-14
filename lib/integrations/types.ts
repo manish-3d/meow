@@ -194,3 +194,4 @@ export const SUPPORTED_INTEGRATIONS: Record<IntegrationProvider, IntegrationMani
     ],
   },
 };
+
