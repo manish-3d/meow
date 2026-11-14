@@ -936,5 +936,48 @@ export type NewInvoice = typeof invoices.$inferInsert;
 export type WorkspaceSettings = typeof workspaceSettings.$inferSelect;
 export type NewWorkspaceSettings = typeof workspaceSettings.$inferInsert;
 
+// ─── Workspace Integrations (Social Media & Dev Platforms) ────
+
+export type IntegrationProvider = "twitter" | "instagram" | "reddit" | "github" | "linkedin";
+
+export const workspaceIntegrations = pgTable(
+  "workspace_integrations",
+  {
+    id: text("id").primaryKey().default(sql`gen_random_uuid()::text`),
+    workspaceId: text("workspace_id")
+      .notNull()
+      .references(() => workspaces.id, { onDelete: "cascade" }),
+    provider: text("provider").$type<IntegrationProvider>().notNull(),
+    status: text("status").notNull().default("connected"),
+    accountHandle: text("account_handle"),
+    accountName: text("account_name"),
+    credentials: jsonb("credentials")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    metadata: jsonb("metadata")
+      .$type<Record<string, unknown>>()
+      .notNull()
+      .default(sql`'{}'::jsonb`),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (t) => ({
+    workspaceIdx: index("workspace_integrations_workspace_id_idx").on(t.workspaceId),
+    uniqueProvider: uniqueIndex("workspace_integrations_workspace_provider_unique").on(
+      t.workspaceId,
+      t.provider,
+    ),
+  }),
+);
+
+export type WorkspaceIntegration = typeof workspaceIntegrations.$inferSelect;
+export type NewWorkspaceIntegration = typeof workspaceIntegrations.$inferInsert;
+
+
 
 

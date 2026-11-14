@@ -13,6 +13,7 @@ import {
   Package,
   Activity,
   CreditCard,
+  Share2,
 } from "lucide-react";
 
 interface NavItem {
@@ -59,6 +60,12 @@ const navItems: NavItem[] = [
     href: "/billing",
     icon: CreditCard,
     badge: "Pro",
+  },
+  {
+    title: "Integrations",
+    href: "/integrations",
+    icon: Share2,
+    badge: "Social",
   },
   {
     title: "Settings",
