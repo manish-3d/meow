@@ -2,7 +2,7 @@
  * Meow Workspace Integrations Service
  */
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   accounts,
@@ -110,7 +110,7 @@ export class IntegrationsService {
         .where(
           and(
             eq(accounts.userId, ws.ownerUserId),
-            eq(accounts.provider, provider),
+            sql`lower(${accounts.provider}) = ${provider.toLowerCase()}`,
           ),
         )
         .limit(1);

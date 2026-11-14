@@ -26,6 +26,7 @@ export const authOptions: AuthOptions = {
     GithubProvider({
       clientId: process.env.GITHUB_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.GITHUB_CLIENT_SECRET || "placeholder-secret",
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           scope: "read:user user:email repo workflow",
@@ -35,6 +36,7 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder-secret",
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           scope:
@@ -47,6 +49,7 @@ export const authOptions: AuthOptions = {
     TwitterProvider({
       clientId: process.env.TWITTER_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.TWITTER_CLIENT_SECRET || "placeholder-secret",
+      allowDangerousEmailAccountLinking: true,
       version: "2.0",
       authorization: {
         params: {
@@ -57,6 +60,7 @@ export const authOptions: AuthOptions = {
     RedditProvider({
       clientId: process.env.REDDIT_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.REDDIT_CLIENT_SECRET || "placeholder-secret",
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           duration: "permanent",
@@ -67,6 +71,7 @@ export const authOptions: AuthOptions = {
     InstagramProvider({
       clientId: process.env.INSTAGRAM_CLIENT_ID || "placeholder-id",
       clientSecret: process.env.INSTAGRAM_CLIENT_SECRET || "placeholder-secret",
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   pages: {
