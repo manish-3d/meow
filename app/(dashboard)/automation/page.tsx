@@ -19,6 +19,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Cpu,
+  MonitorPlay,
 } from "lucide-react";
 
 interface AutomationResult {
@@ -32,11 +33,15 @@ interface AutomationResult {
   actionId?: string;
   status?: string;
   resultSummary?: string;
+  sessionId?: string;
+  debuggerUrl?: string;
+  engine?: string;
 }
 
 export default function WebAutomationPage() {
   const [url, setUrl] = useState("https://news.ycombinator.com");
   const [action, setAction] = useState<"navigate" | "extract" | "action">("navigate");
+  const [engine, setEngine] = useState<"native" | "browserbase">("browserbase");
   const [topic, setTopic] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<AutomationResult | null>(null);
@@ -67,7 +72,11 @@ export default function WebAutomationPage() {
     },
   ];
 
-  const runAutomation = async (overrideUrl?: string, overrideAction?: "navigate" | "extract" | "action", overrideTopic?: string) => {
+  const runAutomation = async (
+    overrideUrl?: string,
+    overrideAction?: "navigate" | "extract" | "action",
+    overrideTopic?: string
+  ) => {
     const targetUrl = overrideUrl || url;
     const targetAction = overrideAction || action;
     const targetTopic = overrideTopic !== undefined ? overrideTopic : topic;
@@ -86,6 +95,7 @@ export default function WebAutomationPage() {
           url: targetUrl.trim(),
           action: targetAction,
           topic: targetTopic.trim() || undefined,
+          engine,
         }),
       });
 
@@ -114,15 +124,15 @@ export default function WebAutomationPage() {
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-r from-[#0c0d10] via-[#0f1117] to-indigo-950/20 p-8 shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-              <Zap className="h-3.5 w-3.5" />
-              <span>Zero-API Cost · Headless Web Automation</span>
+            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-semibold text-indigo-400 border border-indigo-500/20">
+              <Cpu className="h-3.5 w-3.5" />
+              <span>Browserbase & Headless Web Automation Suite</span>
             </div>
             <h1 className="text-3xl font-extrabold tracking-tight text-white">
-              Web Automation & Scraping Studio
+              Cloud Web Automation & Scraping Studio
             </h1>
             <p className="text-sm text-white/60 leading-relaxed">
-              Control autonomous headless browser agents to navigate, scrape data, monitor competitors, and extract live web intelligence across the internet — with zero expensive third-party API subscriptions.
+              Control autonomous browser agents powered by Browserbase cloud Chromium and local stealth extractors. Run live sessions, bypass anti-bot gates, and extract web data with zero expensive social media API fees.
             </p>
           </div>
 
@@ -132,8 +142,8 @@ export default function WebAutomationPage() {
               <p className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">API Fees</p>
             </div>
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-4 text-center">
-              <span className="text-2xl font-bold font-mono text-indigo-400">100%</span>
-              <p className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">Web Coverage</p>
+              <span className="text-2xl font-bold font-mono text-indigo-400">Browserbase</span>
+              <p className="text-[11px] text-white/40 uppercase tracking-wider font-semibold">Cloud Fleet</p>
             </div>
           </div>
         </div>
@@ -150,7 +160,7 @@ export default function WebAutomationPage() {
                 <span>Target Automation Request</span>
               </h2>
               <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                Stealth Mode
+                Anti-Bot Active
               </span>
             </div>
 
@@ -166,6 +176,37 @@ export default function WebAutomationPage() {
                   placeholder="https://example.com"
                   className="w-full rounded-xl border border-white/10 bg-white/[0.03] pl-9 pr-3 py-2.5 text-xs text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none"
                 />
+              </div>
+            </div>
+
+            {/* Engine Selector (Browserbase vs Native) */}
+            <div className="space-y-2">
+              <label className="text-xs font-semibold text-white/70">Execution Engine</label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEngine("browserbase")}
+                  className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                    engine === "browserbase"
+                      ? "border-indigo-500 bg-indigo-500/20 text-white shadow-sm"
+                      : "border-white/10 bg-white/[0.02] text-white/50 hover:text-white"
+                  }`}
+                >
+                  <Cpu className="h-3.5 w-3.5" />
+                  <span>Browserbase Cloud</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEngine("native")}
+                  className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                    engine === "native"
+                      ? "border-indigo-500 bg-indigo-500/20 text-white shadow-sm"
+                      : "border-white/10 bg-white/[0.02] text-white/50 hover:text-white"
+                  }`}
+                >
+                  <Zap className="h-3.5 w-3.5" />
+                  <span>Stealth Native</span>
+                </button>
               </div>
             </div>
 
@@ -221,7 +262,9 @@ export default function WebAutomationPage() {
               {isRunning ? (
                 <>
                   <div className="h-4 w-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                  <span>Executing Headless Crawler...</span>
+                  <span>
+                    {engine === "browserbase" ? "Spawning Browserbase Cloud..." : "Executing Stealth Crawler..."}
+                  </span>
                 </>
               ) : (
                 <>
@@ -299,8 +342,16 @@ export default function WebAutomationPage() {
               {isRunning && (
                 <div className="h-full flex flex-col items-center justify-center gap-3 text-white/50 py-16">
                   <div className="h-6 w-6 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-xs">Connecting to headless browser engine...</p>
-                  <p className="text-[10px] text-white/30 font-mono">Bypassing paywalls · Extracting DOM nodes</p>
+                  <p className="text-xs">
+                    {engine === "browserbase"
+                      ? "Connecting to Browserbase Cloud Session..."
+                      : "Connecting to stealth headless engine..."}
+                  </p>
+                  <p className="text-[10px] text-white/30 font-mono">
+                    {engine === "browserbase"
+                      ? "Cloud Chromium · Residential Proxies · Captcha Solver"
+                      : "Zero API Fees · Fast DOM Parser"}
+                  </p>
                 </div>
               )}
 
@@ -319,13 +370,37 @@ export default function WebAutomationPage() {
                   <Globe className="h-8 w-8 text-white/20" />
                   <p className="text-xs font-sans font-medium text-white/50">Ready to execute web automation</p>
                   <p className="text-[11px] max-w-sm leading-relaxed">
-                    Select a preset or enter any URL to crawl live web pages, extract content, or simulate automated actions.
+                    Select an engine (Browserbase Cloud or Stealth Native) and run live web extraction or simulated workflows.
                   </p>
                 </div>
               )}
 
               {!isRunning && result && (
                 <div className="space-y-4">
+                  {/* Session & Engine Banner */}
+                  {result.engine && (
+                    <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl border border-indigo-500/20 bg-indigo-500/5 text-xs font-sans">
+                      <div className="flex items-center gap-2">
+                        <MonitorPlay className="h-4 w-4 text-indigo-400" />
+                        <span className="font-semibold text-white">{result.engine}</span>
+                        {result.sessionId && (
+                          <span className="text-[10px] font-mono text-white/40">({result.sessionId})</span>
+                        )}
+                      </div>
+                      {result.debuggerUrl && (
+                        <a
+                          href={result.debuggerUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-[11px] font-semibold transition-all shadow-sm"
+                        >
+                          <ExternalLink className="h-3 w-3" />
+                          <span>View Live Cloud Session</span>
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                   {result.title && (
                     <div className="border-b border-white/[0.08] pb-2">
                       <span className="text-[10px] text-white/40 uppercase tracking-wider block font-sans">Page Title</span>
@@ -369,7 +444,7 @@ export default function WebAutomationPage() {
                 <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
                 Browser Engine Online
               </span>
-              <span>Gemini Agent Integration Ready</span>
+              <span>Browserbase & Gemini Ready</span>
             </div>
           </div>
         </div>
@@ -377,4 +452,3 @@ export default function WebAutomationPage() {
     </div>
   );
 }
-
