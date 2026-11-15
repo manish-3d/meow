@@ -27,43 +27,20 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-    title: "Overview",
+    title: "Browser Automation",
+    href: "/automation",
+    icon: Globe,
+    badge: "Live",
+  },
+  {
+    title: "Workflow Pipelines",
     href: "/overview",
     icon: LayoutDashboard,
+    badge: "n8n Style",
     exact: true,
   },
   {
-    title: "Browser Agent",
-    href: "/automation",
-    icon: Globe,
-    badge: "Stagehand",
-  },
-  {
-    title: "Agents",
-    href: "/agents",
-    icon: Bot,
-    badge: "Runtime",
-  },
-  {
-    title: "Plugins",
-    href: "/plugins",
-    icon: Package,
-    badge: "Hub",
-  },
-  {
-    title: "Observability",
-    href: "/observability",
-    icon: Activity,
-    badge: "Telemetry",
-  },
-  {
-    title: "Billing & Plans",
-    href: "/billing",
-    icon: CreditCard,
-    badge: "Stripe",
-  },
-  {
-    title: "Settings",
+    title: "Engine Settings",
     href: "/settings/workspace",
     icon: Settings,
   },

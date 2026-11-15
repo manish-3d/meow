@@ -266,12 +266,34 @@ export default function AutonomousBrowserAgentPage() {
             <div className="space-y-2">
               <label className="text-xs font-semibold text-white/70">Agent Prompt / User Directive</label>
               <textarea
-                rows={4}
+                rows={3}
                 value={instruction}
                 onChange={(e) => setInstruction(e.target.value)}
-                placeholder="Give Meow instructions (e.g. Open X, research NVIDIA, draft a post, and publish after approval)..."
+                placeholder="Give Meow instructions (e.g. 'find price of ipad on flipkart' or 'Open X, research AI, draft post')..."
                 className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none leading-relaxed font-sans"
               />
+              
+              {/* Quick Prompt Chips */}
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {[
+                  "find price of ipad on flipkart",
+                  "check price of RTX 4090 on amazon",
+                  "Open my X account, research trending AI topics, draft a post about NVIDIA, and publish it after my approval.",
+                  "extract top discussions from hacker news",
+                ].map((chip) => (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      setInstruction(chip);
+                      handleRunTask(chip);
+                    }}
+                    className="text-[10px] font-mono rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-2 py-1 text-white/60 hover:text-white transition-colors cursor-pointer text-left truncate max-w-full"
+                  >
+                    ⚡ {chip.length > 36 ? chip.slice(0, 36) + "..." : chip}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Execute Button */}
