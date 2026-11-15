@@ -4,17 +4,9 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Bot,
-  LayoutDashboard,
-  Wrench,
-  Settings,
-  Sparkles,
-  ExternalLink,
-  Package,
-  Activity,
-  CreditCard,
   Globe,
-  Share2,
+  LayoutDashboard,
+  Settings,
 } from "lucide-react";
 
 interface NavItem {
@@ -30,7 +22,7 @@ const navItems: NavItem[] = [
     title: "Browser Automation",
     href: "/automation",
     icon: Globe,
-    badge: "Live",
+    badge: "Studio",
   },
   {
     title: "Workflow Pipelines",
@@ -58,9 +50,9 @@ export function SidebarNav() {
 
   return (
     <div className="flex flex-col h-full justify-between">
-      <div className="space-y-1 px-3 py-4">
-        <div className="px-3 mb-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-          Navigation
+      <div className="space-y-1.5 px-3">
+        <div className="px-3 mb-2 text-[11px] font-semibold tracking-wider text-[#9E988F] uppercase">
+          Workspace
         </div>
         <nav className="space-y-1">
           {navItems.map((item) => {
@@ -70,26 +62,26 @@ export function SidebarNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`group flex items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all ${
+                className={`group flex items-center justify-between rounded-full px-3.5 py-2 text-xs font-medium transition-all ${
                   active
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                    ? "bg-black text-white shadow-xs"
+                    : "text-[#777169] hover:bg-black/5 hover:text-black"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <Icon
-                    className={`h-4 w-4 transition-transform group-hover:scale-110 ${
-                      active ? "text-primary-foreground" : "text-muted-foreground"
+                    className={`h-4 w-4 transition-transform group-hover:scale-105 ${
+                      active ? "text-white" : "text-[#777169] group-hover:text-black"
                     }`}
                   />
                   <span>{item.title}</span>
                 </div>
                 {item.badge && (
                   <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                    className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                       active
-                        ? "bg-primary-foreground/20 text-primary-foreground"
-                        : "bg-muted text-muted-foreground"
+                        ? "bg-white/20 text-white"
+                        : "bg-[#F5F4F0] text-[#777169] border border-[#ebe8e4]"
                     }`}
                   >
                     {item.badge}
@@ -101,23 +93,12 @@ export function SidebarNav() {
         </nav>
       </div>
 
-      {/* System Status Pill at the bottom */}
-      <div className="p-4 border-t bg-muted/30">
-        <div className="rounded-xl border bg-card p-3 shadow-xs">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-semibold text-foreground">Meow Engine</span>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            ReAct Loop, Tool Sandboxing & Human Approvals Active
-          </p>
-          <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-border/50 text-[10px] text-muted-foreground">
-            <span>Next.js 16 + Neon</span>
-            <span className="font-mono">v0.4.0</span>
-          </div>
-        </div>
+      <div className="px-4 py-4 space-y-2 border-t border-[#ebe8e4] mx-3">
+        <div className="text-[11px] font-semibold text-black">Meow Engine</div>
+        <p className="text-[11px] text-[#777169] leading-relaxed">
+          Browserbase & Playwright stealth automation runtime.
+        </p>
       </div>
     </div>
   );
 }
-

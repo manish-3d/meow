@@ -3,33 +3,22 @@
 import React, { useState } from "react";
 import {
   Globe,
-  Sparkles,
   Play,
   Terminal,
   ExternalLink,
   Layers,
-  Zap,
-  CheckCircle2,
-  AlertCircle,
   Copy,
   Clock,
-  Code2,
-  Search,
-  Filter,
   ArrowRight,
   ShieldCheck,
-  Cpu,
-  Bot,
+  Search,
   ShoppingCart,
-  Briefcase,
   Share2,
-  CheckCheck,
-  ShieldAlert,
-  Send,
-  Loader2,
   Check,
   X,
   Edit3,
+  Bot,
+  Briefcase,
 } from "lucide-react";
 import { BrowserActionStep, AutonomousTaskResult } from "@/lib/automation/browserbase";
 
@@ -51,43 +40,28 @@ export default function AutonomousBrowserAgentPage() {
   const agentArchetypes = [
     {
       id: "social" as const,
-      name: "Social Media Manager",
-      icon: Share2,
-      badge: "Stagehand + X",
-      desc: "Researches trends, drafts posts, and publishes after your explicit human sign-off.",
+      name: "Social Media (X)",
       samplePrompt: "Open my X account, research trending AI topics, draft a post about NVIDIA, and publish it after my approval.",
     },
     {
-      id: "research" as const,
-      name: "Research Agent",
-      icon: Search,
-      badge: "Deep Web Crawler",
-      desc: "Navigates whitepapers, docs, and news feeds to synthesize structured research.",
-      samplePrompt: "Navigate to arxiv.org and Hacker News, find the latest papers on reasoning LLMs, and summarize 3 core breakthroughs.",
+      id: "shopping" as const,
+      name: "Price Finder (Flipkart/Amazon)",
+      samplePrompt: "find price of ipad on flipkart",
     },
     {
-      id: "shopping" as const,
-      name: "Shopping & Price Agent",
-      icon: ShoppingCart,
-      badge: "Cart & Price Engine",
-      desc: "Scrapes competitor pricing across e-commerce portals and prepares order carts.",
-      samplePrompt: "Inspect tech stores for RTX 4090 availability, extract current prices, and compare discounts.",
+      id: "research" as const,
+      name: "Deep Web Research",
+      samplePrompt: "Search Hacker News and technical blogs for 'autonomous browser agents', extract key breakthroughs.",
     },
     {
       id: "job" as const,
-      name: "Job & Career Agent",
-      icon: Briefcase,
-      badge: "Portal Automation",
-      desc: "Searches open AI engineering roles, extracts requirements, and prepares applications.",
-      samplePrompt: "Search tech job boards for 'Senior AI Agent Engineer', filter by remote, and list top 5 openings with required skills.",
+      name: "Job Harvester",
+      samplePrompt: "Search tech job boards for 'Senior AI Agent Engineer', filter by remote, and list top openings.",
     },
     {
       id: "qa" as const,
-      name: "QA & Site Tester",
-      icon: ShieldCheck,
-      badge: "Playwright Verifier",
-      desc: "Visits your web application, clicks buttons, validates responsiveness, and reports errors.",
-      samplePrompt: "Navigate through meow.vercel.app, test sign-in flow, check navigation links, and verify zero 404 errors.",
+      name: "Site QA & Tester",
+      samplePrompt: "Navigate to meow-five-theta.vercel.app, test navigation links, and verify zero 404 errors.",
     },
   ];
 
@@ -158,399 +132,342 @@ export default function AutonomousBrowserAgentPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 font-sans selection:bg-indigo-500/30 selection:text-white">
-      {/* ─── HERO HEADER ─── */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-r from-[#0c0d10] via-[#0f1117] to-indigo-950/20 p-8 shadow-xl">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-              <Bot className="h-3.5 w-3.5" />
-              <span>Meow · Autonomous AI Browser Agent Engine</span>
+    <div className="p-6 sm:p-10 max-w-6xl mx-auto space-y-8 font-sans selection:bg-black/10 selection:text-black">
+      {/* ─── 1. HERO HEADER (Clean Minimalist Black & White) ─── */}
+      <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 sm:p-9 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 rounded-full bg-[#F5F4F0] px-3 py-1 text-xs font-medium text-black border border-[#ebe8e4]">
+              <span className="h-1.5 w-1.5 rounded-full bg-black animate-pulse" />
+              <span>Autonomous Browser Agent Studio</span>
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight text-white">
+            <h1 className="text-3xl sm:text-4xl font-light tracking-[-0.03em] text-black">
               Operate Websites Like a Human
             </h1>
-            <p className="text-sm text-white/60 leading-relaxed">
-              Give your agent instructions in plain English. Meow opens cloud browsers via{" "}
-              <strong className="text-white">Browserbase</strong>, observes DOM state using{" "}
-              <strong className="text-white">Stagehand</strong>, executes human-like clicks with{" "}
-              <strong className="text-white">Playwright</strong>, and halts for your explicit approval before publishing.
+            <p className="text-sm text-[#777169] leading-relaxed">
+              Give your agent instructions in plain English. Meow opens stealth browsers, observes DOM elements via Stagehand, scrapes real live data with zero API fees, and pauses for human approval before write actions.
             </p>
           </div>
 
-          {/* Tech Stack Pillars */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center">
-              <span className="text-[11px] font-mono text-indigo-400 font-bold block">AI Brain</span>
-              <span className="text-xs text-white font-semibold">Gemini 2.5</span>
+          <div className="grid grid-cols-2 gap-2 text-center shrink-0">
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-3">
+              <span className="text-[11px] font-mono text-[#777169] block">Engine</span>
+              <span className="text-xs text-black font-semibold">Playwright</span>
             </div>
-            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center">
-              <span className="text-[11px] font-mono text-emerald-400 font-bold block">Cloud Browser</span>
-              <span className="text-xs text-white font-semibold">Browserbase</span>
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-3">
+              <span className="text-[11px] font-mono text-[#777169] block">Vision</span>
+              <span className="text-xs text-black font-semibold">Stagehand</span>
             </div>
-            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center">
-              <span className="text-[11px] font-mono text-purple-400 font-bold block">AI Interaction</span>
-              <span className="text-xs text-white font-semibold">Stagehand</span>
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-3">
+              <span className="text-[11px] font-mono text-[#777169] block">Cloud Host</span>
+              <span className="text-xs text-black font-semibold">Browserbase</span>
             </div>
-            <div className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-3 text-center">
-              <span className="text-[11px] font-mono text-amber-400 font-bold block">Automation</span>
-              <span className="text-xs text-white font-semibold">Playwright</span>
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-3">
+              <span className="text-[11px] font-mono text-[#777169] block">Cost</span>
+              <span className="text-xs text-black font-semibold">$0.00 Free</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* ─── AGENT ARCHETYPE SELECTOR ─── */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-mono uppercase text-white/40 tracking-wider">
-            Select Specialized Browser Agent Archetype
-          </span>
-          <span className="text-[11px] text-indigo-400 font-mono">5 Specialized Engines Active</span>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+      {/* ─── 2. AGENT ARCHETYPE SEGMENTED PILLS ─── */}
+      <div className="space-y-2">
+        <span className="text-[11px] font-mono uppercase tracking-wider text-[#9E988F]">
+          Target Archetype
+        </span>
+        <div className="inline-flex flex-wrap p-1 bg-[#F5F4F0] rounded-full border border-[#ebe8e4] gap-1">
           {agentArchetypes.map((archetype) => {
-            const Icon = archetype.icon;
             const isSelected = agentRole === archetype.id;
             return (
-              <div
+              <button
                 key={archetype.id}
                 onClick={() => {
                   setAgentRole(archetype.id);
                   setInstruction(archetype.samplePrompt);
                 }}
-                className={`rounded-2xl border p-4 space-y-2 cursor-pointer transition-all ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all ${
                   isSelected
-                    ? "border-indigo-500 bg-indigo-500/10 shadow-lg shadow-indigo-500/10 scale-[1.02]"
-                    : "border-white/[0.08] bg-[#0c0d10] hover:border-white/20 hover:bg-white/[0.02]"
+                    ? "bg-black text-white shadow-xs"
+                    : "text-[#777169] hover:text-black"
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <div
-                    className={`h-8 w-8 rounded-xl flex items-center justify-center ${
-                      isSelected ? "bg-indigo-600 text-white" : "bg-white/5 text-white/70"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <span className="text-[9px] font-mono text-white/40 uppercase tracking-wider">
-                    {archetype.badge}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-xs font-bold text-white">{archetype.name}</h3>
-                  <p className="text-[11px] text-white/50 leading-relaxed pt-1">{archetype.desc}</p>
-                </div>
-              </div>
+                {archetype.name}
+              </button>
             );
           })}
         </div>
       </div>
 
-      {/* ─── INSTRUCTION RUNNER & LIVE PLAYWRIGHT CONSOLE ─── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Form: Natural Language Command Input (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-5 shadow-xl">
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <h2 className="text-sm font-bold text-white flex items-center gap-2">
-                <Terminal className="h-4 w-4 text-indigo-400" />
-                <span>Command Meow Browser Agent</span>
-              </h2>
-              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
-                Playwright CDP Connected
-              </span>
-            </div>
-
-            {/* Instruction Textarea */}
-            <div className="space-y-2">
-              <label className="text-xs font-semibold text-white/70">Agent Prompt / User Directive</label>
-              <textarea
-                rows={3}
-                value={instruction}
-                onChange={(e) => setInstruction(e.target.value)}
-                placeholder="Give Meow instructions (e.g. 'find price of ipad on flipkart' or 'Open X, research AI, draft post')..."
-                className="w-full rounded-xl border border-white/10 bg-white/[0.03] p-3 text-xs text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none leading-relaxed font-sans"
-              />
-              
-              {/* Quick Prompt Chips */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {[
-                  "find price of ipad on flipkart",
-                  "check price of RTX 4090 on amazon",
-                  "Open my X account, research trending AI topics, draft a post about NVIDIA, and publish it after my approval.",
-                  "extract top discussions from hacker news",
-                ].map((chip) => (
-                  <button
-                    key={chip}
-                    type="button"
-                    onClick={() => {
-                      setInstruction(chip);
-                      handleRunTask(chip);
-                    }}
-                    className="text-[10px] font-mono rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-2 py-1 text-white/60 hover:text-white transition-colors cursor-pointer text-left truncate max-w-full"
-                  >
-                    ⚡ {chip.length > 36 ? chip.slice(0, 36) + "..." : chip}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Execute Button */}
-            <button
-              type="button"
-              onClick={() => handleRunTask()}
-              disabled={isRunning || !instruction.trim()}
-              className="w-full py-3 px-4 rounded-xl bg-white text-black text-xs font-bold flex items-center justify-center gap-2 hover:bg-white/90 transition-all shadow-md hover:scale-[1.01] disabled:opacity-50 cursor-pointer"
-            >
-              {isRunning ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin text-black" />
-                  <span>Launching Cloud Browser & Stagehand...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="h-3.5 w-3.5 fill-black" />
-                  <span>Execute Autonomous Browser Agent</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Cloud Browser Session Card */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-5 space-y-3">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-white/60 font-mono">Browserbase Session</span>
-              <span className="flex items-center gap-1.5 text-emerald-400 font-mono text-[11px]">
-                <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                Headless Chromium
-              </span>
-            </div>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              When triggered, Meow spins up an isolated sandbox browser in the cloud, navigates to the target service, and observes DOM actions via Stagehand AI.
-            </p>
-          </div>
+      {/* ─── 3. DIRECTIVE INPUT CARD ─── */}
+      <div className="rounded-2xl border border-[#ebe8e4] bg-white p-6 sm:p-8 shadow-[0_1px_1px_rgba(0,0,0,0.04)] space-y-4">
+        <div className="flex items-center justify-between text-xs text-[#777169]">
+          <span className="font-semibold text-black uppercase tracking-wider text-[11px]">
+            Natural Language Directive
+          </span>
+          <span className="font-mono text-[11px]">Human-in-the-Loop Active</span>
         </div>
 
-        {/* Right Console: Live Action Traces & Human Gate (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 shadow-xl space-y-6 min-h-[520px] flex flex-col justify-between">
-            {/* Console Header */}
-            <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-              <div className="flex items-center gap-2">
-                <Globe className="h-4 w-4 text-emerald-400" />
-                <span className="text-xs font-mono text-white/80">Autonomous Action Stream (Stagehand ReAct)</span>
-              </div>
-              {taskResult && (
-                <span className="text-[10px] font-mono bg-indigo-500/10 text-indigo-400 px-2.5 py-0.5 rounded border border-indigo-500/20">
-                  Task ID: {taskResult.taskId}
-                </span>
-              )}
-            </div>
-
-            {/* Console Content */}
-            <div className="flex-1 space-y-4">
-              {isRunning && (
-                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 text-white/50">
-                  <div className="h-8 w-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                  <p className="text-xs font-medium text-white/70">Connecting to Browserbase Cloud Session...</p>
-                  <p className="text-[11px] text-white/40 font-mono">
-                    stagehand.page.goto() ➔ stagehand.page.observe() ➔ reasoning
-                  </p>
-                </div>
-              )}
-
-              {error && (
-                <div className="p-4 rounded-xl border border-red-500/20 bg-red-500/10 text-red-300 space-y-1">
-                  <div className="flex items-center gap-2 font-semibold text-xs">
-                    <AlertCircle className="h-4 w-4 text-red-400" />
-                    <span>Browser Automation Error</span>
-                  </div>
-                  <p className="text-[11px] font-mono text-red-400/90">{error}</p>
-                </div>
-              )}
-
-              {!isRunning && !error && !taskResult && (
-                <div className="py-20 flex flex-col items-center justify-center text-center space-y-3 text-white/30">
-                  <Cpu className="h-10 w-10 text-white/20" />
-                  <p className="text-xs font-semibold text-white/60">Autonomous Agent Idle</p>
-                  <p className="text-[11px] max-w-md leading-relaxed text-white/40">
-                    Click &ldquo;Execute Autonomous Browser Agent&rdquo; above. The agent will launch a browser, inspect page targets, formulate actions, and halt for your review.
-                  </p>
-                </div>
-              )}
-
-              {!isRunning && taskResult && (
-                <div className="space-y-4">
-                  {/* Step By Step Execution Traces */}
-                  {taskResult.steps.map((step) => {
-                    const isApproval = step.action === "approval_request";
-                    return (
-                      <div
-                        key={step.stepNumber}
-                        className={`rounded-xl border p-4 space-y-2.5 font-mono text-xs transition-all ${
-                          isApproval
-                            ? "border-amber-500/40 bg-amber-500/5 shadow-lg shadow-amber-500/5"
-                            : "border-white/[0.08] bg-black/40"
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`h-2 w-2 rounded-full ${
-                                isApproval ? "bg-amber-400 animate-pulse" : "bg-emerald-400"
-                              }`}
-                            />
-                            <span
-                              className={`text-[10px] font-bold uppercase tracking-wider ${
-                                isApproval ? "text-amber-400" : "text-emerald-400"
-                              }`}
-                            >
-                              Step {step.stepNumber}: {step.action.toUpperCase()}
-                            </span>
-                          </div>
-                          <span className="text-[10px] text-white/40">{step.target}</span>
-                        </div>
-
-                        <p className="text-[11px] font-sans text-white/80">{step.description}</p>
-
-                        {step.codeSnippet && (
-                          <div className="rounded-lg bg-black/60 p-2.5 border border-white/5 text-indigo-300 text-[11px] overflow-x-auto">
-                            <code>{step.codeSnippet}</code>
-                          </div>
-                        )}
-
-                        {step.outputSummary && (
-                          <p className="text-[11px] text-white/60">↳ {step.outputSummary}</p>
-                        )}
-                      </div>
-                    );
-                  })}
-
-                  {/* ─── LIVE COMPLETED RESULTS CARD ─── */}
-                  {taskResult.status === "completed" && taskResult.finalOutput && (
-                    <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-[#0e1615] to-[#0c0d10] p-6 space-y-4 shadow-2xl animate-in fade-in">
-                      <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                          <h3 className="text-sm font-bold text-white">
-                            Autonomous Browser Findings
-                          </h3>
-                        </div>
-                        <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-semibold">
-                          Live Data Extracted
-                        </span>
-                      </div>
-
-                      <div className="rounded-xl border border-white/10 bg-black/60 p-4 text-xs font-sans text-white/90 leading-relaxed whitespace-pre-line space-y-2">
-                        {taskResult.finalOutput}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ─── HUMAN IN THE LOOP APPROVAL CARD (THE EXACT EXAMPLE) ─── */}
-                  {taskResult.status === "waiting_approval" && approvalStatus === "pending" && (
-                    <div className="rounded-2xl border-2 border-amber-500/60 bg-[#0f1117] p-6 space-y-4 shadow-2xl shadow-amber-500/10 animate-in fade-in">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <ShieldAlert className="h-5 w-5 text-amber-400" />
-                          <h3 className="text-sm font-bold text-white">
-                            Human Approval Required Before Publishing
-                          </h3>
-                        </div>
-                        <span className="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-2.5 py-0.5 rounded-full font-semibold">
-                          Write Action Gate
-                        </span>
-                      </div>
-
-                      <p className="text-xs text-white/70 leading-relaxed font-sans">
-                        Meow has analyzed live data from the web and prepared the draft below. Please review or edit the content before Playwright executes the final publication:
-                      </p>
-
-                      {/* Editable Draft */}
-                      <div className="space-y-1.5">
-                        <div className="flex items-center justify-between text-[11px] text-white/40 font-mono">
-                          <span>Drafted Social Post</span>
-                          <span className="flex items-center gap-1 text-indigo-400">
-                            <Edit3 className="h-3 w-3" /> Editable
-                          </span>
-                        </div>
-                        <textarea
-                          rows={3}
-                          value={draftText}
-                          onChange={(e) => setDraftText(e.target.value)}
-                          className="w-full rounded-xl border border-white/20 bg-black/60 p-3 text-xs text-white placeholder:text-white/30 focus:border-indigo-500 focus:outline-none font-sans leading-relaxed"
-                        />
-                      </div>
-
-                      {/* Approval Buttons */}
-                      <div className="flex items-center gap-3 pt-2">
-                        <button
-                          type="button"
-                          onClick={() => handleApprovalAction(true)}
-                          disabled={isApproving}
-                          className="flex-1 py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-black text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer disabled:opacity-50"
-                        >
-                          {isApproving ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <Check className="h-4 w-4 stroke-[3]" />
-                          )}
-                          <span>Approve & Publish to X</span>
-                        </button>
-
-                        <button
-                          type="button"
-                          onClick={() => handleApprovalAction(false)}
-                          disabled={isApproving}
-                          className="py-2.5 px-4 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
-                        >
-                          <X className="h-3.5 w-3.5" />
-                          <span>Reject</span>
-                        </button>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Confirmed Approved Success Card */}
-                  {approvalStatus === "approved" && approvalResult && (
-                    <div className="rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-5 space-y-2 text-xs">
-                      <div className="flex items-center gap-2 text-emerald-400 font-bold">
-                        <CheckCircle2 className="h-4 w-4" />
-                        <span>Action Approved & Successfully Executed via Playwright</span>
-                      </div>
-                      <p className="text-white/80 font-sans">{approvalResult.message}</p>
-                      {approvalResult.publishedUrl && (
-                        <p className="font-mono text-indigo-400 pt-1">
-                          Live Publication:{" "}
-                          <a href={approvalResult.publishedUrl} target="_blank" rel="noreferrer" className="underline">
-                            {approvalResult.publishedUrl}
-                          </a>
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  {approvalStatus === "rejected" && (
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-white/60">
-                      Publication cancelled by user. No external actions were executed.
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Console Footer */}
-            <div className="flex items-center justify-between pt-3 border-t border-white/[0.06] text-[11px] text-white/40 font-mono">
-              <span className="flex items-center gap-1.5">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                Browserbase Cloud Runner Ready
-              </span>
-              <span>Stagehand v1.2 Protocol</span>
-            </div>
-          </div>
+        {/* 1-Click Quick Prompt Chips */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-[11px] text-[#9E988F] font-mono">Quick test:</span>
+          <button
+            type="button"
+            onClick={() => {
+              const p = "find price of ipad on flipkart";
+              setInstruction(p);
+              setAgentRole("shopping");
+              handleRunTask(p);
+            }}
+            className="rounded-full border border-[#ebe8e4] bg-[#FAFAF9] px-3 py-1 text-xs text-black hover:bg-black hover:text-white transition-all active:scale-[0.98]"
+          >
+            ⚡ find price of ipad on flipkart
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const p = "check price of RTX 4090 on amazon";
+              setInstruction(p);
+              setAgentRole("shopping");
+              handleRunTask(p);
+            }}
+            className="rounded-full border border-[#ebe8e4] bg-[#FAFAF9] px-3 py-1 text-xs text-black hover:bg-black hover:text-white transition-all active:scale-[0.98]"
+          >
+            ⚡ check RTX 4090 on amazon
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              const p = "Open my X account, research trending AI topics, draft a post about NVIDIA, and publish it after my approval.";
+              setInstruction(p);
+              setAgentRole("social");
+              handleRunTask(p);
+            }}
+            className="rounded-full border border-[#ebe8e4] bg-[#FAFAF9] px-3 py-1 text-xs text-black hover:bg-black hover:text-white transition-all active:scale-[0.98]"
+          >
+            ⚡ Post to X (with approval)
+          </button>
         </div>
+
+        {/* Textarea */}
+        <div className="relative">
+          <textarea
+            value={instruction}
+            onChange={(e) => setInstruction(e.target.value)}
+            disabled={isRunning}
+            rows={3}
+            className="w-full resize-none rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-sm text-black placeholder-[#9E988F] outline-none focus:border-black focus:bg-white transition-all disabled:opacity-50"
+            placeholder="Tell Meow what to do on the web..."
+          />
+        </div>
+
+        {/* Execution Toolbar */}
+        <div className="flex items-center justify-between pt-2">
+          <div className="text-xs text-[#777169] flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-black" />
+            <span>Dual-Mode: Cloud Browserbase / Local Stealth</span>
+          </div>
+
+          <button
+            onClick={() => handleRunTask()}
+            disabled={isRunning || !instruction.trim()}
+            className="inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:bg-neutral-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-xs"
+          >
+            {isRunning ? (
+              <>
+                <div className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                <span>Running Browser Agent...</span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>Run Autonomous Browser</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {error && (
+          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-xs text-red-800">
+            <strong>Error:</strong> {error}
+          </div>
+        )}
       </div>
+
+      {/* ─── 4. HUMAN-IN-THE-LOOP APPROVAL CARD (Black & White Minimalist) ─── */}
+      {taskResult && taskResult.status === "waiting_approval" && (
+        <div className="rounded-2xl border-2 border-black bg-white p-7 shadow-md space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-[#ebe8e4]">
+            <div className="flex items-center gap-2">
+              <span className="rounded-full bg-black text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5">
+                Human Approval Required
+              </span>
+              <span className="text-xs font-semibold text-black">
+                Write Action Halted
+              </span>
+            </div>
+            <span className="text-xs text-[#777169] font-mono">
+              Target: {taskResult.pendingApproval?.targetPlatform || "X / Twitter"}
+            </span>
+          </div>
+
+          <p className="text-xs text-[#777169]">
+            The autonomous browser researched the topic, drafted the content below, and paused before publishing. You may review and edit the draft:
+          </p>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs text-[#777169]">
+              <span className="font-semibold text-black flex items-center gap-1.5">
+                <Edit3 className="h-3.5 w-3.5" /> Editable Post Draft
+              </span>
+              <span className="font-mono text-[11px]">{draftText.length} characters</span>
+            </div>
+            <textarea
+              value={draftText}
+              onChange={(e) => setDraftText(e.target.value)}
+              disabled={isApproving || approvalStatus !== "pending"}
+              rows={4}
+              className="w-full resize-none rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-sm font-sans text-black outline-none focus:border-black focus:bg-white transition-all disabled:opacity-50"
+            />
+          </div>
+
+          {approvalStatus === "pending" ? (
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => handleApprovalAction(false)}
+                disabled={isApproving}
+                className="inline-flex items-center gap-1.5 h-10 px-5 rounded-full border border-[#ebe8e4] bg-white text-xs font-medium text-black hover:bg-neutral-100 active:scale-[0.98] transition-all disabled:opacity-50"
+              >
+                <X className="h-3.5 w-3.5" />
+                <span>Reject / Cancel</span>
+              </button>
+              <button
+                onClick={() => handleApprovalAction(true)}
+                disabled={isApproving}
+                className="inline-flex items-center gap-1.5 h-10 px-6 rounded-full bg-black text-white text-xs font-medium hover:bg-neutral-800 active:scale-[0.98] transition-all disabled:opacity-50 shadow-xs"
+              >
+                {isApproving ? (
+                  <>
+                    <div className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                    <span>Publishing to X...</span>
+                  </>
+                ) : (
+                  <>
+                    <Check className="h-3.5 w-3.5" />
+                    <span>Approve & Publish to X</span>
+                  </>
+                )}
+              </button>
+            </div>
+          ) : (
+            <div
+              className={`rounded-xl border p-4 text-xs font-medium ${
+                approvalStatus === "approved"
+                  ? "border-black bg-[#FAFAF9] text-black"
+                  : "border-[#ebe8e4] bg-[#FAFAF9] text-[#777169]"
+              }`}
+            >
+              {approvalStatus === "approved" ? (
+                <div className="space-y-1">
+                  <div className="font-semibold text-black">✓ Published Successfully</div>
+                  <p className="text-[#777169]">{approvalResult?.message}</p>
+                  {approvalResult?.publishedUrl && (
+                    <a
+                      href={approvalResult.publishedUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-black underline font-mono text-[11px] pt-1"
+                    >
+                      {approvalResult.publishedUrl} <ExternalLink className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div>✕ Action Rejected by User. Browser session terminated without publishing.</div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ─── 5. AUTONOMOUS FINDINGS (Structured Results Card) ─── */}
+      {taskResult && taskResult.status === "completed" && taskResult.finalOutput && (
+        <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)] space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#ebe8e4]">
+            <div className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-black" />
+              <span className="font-semibold text-black text-sm">
+                Autonomous Browser Findings
+              </span>
+            </div>
+            <span className="text-[11px] font-mono text-[#777169]">
+              Scraped without API fees
+            </span>
+          </div>
+
+          <div className="prose prose-sm max-w-none text-black leading-relaxed whitespace-pre-wrap font-sans">
+            {taskResult.finalOutput}
+          </div>
+        </div>
+      )}
+
+      {/* ─── 6. EXECUTION TRACE STEPS ─── */}
+      {taskResult && taskResult.steps && taskResult.steps.length > 0 && (
+        <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)] space-y-5">
+          <div className="flex items-center justify-between pb-3 border-b border-[#ebe8e4]">
+            <span className="font-semibold text-black text-sm flex items-center gap-2">
+              <Terminal className="h-4 w-4" /> Stagehand Execution Steps ({taskResult.steps.length})
+            </span>
+            <span className="text-[11px] font-mono text-[#777169]">
+              Session: {taskResult.sessionId}
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {taskResult.steps.map((step) => (
+              <div
+                key={step.stepNumber}
+                className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4.5 space-y-2 text-xs"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-5 rounded-full bg-black text-white font-mono text-[10px] flex items-center justify-center font-bold">
+                      {step.stepNumber}
+                    </span>
+                    <span className="font-semibold text-black uppercase tracking-wider text-[11px]">
+                      {step.action}
+                    </span>
+                  </div>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-medium ${
+                      step.status === "completed"
+                        ? "bg-black text-white"
+                        : step.status === "waiting_approval"
+                        ? "border border-black bg-white text-black font-bold"
+                        : "bg-[#ebe8e4] text-[#777169]"
+                    }`}
+                  >
+                    {step.status}
+                  </span>
+                </div>
+
+                <p className="text-black leading-relaxed">{step.description}</p>
+
+                {step.codeSnippet && (
+                  <pre className="rounded-lg bg-[#18181B] p-3 font-mono text-[11px] text-white/90 overflow-x-auto">
+                    <code>{step.codeSnippet}</code>
+                  </pre>
+                )}
+
+                {step.outputSummary && (
+                  <div className="text-[#777169] text-[11px] border-t border-[#ebe8e4] pt-2">
+                    &gt; {step.outputSummary}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { LogOut, Settings, CreditCard, ChevronDown, User, Shield } from "lucide-react";
+import { LogOut, Settings, ChevronDown, User, Shield } from "lucide-react";
 
 export function UserProfileMenu() {
   const { data: session, status } = useSession();
@@ -24,7 +24,6 @@ export function UserProfileMenu() {
   const user = session?.user;
   const displayName = user?.name || user?.email?.split("@")[0] || "Founder";
   const displayEmail = user?.email || "workspace@meow.ai";
-  const userImage = user?.image;
   const initials = displayName.slice(0, 2).toUpperCase();
 
   const handleSignOut = () => {
@@ -33,7 +32,7 @@ export function UserProfileMenu() {
 
   if (status === "loading") {
     return (
-      <div className="h-8 w-24 rounded-lg bg-white/5 animate-pulse" />
+      <div className="h-8 w-24 rounded-full bg-[#FAFAF9] animate-pulse border border-[#ebe8e4]" />
     );
   }
 
@@ -41,7 +40,7 @@ export function UserProfileMenu() {
     return (
       <Link
         href="/sign-in"
-        className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white transition-colors"
+        className="rounded-full border border-[#ebe8e4] bg-white px-3.5 py-1.5 text-xs font-medium text-black hover:bg-[#FAFAF9] transition-colors shadow-xs"
       >
         Sign In
       </Link>
@@ -54,74 +53,64 @@ export function UserProfileMenu() {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.07] px-2.5 py-1.5 transition-all text-left cursor-pointer group"
+        className="flex items-center gap-2 rounded-full border border-[#ebe8e4] bg-white hover:bg-[#FAFAF9] px-2.5 py-1 transition-all text-left cursor-pointer group shadow-xs"
       >
         {/* User Avatar */}
-        <div className="relative flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 text-[11px] font-bold text-white shadow-xs overflow-hidden">
-          {userImage ? (
-            <img src={userImage} alt={displayName} className="h-full w-full object-cover" />
-          ) : (
-            <span>{initials}</span>
-          )}
+        <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white shadow-xs">
+          {initials}
         </div>
 
-        {/* User Info (Desktop) */}
-        <div className="hidden sm:flex flex-col">
-          <span className="text-xs font-semibold text-white leading-tight group-hover:text-indigo-300 transition-colors">
-            {displayName}
-          </span>
-          <span className="text-[10px] font-mono text-white/40 leading-none">
-            Pro Plan
-          </span>
-        </div>
+        {/* User Meta */}
+        <span className="text-xs font-medium text-black max-w-[120px] truncate">
+          {displayName}
+        </span>
 
-        <ChevronDown className={`h-3 w-3 text-white/40 transition-transform ${open ? "rotate-180" : ""}`} />
+        <ChevronDown className="h-3 w-3 text-[#777169] transition-transform duration-200 group-hover:text-black" />
       </button>
 
-      {/* Dropdown Menu */}
+      {/* Profile Dropdown Menu */}
       {open && (
-        <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-white/[0.1] bg-[#0c0d10] p-2 shadow-2xl backdrop-blur-2xl z-50 animate-in fade-in slide-in-from-top-1">
-          {/* Header */}
-          <div className="px-3 py-2.5 border-b border-white/[0.06]">
-            <p className="text-xs font-semibold text-white truncate">{displayName}</p>
-            <p className="text-[11px] font-mono text-white/40 truncate">{displayEmail}</p>
-            <div className="mt-2 flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 rounded bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-medium text-indigo-400 border border-indigo-500/20">
-                <Shield className="h-2.5 w-2.5" />
-                Workspace Admin
-              </span>
+        <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-[#ebe8e4] bg-white p-2 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-100">
+          {/* User Header Info */}
+          <div className="flex items-center gap-3 p-3 border-b border-[#ebe8e4]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-black text-xs font-bold text-white">
+              {initials}
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-xs font-semibold text-black truncate">{displayName}</span>
+              <span className="text-[11px] text-[#777169] truncate font-mono">{displayEmail}</span>
             </div>
           </div>
 
-          {/* Links */}
+          {/* Quick Menu Actions */}
           <div className="py-1">
-            <Link
-              href="/billing"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/[0.06] hover:text-white transition-colors"
-            >
-              <CreditCard className="h-3.5 w-3.5 text-white/40" />
-              <span>Billing & Subscriptions</span>
-            </Link>
             <Link
               href="/settings/workspace"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs text-white/70 hover:bg-white/[0.06] hover:text-white transition-colors"
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-black hover:bg-[#FAFAF9] transition-colors"
             >
-              <Settings className="h-3.5 w-3.5 text-white/40" />
-              <span>Workspace Settings</span>
+              <Settings className="h-3.5 w-3.5 text-[#777169]" />
+              <span>Engine Settings</span>
+            </Link>
+
+            <Link
+              href="/automation"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-black hover:bg-[#FAFAF9] transition-colors"
+            >
+              <User className="h-3.5 w-3.5 text-[#777169]" />
+              <span>Browser Studio</span>
             </Link>
           </div>
 
-          {/* Sign Out */}
-          <div className="pt-1 border-t border-white/[0.06]">
+          {/* Sign Out CTA */}
+          <div className="pt-1 border-t border-[#ebe8e4]">
             <button
-              type="button"
               onClick={handleSignOut}
-              className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors cursor-pointer"
+              className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-black hover:bg-neutral-100 transition-colors cursor-pointer"
             >
-              <LogOut className="h-3.5 w-3.5" />
-              <span>Log out</span>
+              <LogOut className="h-3.5 w-3.5 text-[#777169]" />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -129,4 +118,3 @@ export function UserProfileMenu() {
     </div>
   );
 }
-

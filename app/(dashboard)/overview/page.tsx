@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   Globe,
@@ -9,15 +9,8 @@ import {
   Search,
   ArrowRight,
   Play,
-  CheckCircle2,
-  ShieldAlert,
-  Sparkles,
-  Terminal,
-  Cpu,
   Layers,
-  ExternalLink,
-  Workflow,
-  Zap,
+  Terminal,
 } from "lucide-react";
 
 export default function DashboardOverviewPage() {
@@ -36,7 +29,7 @@ export default function DashboardOverviewPage() {
     },
     {
       id: "flipkart",
-      name: "Flipkart & Amazon Price Tracker",
+      name: "Flipkart & Amazon Live Price Tracker",
       icon: ShoppingCart,
       badge: "E-Commerce Scraper",
       description:
@@ -72,152 +65,113 @@ export default function DashboardOverviewPage() {
   ];
 
   return (
-    <div className="p-8 max-w-7xl mx-auto space-y-8 text-[#f7f8f8] font-sans selection:bg-indigo-500/30 selection:text-white">
-      {/* Hero Welcome Banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-r from-[#0c0d10] via-[#0f1117] to-indigo-950/20 p-8 shadow-xl">
-        <div className="relative z-10 max-w-3xl space-y-4">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 text-xs font-mono text-emerald-400">
-            <Globe className="h-3.5 w-3.5" />
-            <span>Meow · AI Browser Automation Studio (n8n Style)</span>
+    <div className="p-6 sm:p-10 max-w-6xl mx-auto space-y-8 font-sans selection:bg-black/10 selection:text-black">
+      {/* ─── 1. HERO BANNER (Clean Minimalist Black & White) ─── */}
+      <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 sm:p-9 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+        <div className="max-w-2xl space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#F5F4F0] border border-[#ebe8e4] px-3 py-1 text-xs font-medium text-black">
+            <span className="h-1.5 w-1.5 rounded-full bg-black animate-pulse" />
+            <span>n8n-Style Workflow Pipelines</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl text-white">
-            Automate Anything on the Web with AI
+          <h1 className="text-3xl sm:text-4xl font-light tracking-[-0.03em] text-black">
+            Browser Automation Pipelines Hub
           </h1>
-          <p className="text-sm text-white/60 leading-relaxed max-w-2xl">
-            Control real browsers like a human. Use AI as your autonomous helper to scrape data, track product prices, and publish content to social platforms without expensive $100+/mo APIs.
+          <p className="text-sm text-[#777169] leading-relaxed">
+            Construct and trigger autonomous web workflows. Meow combines Stagehand DOM observation, Playwright headless execution, and human approval gates into self-healing pipelines.
           </p>
-
-          <div className="pt-2 flex flex-wrap items-center gap-3">
+          <div className="pt-2">
             <Link
               href="/automation"
-              className="inline-flex items-center gap-2 rounded-full bg-white text-black px-6 py-2.5 text-xs font-bold shadow-md hover:bg-white/90 transition-all hover:scale-[1.02]"
+              className="inline-flex items-center gap-2 h-10 px-5 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:bg-neutral-800 transition-all active:scale-[0.98] shadow-xs"
             >
-              <Play className="h-3.5 w-3.5 fill-black" />
-              <span>Open Browser Automation Studio</span>
-            </Link>
-            <Link
-              href="/settings/workspace"
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white/80 hover:text-white hover:bg-white/10 transition-all"
-            >
-              <span>Browser Engine Settings</span>
+              <Play className="h-3.5 w-3.5 fill-current" />
+              <span>Launch Live Studio</span>
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Visual n8n-Style Pipeline Architecture */}
-      <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-4 shadow-xl">
-        <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
-          <h2 className="text-xs font-mono uppercase text-white/50 tracking-wider flex items-center gap-2">
-            <Workflow className="h-3.5 w-3.5 text-indigo-400" />
-            <span>Autonomous Pipeline Flow</span>
-          </h2>
-          <span className="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded border border-emerald-500/20">
-            Zero API Keys Required
+      {/* ─── 2. VISUAL 5-NODE ARCHITECTURE (Clean Monochrome) ─── */}
+      <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)] space-y-4">
+        <div className="flex items-center justify-between pb-3 border-b border-[#ebe8e4]">
+          <span className="font-semibold text-black text-xs uppercase tracking-wider">
+            Pipeline Execution Flow (n8n Style)
+          </span>
+          <span className="text-[11px] font-mono text-[#777169]">
+            Continuous Stagehand Runtime
           </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3 pt-2">
-          {/* Node 1 */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
-            <div className="text-[10px] font-mono text-indigo-400 font-bold">1. TRIGGER</div>
-            <h3 className="text-xs font-bold text-white">Natural Directive</h3>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              You type what to do in plain English (e.g. &ldquo;find iPad on Flipkart&rdquo;).
-            </p>
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 pt-2">
+          <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-center space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[#9E988F] font-bold block">Node 1</span>
+            <span className="text-xs font-semibold text-black block">Trigger Event</span>
+            <span className="text-[11px] text-[#777169]">Manual or Cron</span>
           </div>
 
-          {/* Node 2 */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
-            <div className="text-[10px] font-mono text-emerald-400 font-bold">2. BROWSER LAUNCH</div>
-            <h3 className="text-xs font-bold text-white">Cloud Chromium</h3>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              Browserbase opens a real headless Chrome session via Playwright CDP.
-            </p>
+          <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-center space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[#9E988F] font-bold block">Node 2</span>
+            <span className="text-xs font-semibold text-black block">Browser Navigate</span>
+            <span className="text-[11px] text-[#777169]">Chromium Stealth</span>
           </div>
 
-          {/* Node 3 */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
-            <div className="text-[10px] font-mono text-purple-400 font-bold">3. STAGEHAND AI</div>
-            <h3 className="text-xs font-bold text-white">DOM Vision & Scrape</h3>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              Stagehand inspects elements, clicks buttons, and extracts live data.
-            </p>
+          <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-center space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[#9E988F] font-bold block">Node 3</span>
+            <span className="text-xs font-semibold text-black block">Stagehand Extract</span>
+            <span className="text-[11px] text-[#777169]">Live DOM Elements</span>
           </div>
 
-          {/* Node 4 */}
-          <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
-            <div className="text-[10px] font-mono text-amber-400 font-bold">4. SAFETY GATE</div>
-            <h3 className="text-xs font-bold text-white">Human Approval</h3>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              Pauses execution before write actions (e.g. posting on X) for your sign-off.
-            </p>
+          <div className="rounded-xl border-2 border-black bg-white p-4 text-center space-y-1 shadow-xs">
+            <span className="text-[10px] font-mono uppercase text-black font-bold block">Node 4</span>
+            <span className="text-xs font-bold text-black block">Human Approval</span>
+            <span className="text-[11px] text-[#777169]">Write Action Gate</span>
           </div>
 
-          {/* Node 5 */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4 space-y-2">
-            <div className="text-[10px] font-mono text-emerald-400 font-bold">5. COMPLETE</div>
-            <h3 className="text-xs font-bold text-white">Publish / Result</h3>
-            <p className="text-[11px] text-white/50 leading-relaxed">
-              Publishes confirmed content to target website or exports structured data.
-            </p>
+          <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4 text-center space-y-1">
+            <span className="text-[10px] font-mono uppercase text-[#9E988F] font-bold block">Node 5</span>
+            <span className="text-xs font-semibold text-black block">Publish / Webhook</span>
+            <span className="text-[11px] text-[#777169]">Final Execution</span>
           </div>
         </div>
       </div>
 
-      {/* Active Automation Pipelines Grid */}
+      {/* ─── 3. WORKFLOW TEMPLATES GRID ─── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono uppercase text-white/50 tracking-wider">
-            Ready-Made Automation Pipelines
-          </h2>
-          <span className="text-[11px] font-mono text-indigo-400">4 Active Automation Workflows</span>
+          <span className="text-xs font-mono uppercase tracking-wider text-[#9E988F]">
+            Prebuilt Automation Templates
+          </span>
+          <span className="text-xs font-mono text-[#777169]">4 Active Blueprints</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {pipelines.map((pipe) => {
             const Icon = pipe.icon;
             return (
               <div
                 key={pipe.id}
-                className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-5 shadow-xl hover:border-white/20 transition-all flex flex-col justify-between"
+                className="rounded-2xl border border-[#ebe8e4] bg-white p-6 shadow-[0_1px_1px_rgba(0,0,0,0.04)] flex flex-col justify-between hover:border-black/20 transition-all space-y-5"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="h-9 w-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white">
-                        <Icon className="h-4 w-4" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-bold text-white">{pipe.name}</h3>
-                        <span className="text-[11px] font-mono text-white/40">{pipe.target}</span>
-                      </div>
-                    </div>
-                    <span className="text-[10px] font-mono bg-white/5 text-white/70 px-2 py-0.5 rounded border border-white/10">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5F4F0] border border-[#ebe8e4] text-xs font-medium text-black">
+                      <Icon className="h-3.5 w-3.5" />
                       {pipe.badge}
                     </span>
+                    <span className="text-[11px] font-mono text-[#777169]">{pipe.trigger}</span>
                   </div>
 
-                  <p className="text-xs text-white/60 leading-relaxed">{pipe.description}</p>
-
-                  <div className="rounded-xl bg-black/60 p-3 border border-white/5 space-y-1">
-                    <span className="text-[10px] font-mono text-white/40 uppercase">Sample Prompt:</span>
-                    <p className="text-xs font-mono text-indigo-300">{pipe.samplePrompt}</p>
-                  </div>
+                  <h3 className="text-lg font-normal text-black">{pipe.name}</h3>
+                  <p className="text-xs text-[#777169] leading-relaxed">{pipe.description}</p>
                 </div>
 
-                <div className="pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                  <span className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-                    Ready to Run
-                  </span>
-
+                <div className="pt-2 border-t border-[#ebe8e4] flex items-center justify-between">
+                  <span className="text-[11px] font-mono text-[#777169]">Target: {pipe.target}</span>
                   <Link
                     href={`/automation`}
-                    className="inline-flex items-center gap-1.5 text-xs font-bold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
+                    className="inline-flex items-center gap-1 text-xs font-medium text-black hover:underline"
                   >
-                    <span>Run in Studio</span>
-                    <ArrowRight className="h-3.5 w-3.5" />
+                    Run in Studio <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 </div>
               </div>
