@@ -104,28 +104,51 @@ function parseDirective(instruction: string, customUrl?: string): ParsedDirectiv
   }
 
   // Clean common filler phrases to isolate the core search topic
-  let cleanQuery = instruction
-    .replace(/find\s+price\s+of/gi, "")
-    .replace(/check\s+price\s+of/gi, "")
-    .replace(/what\s+is\s+the\s+price\s+of/gi, "")
-    .replace(/search\s+for/gi, "")
-    .replace(/look\s+up/gi, "")
-    .replace(/find/gi, "")
-    .replace(/price\s+of/gi, "")
-    .replace(/cost\s+of/gi, "")
-    .replace(/on\s+flipkart/gi, "")
-    .replace(/from\s+flipkart/gi, "")
-    .replace(/on\s+amazon/gi, "")
-    .replace(/from\s+amazon/gi, "")
-    .replace(/on\s+x/gi, "")
-    .replace(/on\s+twitter/gi, "")
-    .replace(/on\s+linkedin/gi, "")
-    .replace(/and\s+publish.*/gi, "")
-    .replace(/and\s+draft.*/gi, "")
-    .replace(/after\s+my\s+approval.*/gi, "")
-    .trim();
+  let cleanQuery = "";
+  const aboutMatch = instruction.match(/(?:about|topic)\s+([^,.\n]+)/i);
+  if (aboutMatch && aboutMatch[1]) {
+    cleanQuery = aboutMatch[1]
+      .replace(/and\s+publish.*/gi, "")
+      .replace(/after\s+my\s+approval.*/gi, "")
+      .trim();
+  }
 
-  if (!cleanQuery) cleanQuery = "iPad";
+  if (!cleanQuery) {
+    cleanQuery = instruction
+      .replace(/open\s+my\s+x\s+account,?\s*/gi, "")
+      .replace(/open\s+my\s+twitter\s+account,?\s*/gi, "")
+      .replace(/upload\s+a\s+post\s+on\s+twitter/gi, "")
+      .replace(/upload\s+a\s+post\s+on\s+x/gi, "")
+      .replace(/upload\s+a\s+post/gi, "")
+      .replace(/post\s+on\s+twitter/gi, "")
+      .replace(/post\s+on\s+x/gi, "")
+      .replace(/draft\s+a\s+post\s+about/gi, "")
+      .replace(/draft\s+a\s+post/gi, "")
+      .replace(/find\s+price\s+of/gi, "")
+      .replace(/check\s+price\s+of/gi, "")
+      .replace(/what\s+is\s+the\s+price\s+of/gi, "")
+      .replace(/search\s+for/gi, "")
+      .replace(/look\s+up/gi, "")
+      .replace(/find/gi, "")
+      .replace(/price\s+of/gi, "")
+      .replace(/cost\s+of/gi, "")
+      .replace(/on\s+flipkart/gi, "")
+      .replace(/from\s+flipkart/gi, "")
+      .replace(/on\s+amazon/gi, "")
+      .replace(/from\s+amazon/gi, "")
+      .replace(/on\s+x/gi, "")
+      .replace(/on\s+twitter/gi, "")
+      .replace(/on\s+linkedin/gi, "")
+      .replace(/and\s+publish.*/gi, "")
+      .replace(/and\s+draft.*/gi, "")
+      .replace(/after\s+my\s+approval.*/gi, "")
+      .replace(/about\s+/gi, "")
+      .trim();
+  }
+
+  if (!cleanQuery) {
+    cleanQuery = platform === "X" ? "Autonomous AI Agents" : "iPad";
+  }
 
   if (platform === "Flipkart") {
     searchUrl = `https://www.flipkart.com/search?q=${encodeURIComponent(cleanQuery)}`;
@@ -357,7 +380,14 @@ export class BrowserbaseClient {
 
     // Step 4: Decision: Write Action (approval gate) vs Read Action (completed)
     if (parsed.isWriteAction) {
-      const draftText = `Update on ${parsed.query}: Live pricing and availability on ${parsed.platform} checked. Highlights:\n${extractedText.slice(0, 180)}... #Tech #${parsed.query.replace(/[^a-zA-Z0-9]/g, "")}`;
+      let draftText = "";
+      if (parsed.platform === "X") {
+        draftText = `🚀 Latest pulse on ${parsed.query}:\n\n${extractedText.slice(0, 180)}...\n\n#AI #Tech #${parsed.query.replace(/[^a-zA-Z0-9]/g, "")}`;
+      } else if (parsed.platform === "Flipkart" || parsed.platform === "Amazon") {
+        draftText = `Update on ${parsed.query}: Live pricing and availability on ${parsed.platform} checked. Highlights:\n${extractedText.slice(0, 180)}...`;
+      } else {
+        draftText = `Update on ${parsed.query}:\n${extractedText.slice(0, 180)}...`;
+      }
 
       steps.push({
         stepNumber: 4,

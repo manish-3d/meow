@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const finalDraft = modifiedDraft || "NVIDIA post confirmed.";
+    const finalDraft = modifiedDraft || "Post confirmed.";
     const publishedId = `pub_${Date.now().toString().slice(-8)}`;
 
     return NextResponse.json({
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
       status: "completed",
       publishedId,
       publishedUrl: `https://x.com/status/${publishedId}`,
-      message: `Action approved by user. Published via Playwright on Browserbase session.`,
+      publishedContent: finalDraft,
+      message: `Action approved by user. Published to Twitter/X via Playwright browser session.`,
       executedAt: new Date().toISOString(),
     });
   } catch (error: unknown) {
