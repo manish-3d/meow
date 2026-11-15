@@ -127,7 +127,7 @@ async with AutonomousBrowser(stealth=True) as agent:
           Autonomous AI Browser Automation & Stagehand Engine is Live.
         </span>
         <Link
-          href="/automation"
+          href="/workspace"
           className="font-medium text-black hover:text-[#777169] transition-colors inline-flex items-center gap-1"
         >
           Try Studio <ArrowRight className="h-3 w-3" />
@@ -147,11 +147,11 @@ async with AutonomousBrowser(stealth=True) as agent:
 
           {/* Center Nav Links */}
           <nav className="hidden md:flex items-center gap-7 text-sm font-normal text-black">
-            <Link href="/automation" className="hover:text-[#777169] transition-colors">
-              Browser Studio
+            <Link href="/workspace" className="hover:text-[#777169] transition-colors">
+              Agent Workspace
             </Link>
-            <Link href="/overview" className="hover:text-[#777169] transition-colors">
-              Workflow Pipelines
+            <Link href="/workspace/create-agent" className="hover:text-[#777169] transition-colors">
+              + New Agent
             </Link>
             <Link href="#features" className="hover:text-[#777169] transition-colors">
               Architecture
@@ -169,10 +169,10 @@ async with AutonomousBrowser(stealth=True) as agent:
             {session ? (
               <div className="flex items-center gap-2">
                 <Link
-                  href="/automation"
+                  href="/workspace"
                   className="inline-flex items-center justify-center h-9 px-4 rounded-full bg-black text-white text-xs font-medium hover:bg-[#374151] active:scale-[0.98] transition-all"
                 >
-                  Enter Studio
+                  Enter Workspace
                 </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
@@ -222,16 +222,16 @@ async with AutonomousBrowser(stealth=True) as agent:
         {/* Dual Signature Pill CTAs */}
         <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14">
           <Link
-            href="/automation"
+            href="/workspace"
             className="inline-flex items-center justify-center h-11 px-6 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all shadow-xs"
           >
-            Launch Browser Engine <ArrowRight className="h-4 w-4 ml-1.5" />
+            Launch Agent Studio <ArrowRight className="h-4 w-4 ml-1.5" />
           </Link>
           <Link
-            href="/overview"
+            href="/workspace/create-agent"
             className="inline-flex items-center justify-center h-11 px-6 rounded-full bg-white text-black text-sm font-medium shadow-[0_1px_1px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.04)] ring-[0.5px] ring-black/12.5 hover:bg-[#FAFAF9] active:scale-[0.98] transition-all"
           >
-            Explore Workflows
+            + Create New Agent
           </Link>
         </div>
 
@@ -489,7 +489,7 @@ async with AutonomousBrowser(stealth=True) as agent:
                 &gt; "Identified 24 product titles, INR prices, and active buy-now buttons on Flipkart."
               </div>
               <Link
-                href="/automation"
+                href="/workspace"
                 className="inline-flex items-center gap-1 text-xs font-medium text-black hover:text-[#777169] transition-colors pt-2"
               >
                 Launch Studio <ArrowRight className="h-3.5 w-3.5" />
@@ -520,10 +520,10 @@ async with AutonomousBrowser(stealth=True) as agent:
                 &gt; Trigger: Hourly Cron → Search Target → Extract Prices → Human Approval Gate → Webhook
               </div>
               <Link
-                href="/overview"
+                href="/workspace"
                 className="inline-flex items-center gap-1 text-xs font-medium text-black hover:text-[#777169] transition-colors pt-2"
               >
-                View Pipelines Hub <ArrowRight className="h-3.5 w-3.5" />
+                View Agent Workspace <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
@@ -694,7 +694,7 @@ async with AutonomousBrowser(stealth=True) as agent:
                 </ul>
               </div>
               <Link
-                href="/automation"
+                href="/workspace"
                 className="inline-flex items-center justify-center h-11 px-5 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all text-center"
               >
                 Start Free in Studio
@@ -730,7 +730,7 @@ async with AutonomousBrowser(stealth=True) as agent:
                 </ul>
               </div>
               <Link
-                href="/automation"
+                href="/workspace"
                 className="inline-flex items-center justify-center h-11 px-5 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all text-center"
               >
                 Upgrade to Pro
@@ -747,30 +747,30 @@ async with AutonomousBrowser(stealth=True) as agent:
             <div>
               <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Product</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/automation" className="hover:text-black transition-colors">Browser Studio</Link></li>
-                <li><Link href="/overview" className="hover:text-black transition-colors">Workflow Pipelines</Link></li>
-                <li><Link href="/automation" className="hover:text-black transition-colors">Flipkart Scraper</Link></li>
-                <li><Link href="/automation" className="hover:text-black transition-colors">Amazon Price Tracker</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Agent Studio</Link></li>
+                <li><Link href="/workspace/create-agent" className="hover:text-black transition-colors">Create Agent</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Flipkart Scraper</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Amazon Price Tracker</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Solutions</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/overview" className="hover:text-black transition-colors">E-Commerce Monitoring</Link></li>
-                <li><Link href="/overview" className="hover:text-black transition-colors">Social Auto-Publishing</Link></li>
-                <li><Link href="/overview" className="hover:text-black transition-colors">Job Discovery</Link></li>
-                <li><Link href="/overview" className="hover:text-black transition-colors">Automated QA Testing</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">E-Commerce Monitoring</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Social Auto-Publishing</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Job Discovery</Link></li>
+                <li><Link href="/workspace" className="hover:text-black transition-colors">Automated QA Testing</Link></li>
               </ul>
             </div>
 
             <div>
               <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Developers</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/automation" className="hover:text-black transition-colors">Stagehand SDK</Link></li>
-                <li><Link href="/automation" className="hover:text-black transition-colors">Playwright Adapter</Link></li>
-                <li><Link href="/automation" className="hover:text-black transition-colors">REST API</Link></li>
-                <li><Link href="/automation" className="hover:text-black transition-colors">Architecture</Link></li>
+                <li><Link href="#developer" className="hover:text-black transition-colors">Stagehand SDK</Link></li>
+                <li><Link href="#developer" className="hover:text-black transition-colors">Playwright Adapter</Link></li>
+                <li><Link href="#developer" className="hover:text-black transition-colors">REST API</Link></li>
+                <li><Link href="#features" className="hover:text-black transition-colors">Architecture</Link></li>
               </ul>
             </div>
 
@@ -814,8 +814,8 @@ async with AutonomousBrowser(stealth=True) as agent:
               <Link href="https://x.com" target="_blank" className="hover:text-black transition-colors">
                 X / Twitter
               </Link>
-              <Link href="/automation" className="hover:text-black transition-colors">
-                Console
+              <Link href="/workspace" className="hover:text-black transition-colors">
+                Workspace
               </Link>
             </div>
           </div>

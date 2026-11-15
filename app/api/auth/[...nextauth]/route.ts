@@ -2,25 +2,15 @@ import NextAuth, { AuthOptions } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { eq } from "drizzle-orm";
-
 import { db } from "@/db";
-import {
-  accounts,
-  sessions,
-  users,
-  verificationTokens,
-} from "@/db/schema";
-import { ensurePersonalWorkspace } from "@/lib/workspace/provision-workspace";
+import { users } from "@/db/schema";
 
 export const authOptions: AuthOptions = {
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
   providers: [
     CredentialsProvider({
       id: "credentials",
@@ -45,18 +35,15 @@ export const authOptions: AuthOptions = {
               id: existingUser.id,
               name: existingUser.name,
               email: existingUser.email,
-              image: existingUser.image,
             };
           }
 
           const [newUser] = await db
             .insert(users)
             .values({
-              id: crypto.randomUUID(),
               name,
               email,
-              image: `https://avatar.vercel.sh/${encodeURIComponent(email)}`,
-              emailVerified: new Date(),
+              credits: 5,
             })
             .returning();
 
@@ -64,95 +51,83 @@ export const authOptions: AuthOptions = {
             id: newUser.id,
             name: newUser.name,
             email: newUser.email,
-            image: newUser.image,
           };
-        } catch (error) {
-          console.error("Credentials authorize error:", error);
-          // Fallback user object to ensure login never fails
+        } catch (err) {
+          console.error("Credentials auth error:", err);
           return {
-            id: "guest-user-" + Date.now(),
+            id: "fallback-user-id",
             name,
             email,
-            image: `https://avatar.vercel.sh/${encodeURIComponent(email)}`,
           };
         }
       },
     }),
-    GithubProvider({
-      clientId: process.env.GITHUB_CLIENT_ID || "placeholder-id",
-      clientSecret: process.env.GITHUB_CLIENT_SECRET || "placeholder-secret",
-      allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          scope: "read:user user:email repo workflow",
-        },
-      },
-    }),
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "placeholder-id",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "placeholder-secret",
-      allowDangerousEmailAccountLinking: true,
-      authorization: {
-        params: {
-          scope: "openid email profile",
-          access_type: "offline",
-          prompt: "consent",
-        },
-      },
-    }),
+    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+      ? [
+          GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+          }),
+        ]
+      : []),
+    ...(process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+      ? [
+          GithubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+          }),
+        ]
+      : []),
   ],
   pages: {
     signIn: "/sign-in",
-    newUser: "/sign-up",
-  },
-  session: {
-    strategy: "jwt",
-  },
-  events: {
-    async createUser({ user }) {
-      if (user?.id) {
-        try {
-          await ensurePersonalWorkspace({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          });
-        } catch (error) {
-          console.error("Failed to provision workspace in createUser event:", error);
-        }
-      }
-    },
+    error: "/sign-in",
   },
   callbacks: {
-    async jwt({ token, user }) {
-      if (user && user.id) {
-        token.id = user.id;
-
+    async signIn({ user }) {
+      if (user.email) {
         try {
-          await ensurePersonalWorkspace({
-            id: user.id,
-            name: user.name,
-            email: user.email,
-          });
-        } catch (error) {
-          console.error("Failed to provision workspace in jwt callback:", error);
+          const [existing] = await db
+            .select()
+            .from(users)
+            .where(eq(users.email, user.email))
+            .limit(1);
+
+          if (!existing) {
+            await db
+              .insert(users)
+              .values({
+                name: user.name || user.email.split("@")[0],
+                email: user.email,
+                credits: 5,
+              })
+              .onConflictDoNothing();
+          }
+        } catch (err) {
+          console.error("Auto user registration error:", err);
         }
       }
-
+      return true;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.email = user.email;
+        token.name = user.name;
+      }
       return token;
     },
-
     async session({ session, token }) {
-      if (session.user && token.id) {
-        session.user.id = token.id as string;
+      if (session.user && token) {
+        (session.user as any).id = token.id as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
       }
-
       return session;
     },
   },
-  secret: process.env.NEXTAUTH_SECRET || "default-development-secret-change-in-env",
+  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-meow-ai-platform-at-least-32-chars",
 };
 
 const handler = NextAuth(authOptions);
-
 export { handler as GET, handler as POST };
