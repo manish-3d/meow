@@ -405,6 +405,27 @@ export default function AutonomousBrowserAgentPage() {
                     );
                   })}
 
+                  {/* ─── LIVE COMPLETED RESULTS CARD ─── */}
+                  {taskResult.status === "completed" && taskResult.finalOutput && (
+                    <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-b from-[#0e1615] to-[#0c0d10] p-6 space-y-4 shadow-2xl animate-in fade-in">
+                      <div className="flex items-center justify-between border-b border-white/[0.06] pb-3">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+                          <h3 className="text-sm font-bold text-white">
+                            Autonomous Browser Findings
+                          </h3>
+                        </div>
+                        <span className="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2.5 py-0.5 rounded-full font-semibold">
+                          Live Data Extracted
+                        </span>
+                      </div>
+
+                      <div className="rounded-xl border border-white/10 bg-black/60 p-4 text-xs font-sans text-white/90 leading-relaxed whitespace-pre-line space-y-2">
+                        {taskResult.finalOutput}
+                      </div>
+                    </div>
+                  )}
+
                   {/* ─── HUMAN IN THE LOOP APPROVAL CARD (THE EXACT EXAMPLE) ─── */}
                   {taskResult.status === "waiting_approval" && approvalStatus === "pending" && (
                     <div className="rounded-2xl border-2 border-amber-500/60 bg-[#0f1117] p-6 space-y-4 shadow-2xl shadow-amber-500/10 animate-in fade-in">
@@ -421,7 +442,7 @@ export default function AutonomousBrowserAgentPage() {
                       </div>
 
                       <p className="text-xs text-white/70 leading-relaxed font-sans">
-                        Meow has analyzed the latest NVIDIA AI benchmarks and prepared the draft below. Please review or edit the content before Playwright executes the final publication:
+                        Meow has analyzed live data from the web and prepared the draft below. Please review or edit the content before Playwright executes the final publication:
                       </p>
 
                       {/* Editable Draft */}
