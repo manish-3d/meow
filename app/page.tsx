@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import {
-  Sparkles,
   ArrowRight,
   Shield,
   Zap,
@@ -18,148 +17,183 @@ import {
   ExternalLink,
   ChevronRight,
   Code2,
-  CreditCard,
   Check,
   Play,
   RotateCcw,
   Sliders,
-  LogOut,
+  Globe,
+  Sparkles,
+  Search,
+  ShoppingCart,
+  Send,
+  Eye,
+  Copy,
 } from "lucide-react";
 
-export default function LandingPage() {
+export default function ElevenLabsStyleLandingPage() {
   const { data: session } = useSession();
   const user = session?.user;
   const displayName = user?.name || user?.email?.split("@")[0] || "Workspace";
-  const initials = displayName.slice(0, 2).toUpperCase();
 
+  // Platform segmented tabs (ElevenLabs style)
+  const [platformTab, setPlatformTab] = useState<"browser" | "pipelines" | "api">("browser");
+
+  // Sub-feature pill selection
+  const [subFeature, setSubFeature] = useState<"flipkart" | "amazon" | "twitter" | "jobs">("flipkart");
+
+  // Interactive Demo Sandbox states
+  const [demoPrompt, setDemoPrompt] = useState<string>("find price of ipad on flipkart [stealth-mode] [extract-prices]");
+  const [isExecuting, setIsExecuting] = useState<boolean>(false);
+  const [execStep, setExecStep] = useState<number>(3); // 1 = navigating, 2 = observing dom, 3 = completed
+  const [copiedCode, setCopiedCode] = useState<boolean>(false);
+  const [codeLanguage, setCodeLanguage] = useState<"ts" | "python" | "curl">("ts");
   const [billingCycle, setBillingCycle] = useState<"monthly" | "annual">("monthly");
-  const [activeScenario, setActiveScenario] = useState<"crawler" | "monitor" | "workflow">("crawler");
-  const [simStep, setSimStep] = useState<number>(3); // 1 = thinking, 2 = tool execution, 3 = completed
-  const [isSimulating, setIsSimulating] = useState<boolean>(false);
 
-  const runSimulation = (scenario: "crawler" | "monitor" | "workflow") => {
-    setActiveScenario(scenario);
-    setIsSimulating(true);
-    setSimStep(1);
-
-    setTimeout(() => {
-      setSimStep(2);
-      setTimeout(() => {
-        setSimStep(3);
-        setIsSimulating(false);
-      }, 1200);
-    }, 900);
+  const handleSubFeatureSelect = (feat: "flipkart" | "amazon" | "twitter" | "jobs") => {
+    setSubFeature(feat);
+    if (feat === "flipkart") {
+      setDemoPrompt("find price of ipad on flipkart [stealth-mode] [extract-prices]");
+    } else if (feat === "amazon") {
+      setDemoPrompt("check price of RTX 4090 on amazon [observe-stock] [sort-lowest]");
+    } else if (feat === "twitter") {
+      setDemoPrompt("open x account, research trending AI topics, draft post about NVIDIA [human-approval]");
+    } else {
+      setDemoPrompt("search tech job boards for 'Senior AI Agent Engineer', filter remote [extract-requirements]");
+    }
   };
 
-  const scenarios = {
-    crawler: {
-      name: "Web Intelligence",
-      title: "Autonomous Web Scraping & Market Intelligence",
-      prompt: "Navigate to tech publications and HackerNews, extract trending AI agent breakthroughs, and summarize insights.",
-      toolCall: 'browser_navigate({ url: "https://news.ycombinator.com", extractLinks: true })',
-      toolOutput: "HTTP 200 OK (142ms). Extracted 30 headlines, 15 discussions. Found major trends in autonomous workflows & local reasoning models.",
-      actionCall: 'browser_extract({ url: "https://news.ycombinator.com", targetTopic: "agent" })',
-      result: "Extracted 6 targeted breakthroughs with zero API fees or platform restrictions.",
-    },
-    monitor: {
-      name: "Competitor Monitor",
-      title: "Competitor Price & Changelog Monitoring",
-      prompt: "Inspect competitor pricing pages, detect tier changes, and alert our team.",
-      toolCall: 'browser_extract({ url: "https://example.com/pricing", targetTopic: "enterprise" })',
-      toolOutput: "Extracted table: Standard ($29/mo), Enterprise ($99/mo). Discovered new feature add-ons.",
-      actionCall: 'github_create_issue({ owner: "manish", repo: "meow", title: "Automated Competitor Pricing Audit" })',
-      result: "Audit complete and logged directly into our repository issue tracker.",
-    },
-    workflow: {
-      name: "Form Automation",
-      title: "Headless Form & Web Action Automation",
-      prompt: "Execute automated web form interactions and lead discovery across public directories.",
-      toolCall: 'browser_action({ actionType: "search_query", targetUrl: "https://directory.com", queryOrData: "AI software founders" })',
-      toolOutput: "Submitted search query. Extracted 24 confirmed company records and verified domain links.",
-      actionCall: 'file_write({ path: "leads/ai-startups.json" })',
-      result: "Successfully saved structured lead intelligence to workspace disk.",
-    },
+  const handleRunDemo = () => {
+    setIsExecuting(true);
+    setExecStep(1);
+    setTimeout(() => {
+      setExecStep(2);
+      setTimeout(() => {
+        setExecStep(3);
+        setIsExecuting(false);
+      }, 900);
+    }, 700);
+  };
+
+  const codeSnippets = {
+    ts: `import { stagehand } from "@meow/browser-agent";
+
+// 1. Launch stealth browser session
+await stagehand.page.goto("https://www.flipkart.com/search?q=ipad", {
+  waitUntil: "domcontentloaded",
+});
+
+// 2. Observe DOM and extract structured catalog items
+const products = await stagehand.page.extract({
+  instruction: "Extract product titles and live INR prices",
+  schema: z.array(z.object({ title: z.string(), price: z.string() })),
+});
+
+console.log("Extracted live pricing:", products);`,
+    python: `from meow_agent import AutonomousBrowser
+
+async with AutonomousBrowser(stealth=True) as agent:
+    # 1. Navigate to target portal
+    await agent.goto("https://www.flipkart.com/search?q=ipad")
+    
+    # 2. Extract structured pricing without platform API fees
+    results = await agent.extract(
+        instruction="Extract product titles and live prices"
+    )
+    print("Found live listings:", results)`,
+    curl: `curl -X POST https://meow-five-theta.vercel.app/api/browser/execute \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "instruction": "find price of ipad on flipkart",
+    "agentRole": "shopping",
+    "requiresApproval": false
+  }'`,
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(codeSnippets[codeLanguage]);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
-    <div className="min-h-screen bg-[#08090a] text-[#f7f8f8] selection:bg-indigo-500/30 selection:text-white relative overflow-hidden font-sans">
-      {/* Ambient background glows */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[550px] bg-[radial-gradient(ellipse_at_top,rgba(120,119,198,0.18),transparent_60%)] pointer-events-none -z-10" />
-      <div className="absolute top-[400px] right-[-100px] w-[500px] h-[500px] bg-[radial-gradient(circle,rgba(99,102,241,0.08),transparent_70%)] pointer-events-none -z-10" />
+    <div className="min-h-screen bg-[#FDFCFC] text-black font-sans selection:bg-black/10 selection:text-black relative antialiased">
+      {/* ─── 1. TOP ANNOUNCEMENT BAR (ElevenLabs Style) ─── */}
+      <div className="border-b border-[#ebe8e4] bg-[#FDFCFC] text-xs font-normal text-black flex items-center justify-center gap-2 px-4 h-11 transition-colors">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#F5F4F0] border border-[#ebe8e4] px-2.5 py-0.5 text-[11px] font-medium text-black">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+          Meow 2.5
+        </span>
+        <span className="text-[#777169] hidden sm:inline">
+          Autonomous AI Browser Automation & Stagehand Engine is Live.
+        </span>
+        <Link
+          href="/automation"
+          className="font-medium text-black hover:text-[#777169] transition-colors inline-flex items-center gap-1"
+        >
+          Try Studio <ArrowRight className="h-3 w-3" />
+        </Link>
+      </div>
 
-      {/* ─── NAVIGATION BAR ─── */}
-      <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-[#08090a]/80 backdrop-blur-xl">
+      {/* ─── 2. STICKY MAIN NAVBAR ─── */}
+      <header className="sticky top-0 z-50 border-b border-[#ebe8e4] bg-[#FDFCFC]/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          {/* Logo & Brand */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <img
-              src="/logo.png"
-              alt="Meow Logo"
-              className="h-8 w-8 rounded-full border border-white/20 object-cover shadow-sm group-hover:scale-105 transition-transform"
-            />
-            <div className="flex items-center gap-2">
-              <span className="font-bold tracking-tight text-white text-base">Meow</span>
-              <span className="text-[10px] font-mono uppercase bg-white/10 text-white/70 px-2 py-0.5 rounded-full border border-white/10 font-semibold tracking-wider">
-                Agent OS
-              </span>
+          {/* Brand Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="h-7 w-7 rounded-full bg-black flex items-center justify-center text-white font-bold text-xs shadow-xs group-hover:scale-105 transition-transform">
+              M
             </div>
+            <span className="text-base font-semibold tracking-tight text-black">Meow</span>
           </Link>
 
-          {/* Desktop Nav Links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs font-medium text-white/60">
-            <a href="#features" className="hover:text-white transition-colors">Features</a>
-            <a href="#simulator" className="hover:text-white transition-colors">Simulator</a>
-            <Link href="/automation" className="hover:text-white transition-colors">Automation</Link>
-            <a href="#pricing" className="hover:text-white transition-colors">Pricing</a>
-            <Link href="/agents" className="hover:text-white transition-colors">Agents</Link>
+          {/* Center Nav Links */}
+          <nav className="hidden md:flex items-center gap-7 text-sm font-normal text-black">
+            <Link href="/automation" className="hover:text-[#777169] transition-colors">
+              Browser Studio
+            </Link>
+            <Link href="/overview" className="hover:text-[#777169] transition-colors">
+              Workflow Pipelines
+            </Link>
+            <Link href="#features" className="hover:text-[#777169] transition-colors">
+              Architecture
+            </Link>
+            <Link href="#developer" className="hover:text-[#777169] transition-colors">
+              Developers
+            </Link>
+            <Link href="#pricing" className="hover:text-[#777169] transition-colors">
+              Pricing
+            </Link>
           </nav>
 
-          {/* Action Buttons */}
+          {/* Right Action CTAs */}
           <div className="flex items-center gap-3">
             {session ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <Link
-                  href="/overview"
-                  className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs font-semibold text-white transition-all"
+                  href="/automation"
+                  className="inline-flex items-center justify-center h-9 px-4 rounded-full bg-black text-white text-xs font-medium hover:bg-[#374151] active:scale-[0.98] transition-all"
                 >
-                  <div className="h-5 w-5 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center text-[10px] font-bold text-white overflow-hidden">
-                    {user?.image ? (
-                      <img src={user.image} alt={displayName} className="h-full w-full object-cover" />
-                    ) : (
-                      initials
-                    )}
-                  </div>
-                  <span className="hidden sm:inline">{displayName}</span>
-                </Link>
-                <Link
-                  href="/overview"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
-                >
-                  <span>Open App</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  Enter Studio
                 </Link>
                 <button
-                  type="button"
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-xs font-semibold text-white/50 hover:text-white px-2.5 py-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+                  className="text-xs text-[#777169] hover:text-black px-2 py-1 transition-colors"
                 >
-                  Log out
+                  Sign out
                 </button>
               </div>
             ) : (
               <>
                 <Link
                   href="/sign-in"
-                  className="text-xs font-semibold text-white/70 hover:text-white px-3.5 py-2 rounded-lg hover:bg-white/5 transition-colors"
+                  className="text-xs font-medium text-black px-3 py-1.5 hover:text-[#777169] transition-colors"
                 >
-                  Log In
+                  Log in
                 </Link>
                 <Link
-                  href="/sign-in"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold bg-white text-black px-4 py-2 rounded-full hover:bg-white/90 shadow-sm transition-all hover:scale-[1.02]"
+                  href="/sign-up"
+                  className="inline-flex items-center justify-center h-9 px-4 rounded-full bg-black text-white text-xs font-medium hover:bg-[#374151] active:scale-[0.98] transition-all shadow-xs"
                 >
-                  <span>Get Started</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
+                  Sign up
                 </Link>
               </>
             )}
@@ -167,457 +201,626 @@ export default function LandingPage() {
         </div>
       </header>
 
-      {/* ─── HERO SECTION ─── */}
-      <section className="pt-24 pb-16 px-6 max-w-5xl mx-auto text-center space-y-8">
-        {/* Release Pill */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/10 bg-white/[0.03] backdrop-blur-md shadow-xs hover:border-white/20 transition-all cursor-pointer">
-          <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-xs font-mono text-white/80">
-            Meow Agent OS 2.0 · Linear Inspired Architecture
-          </span>
-          <ChevronRight className="h-3.5 w-3.5 text-white/40" />
+      {/* ─── 3. HERO SECTION (ElevenLabs Swiss Display Style) ─── */}
+      <section className="pt-16 pb-12 sm:pt-24 sm:pb-16 max-w-5xl mx-auto px-6 text-center">
+        {/* Floating Category Pill */}
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#ebe8e4] bg-white text-xs font-normal text-[#777169] mb-8 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+          <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span>Stagehand + Playwright Autonomous Cloud Runtime</span>
         </div>
 
-        {/* Hero Headline */}
-        <div className="space-y-4">
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight leading-[1.08]">
-            The AI Agent <br />
-            <span className="bg-gradient-to-b from-white via-white/90 to-white/40 bg-clip-text text-transparent">
-              Operating System.
-            </span>
-          </h1>
-          <p className="text-base sm:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed font-normal">
-            Orchestrate autonomous AI agents with sandboxed tool execution, 1-click OAuth workspace integrations, human approval safety gates, and Stripe enterprise subscriptions.
-          </p>
-        </div>
+        {/* Big Swiss H1 Headline */}
+        <h1 className="text-5xl sm:text-7xl lg:text-8xl font-light tracking-[-0.03em] leading-[1.02] text-black text-balance mb-6">
+          Bringing the web to life
+        </h1>
 
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+        {/* Elegant Subtitle */}
+        <p className="text-base sm:text-xl text-[#777169] max-w-2xl mx-auto font-normal leading-relaxed text-balance mb-10">
+          Powering the next generation of autonomous browser agents. Research topics across websites, extract live DOM data, bypass anti-bot challenges, and automate actions with human-in-the-loop safety.
+        </p>
+
+        {/* Dual Signature Pill CTAs */}
+        <div className="flex flex-wrap items-center justify-center gap-3.5 mb-14">
           <Link
-            href={session ? "/overview" : "/sign-in"}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full bg-white text-black px-7 py-3 text-sm font-bold shadow-md hover:bg-white/90 transition-all hover:scale-[1.02]"
+            href="/automation"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all shadow-xs"
           >
-            <Sparkles className="h-4 w-4 text-indigo-600" />
-            <span>{session ? "Open Your Workspace" : "Get Started with Meow"}</span>
+            Launch Browser Engine <ArrowRight className="h-4 w-4 ml-1.5" />
           </Link>
-          <a
-            href="#simulator"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.03] px-6 py-3 text-sm font-semibold text-white hover:bg-white/[0.08] transition-colors"
+          <Link
+            href="/overview"
+            className="inline-flex items-center justify-center h-11 px-6 rounded-full bg-white text-black text-sm font-medium shadow-[0_1px_1px_rgba(0,0,0,0.04),0_2px_4px_rgba(0,0,0,0.04)] ring-[0.5px] ring-black/12.5 hover:bg-[#FAFAF9] active:scale-[0.98] transition-all"
           >
-            <Terminal className="h-4 w-4 text-white/70" />
-            <span>Explore Live Simulator</span>
-          </a>
+            Explore Workflows
+          </Link>
         </div>
 
-        {/* Trust Badges */}
-        <div className="pt-8 flex flex-wrap items-center justify-center gap-8 text-xs font-mono text-white/40">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Gemini 2.5 Flash Engine</span>
+        {/* ─── 4. SEGMENTED PLATFORM PILL TABS (ElevenLabs Style) ─── */}
+        <div className="inline-flex p-1 bg-[#F5F4F0] rounded-full border border-[#ebe8e4] mb-5">
+          <button
+            onClick={() => setPlatformTab("browser")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+              platformTab === "browser"
+                ? "bg-white text-black shadow-[0_1px_1px_rgba(0,0,0,0.04)]"
+                : "text-[#777169] hover:text-black"
+            }`}
+          >
+            MeowBrowser
+          </button>
+          <button
+            onClick={() => setPlatformTab("pipelines")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+              platformTab === "pipelines"
+                ? "bg-white text-black shadow-[0_1px_1px_rgba(0,0,0,0.04)]"
+                : "text-[#777169] hover:text-black"
+            }`}
+          >
+            MeowPipelines
+          </button>
+          <button
+            onClick={() => setPlatformTab("api")}
+            className={`px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+              platformTab === "api"
+                ? "bg-white text-black shadow-[0_1px_1px_rgba(0,0,0,0.04)]"
+                : "text-[#777169] hover:text-black"
+            }`}
+          >
+            MeowAPI
+          </button>
+        </div>
+
+        {/* Sub-feature quick filter pills */}
+        <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+          <button
+            onClick={() => handleSubFeatureSelect("flipkart")}
+            className={`rounded-full px-3.5 py-1 text-xs border transition-all ${
+              subFeature === "flipkart"
+                ? "border-[#ebe8e4] bg-white text-black shadow-xs font-medium"
+                : "border-transparent text-[#777169] hover:text-black"
+            }`}
+          >
+            Flipkart Live Scraper
+          </button>
+          <button
+            onClick={() => handleSubFeatureSelect("amazon")}
+            className={`rounded-full px-3.5 py-1 text-xs border transition-all ${
+              subFeature === "amazon"
+                ? "border-[#ebe8e4] bg-white text-black shadow-xs font-medium"
+                : "border-transparent text-[#777169] hover:text-black"
+            }`}
+          >
+            Amazon Price Tracker
+          </button>
+          <button
+            onClick={() => handleSubFeatureSelect("twitter")}
+            className={`rounded-full px-3.5 py-1 text-xs border transition-all ${
+              subFeature === "twitter"
+                ? "border-[#ebe8e4] bg-white text-black shadow-xs font-medium"
+                : "border-transparent text-[#777169] hover:text-black"
+            }`}
+          >
+            Social Content Publisher (X)
+          </button>
+          <button
+            onClick={() => handleSubFeatureSelect("jobs")}
+            className={`rounded-full px-3.5 py-1 text-xs border transition-all ${
+              subFeature === "jobs"
+                ? "border-[#ebe8e4] bg-white text-black shadow-xs font-medium"
+                : "border-transparent text-[#777169] hover:text-black"
+            }`}
+          >
+            Job & Lead Harvester
+          </button>
+        </div>
+
+        {/* ─── 5. INTERACTIVE DEMO SANDBOX WIDGET (The ElevenLabs Centerpiece) ─── */}
+        <div className="rounded-2xl border border-[#ebe8e4] bg-white shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-6 sm:p-8 max-w-4xl mx-auto text-left relative overflow-hidden transition-all">
+          {/* Top metadata row */}
+          <div className="flex items-center justify-between pb-4 border-b border-[#ebe8e4]/60 mb-4 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-black uppercase tracking-wider text-[11px]">Directive Prompt</span>
+              <span className="text-[#9E988F]">·</span>
+              <span className="text-[#777169] font-mono">Stagehand Act / Extract</span>
+            </div>
+            <div className="flex items-center gap-2 text-[#777169]">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span>Headless Stealth · Zero API Cost</span>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Neon Cloud PostgreSQL</span>
+
+          {/* Interactive Textarea */}
+          <div className="relative mb-5">
+            <textarea
+              value={demoPrompt}
+              onChange={(e) => setDemoPrompt(e.target.value)}
+              rows={3}
+              className="w-full resize-none outline-none text-base sm:text-lg text-black font-normal bg-transparent caret-[#2B7FFF] placeholder-[#9E988F]"
+              placeholder="Give Meow instructions in plain English (e.g. find price of ipad on flipkart)..."
+            />
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Headless Web Automation ($0 Fees)</span>
+
+          {/* Bottom Action Controls */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-[#ebe8e4]/60">
+            <div className="flex items-center gap-2 text-xs text-[#777169]">
+              <span className="px-2.5 py-1 rounded-lg border border-[#ebe8e4] bg-[#FAFAF9] text-black font-medium">
+                {subFeature === "flipkart" ? "Flipkart DOM" : subFeature === "amazon" ? "Amazon DOM" : subFeature === "twitter" ? "Twitter/X (Approval)" : "Web Directory"}
+              </span>
+              <span className="hidden sm:inline">Engine: Chromium Stealth</span>
+            </div>
+
+            <button
+              onClick={handleRunDemo}
+              disabled={isExecuting}
+              className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full bg-black text-white text-xs sm:text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all ml-auto disabled:opacity-50"
+            >
+              {isExecuting ? (
+                <>
+                  <div className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                  <span>Executing Trace...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="h-3.5 w-3.5 fill-current" />
+                  <span>Execute Browser Task</span>
+                </>
+              )}
+            </button>
           </div>
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-            <span>Stripe Billing Active</span>
+
+          {/* Live Execution Visualizer Card */}
+          <div className="mt-6 rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-4.5 space-y-3 font-mono text-xs">
+            <div className="flex items-center justify-between text-[#777169] text-[11px] pb-2 border-b border-[#ebe8e4]">
+              <span className="flex items-center gap-1.5 text-black font-semibold">
+                <Terminal className="h-3.5 w-3.5" /> Stagehand Autonomous Trace
+              </span>
+              <span>Latency: {isExecuting ? "executing..." : "84ms"}</span>
+            </div>
+
+            {/* Step 1: Navigation */}
+            <div className="flex items-start gap-2.5">
+              <span className={`h-4 w-4 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 ${execStep >= 1 ? "bg-black text-white" : "bg-[#ebe8e4] text-[#777169]"}`}>
+                1
+              </span>
+              <div className="flex-1">
+                <span className="font-semibold text-black">Navigate & Initialize: </span>
+                <span className="text-[#777169]">
+                  {subFeature === "flipkart"
+                    ? "https://www.flipkart.com/search?q=ipad"
+                    : subFeature === "amazon"
+                    ? "https://www.amazon.in/s?k=rtx+4090"
+                    : subFeature === "twitter"
+                    ? "https://x.com/explore (Researching AI topics)"
+                    : "https://directory.com/jobs"}
+                </span>
+              </div>
+            </div>
+
+            {/* Step 2: DOM Observation */}
+            <div className="flex items-start gap-2.5">
+              <span className={`h-4 w-4 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 ${execStep >= 2 ? "bg-black text-white" : "bg-[#ebe8e4] text-[#777169]"}`}>
+                2
+              </span>
+              <div className="flex-1">
+                <span className="font-semibold text-black">Inspect & Filter: </span>
+                <span className="text-[#777169]">
+                  Observed catalog elements, filtered pricing nodes, bypassed anti-bot rate limits with stealth browser headers.
+                </span>
+              </div>
+            </div>
+
+            {/* Step 3: Result Preview */}
+            <div className="flex items-start gap-2.5">
+              <span className={`h-4 w-4 rounded-full flex items-center justify-center text-[10px] shrink-0 mt-0.5 ${execStep >= 3 ? "bg-emerald-600 text-white" : "bg-[#ebe8e4] text-[#777169]"}`}>
+                ✓
+              </span>
+              <div className="flex-1">
+                <span className="font-semibold text-black">Output Extracted: </span>
+                {subFeature === "flipkart" ? (
+                  <span className="text-emerald-700 font-medium">
+                    Apple iPad (10th Gen) 64 GB: <strong>₹27,399</strong> · Apple iPad (9th Gen): <strong>₹32,199</strong> · Apple 2025 iPad (A16): <strong>₹49,900</strong>
+                  </span>
+                ) : subFeature === "amazon" ? (
+                  <span className="text-emerald-700 font-medium">
+                    RTX 4090 OC 24GB: <strong>₹1,84,900</strong> (In Stock, 2 sellers)
+                  </span>
+                ) : subFeature === "twitter" ? (
+                  <span className="text-amber-700 font-medium">
+                    [HALTED FOR APPROVAL] Drafted post on NVIDIA Alpamayo 2 Edge AI reasoning. Awaiting human confirmation.
+                  </span>
+                ) : (
+                  <span className="text-emerald-700 font-medium">
+                    Extracted 5 verified openings with remote salary bands ($180k - $240k).
+                  </span>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ─── INTERACTIVE AGENT SIMULATOR (GROK / LINEAR STYLE) ─── */}
-      <section id="simulator" className="py-12 px-6 max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-white/[0.12] bg-[#0c0d10] shadow-2xl overflow-hidden relative">
-          {/* Top Window Bar */}
-          <div className="px-5 py-3 border-b border-white/[0.08] bg-[#08090a]/60 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex gap-1.5">
-                <span className="h-3 w-3 rounded-full bg-red-500/80" />
-                <span className="h-3 w-3 rounded-full bg-amber-500/80" />
-                <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
+      {/* ─── 6. TRUSTED BY TEAMS (ElevenLabs Style Minimal Logos) ─── */}
+      <section className="py-12 border-y border-[#ebe8e4] bg-[#FAFAF9]/50">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <p className="text-xs uppercase tracking-wider text-[#9E988F] font-semibold mb-6">
+            Engineered for modern autonomous web operations & n8n-style pipelines
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-16 opacity-70 grayscale">
+            <span className="font-semibold tracking-tight text-sm text-black">PLAYWRIGHT</span>
+            <span className="font-semibold tracking-tight text-sm text-black">STAGEHAND</span>
+            <span className="font-semibold tracking-tight text-sm text-black">BROWSERBASE</span>
+            <span className="font-semibold tracking-tight text-sm text-black">CHROMIUM</span>
+            <span className="font-semibold tracking-tight text-sm text-black">INNGEST</span>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 7. TWO PLATFORMS ARCHITECTURE (ElevenLabs 2-Column Grid) ─── */}
+      <section id="features" className="py-24 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-5xl font-light tracking-[-0.03em] text-black mb-4">
+            Two platforms built on the same autonomous foundation
+          </h2>
+          <p className="text-base text-[#777169] leading-relaxed">
+            Whether running individual live browser tasks or building automated recurring pipelines, Meow delivers human-grade web execution.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Card 1: Browser Studio */}
+          <div className="rounded-2xl border border-[#ebe8e4] bg-white p-8 lg:p-10 flex flex-col justify-between hover:border-black/20 transition-all shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5F4F0] text-xs font-semibold text-black mb-6">
+                <Globe className="h-3.5 w-3.5" /> Meow Studio
               </div>
-              <span className="text-xs font-mono text-white/40 pl-2">
-                meow-agent-runtime · active thread #1
-              </span>
+              <h3 className="text-2xl font-normal text-black mb-3">
+                Autonomous Browser Studio
+              </h3>
+              <p className="text-sm text-[#777169] leading-relaxed mb-8">
+                Operate any website like a human. Launch headless or live streaming cloud Chromium browsers, inspect interactive DOM elements, bypass rate limits, and scrape structured catalog data with zero API fees.
+              </p>
             </div>
 
-            {/* Scenario Switcher Tabs */}
-            <div className="flex gap-1 bg-white/5 p-1 rounded-lg">
-              {(["crawler", "monitor", "workflow"] as const).map((sc) => (
-                <button
-                  key={sc}
-                  onClick={() => runSimulation(sc)}
-                  className={`px-3 py-1 text-xs font-mono rounded transition-all ${
-                    activeScenario === sc
-                      ? "bg-white text-black font-semibold shadow-xs"
-                      : "text-white/60 hover:text-white"
-                  }`}
-                >
-                  {scenarios[sc].name}
-                </button>
-              ))}
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-5 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between text-[#777169]">
+                <span>stagehand.page.observe()</span>
+                <span className="text-emerald-600 font-semibold">Active</span>
+              </div>
+              <div className="text-black bg-white p-3 rounded-lg border border-[#ebe8e4]">
+                &gt; "Identified 24 product titles, INR prices, and active buy-now buttons on Flipkart."
+              </div>
+              <Link
+                href="/automation"
+                className="inline-flex items-center gap-1 text-xs font-medium text-black hover:text-[#777169] transition-colors pt-2"
+              >
+                Launch Studio <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           </div>
 
-          {/* Interactive Terminal Body */}
-          <div className="p-6 sm:p-8 space-y-6">
-            {/* User Prompt */}
-            <div className="flex items-start gap-3">
-              <div className="h-8 w-8 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center shrink-0 text-xs font-bold text-indigo-300">
-                U
+          {/* Card 2: Workflow Pipelines */}
+          <div className="rounded-2xl border border-[#ebe8e4] bg-white p-8 lg:p-10 flex flex-col justify-between hover:border-black/20 transition-all shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F5F4F0] text-xs font-semibold text-black mb-6">
+                <Layers className="h-3.5 w-3.5" /> Workflow Engine
               </div>
-              <div className="space-y-1">
-                <span className="text-xs font-semibold text-white/40 uppercase tracking-wider">User Instruction</span>
-                <p className="text-sm text-white font-medium bg-white/[0.03] p-3.5 rounded-xl border border-white/5">
-                  &ldquo;{scenarios[activeScenario].prompt}&rdquo;
+              <h3 className="text-2xl font-normal text-black mb-3">
+                n8n-Style Workflow Pipelines
+              </h3>
+              <p className="text-sm text-[#777169] leading-relaxed mb-8">
+                Chain web triggers, Stagehand scrapers, AI summarizers, and human approval gates into self-healing pipelines. Schedule price drop alerts or publish approved content directly to Twitter/X.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-[#ebe8e4] bg-[#FAFAF9] p-5 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between text-[#777169]">
+                <span>pipeline.orchestrate()</span>
+                <span className="text-indigo-600 font-semibold">5 Nodes Ready</span>
+              </div>
+              <div className="text-black bg-white p-3 rounded-lg border border-[#ebe8e4]">
+                &gt; Trigger: Hourly Cron → Search Target → Extract Prices → Human Approval Gate → Webhook
+              </div>
+              <Link
+                href="/overview"
+                className="inline-flex items-center gap-1 text-xs font-medium text-black hover:text-[#777169] transition-colors pt-2"
+              >
+                View Pipelines Hub <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 8. DEVELOPER API & CODE SHOWCASE (ElevenLabs Developer Section) ─── */}
+      <section id="developer" className="py-20 border-t border-[#ebe8e4] bg-[#FAFAF9]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left description */}
+            <div className="lg:col-span-5 space-y-6">
+              <span className="text-xs uppercase tracking-wider text-[#9E988F] font-bold">
+                Developer API
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-light tracking-[-0.03em] text-black">
+                Integrate autonomous browsing into any stack in minutes
+              </h2>
+              <p className="text-sm text-[#777169] leading-relaxed">
+                Connect your scripts to Meow's REST API or Stagehand TypeScript SDK. Run stealth tasks, handle multi-page sessions, and receive structured JSON responses with complete DOM execution traces.
+              </p>
+
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-3 text-sm text-black">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Headless stealth mode with desktop Chrome user-agent headers</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-black">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Zero API costs for web reading, price tracking, and research</span>
+                </div>
+                <div className="flex items-center gap-3 text-sm text-black">
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600 shrink-0" />
+                  <span>Interactive human approval gate for social publishing</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right code box (ElevenLabs dark minimal terminal) */}
+            <div className="lg:col-span-7">
+              <div className="rounded-2xl border border-[#ebe8e4] bg-[#18181B] shadow-xl overflow-hidden">
+                {/* Code tab header */}
+                <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-[#141416]">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCodeLanguage("ts")}
+                      className={`px-3 py-1 rounded-md text-xs font-mono transition-colors ${
+                        codeLanguage === "ts" ? "bg-white/15 text-white font-semibold" : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      typescript
+                    </button>
+                    <button
+                      onClick={() => setCodeLanguage("python")}
+                      className={`px-3 py-1 rounded-md text-xs font-mono transition-colors ${
+                        codeLanguage === "python" ? "bg-white/15 text-white font-semibold" : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      python
+                    </button>
+                    <button
+                      onClick={() => setCodeLanguage("curl")}
+                      className={`px-3 py-1 rounded-md text-xs font-mono transition-colors ${
+                        codeLanguage === "curl" ? "bg-white/15 text-white font-semibold" : "text-white/60 hover:text-white"
+                      }`}
+                    >
+                      curl
+                    </button>
+                  </div>
+
+                  <button
+                    onClick={handleCopyCode}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-white/20 text-xs text-white/80 hover:bg-white/10 transition-colors"
+                  >
+                    {copiedCode ? <Check className="h-3 w-3 text-emerald-400" /> : <Copy className="h-3 w-3" />}
+                    <span>{copiedCode ? "Copied" : "Copy"}</span>
+                  </button>
+                </div>
+
+                {/* Code body */}
+                <pre className="p-6 text-xs sm:text-sm font-mono text-white/90 leading-relaxed overflow-x-auto">
+                  <code>{codeSnippets[codeLanguage]}</code>
+                </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 9. SAFETY, BUILT IN (ElevenLabs 3-Card Grid) ─── */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <h2 className="text-3xl sm:text-4xl font-light tracking-[-0.03em] text-black mb-3">
+            Safety, built in
+          </h2>
+          <p className="text-sm text-[#777169]">
+            Autonomous agents must never act recklessly. We enforce strict guardrails at every layer of the runtime.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+            <div className="h-10 w-10 rounded-xl bg-[#F5F4F0] flex items-center justify-center text-black mb-5">
+              <Shield className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-normal text-black mb-2">Human-in-the-Loop</h3>
+            <p className="text-sm text-[#777169] leading-relaxed">
+              Write actions like publishing to Twitter/X or submitting payment forms are hard-blocked until you inspect and approve the draft.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+            <div className="h-10 w-10 rounded-xl bg-[#F5F4F0] flex items-center justify-center text-black mb-5">
+              <Lock className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-normal text-black mb-2">Zero Credential Exposure</h3>
+            <p className="text-sm text-[#777169] leading-relaxed">
+              Read and scrape public web data without logging in. When authenticated sessions are needed, session cookies are sandboxed.
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-[#ebe8e4] bg-white p-7 shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+            <div className="h-10 w-10 rounded-xl bg-[#F5F4F0] flex items-center justify-center text-black mb-5">
+              <Terminal className="h-5 w-5" />
+            </div>
+            <h3 className="text-lg font-normal text-black mb-2">Immutable Audit Traces</h3>
+            <p className="text-sm text-[#777169] leading-relaxed">
+              Every Playwright navigation, Stagehand extraction, and DOM element selector is recorded with exact millisecond timestamps.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 10. PRICING SECTION (ElevenLabs Clean Table/Cards) ─── */}
+      <section id="pricing" className="py-20 border-t border-[#ebe8e4] bg-[#FAFAF9]">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-3xl sm:text-5xl font-light tracking-[-0.03em] text-black mb-4">
+            Simple, transparent pricing
+          </h2>
+          <p className="text-base text-[#777169] mb-8">
+            Start free with our native stealth engine. Upgrade when you need cloud browser streaming.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left mt-12">
+            {/* Free Plan */}
+            <div className="rounded-2xl border border-[#ebe8e4] bg-white p-8 shadow-[0_1px_1px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+              <div>
+                <h3 className="text-xl font-normal text-black mb-2">Community Engine</h3>
+                <div className="text-4xl font-light text-black mb-4">
+                  $0 <span className="text-sm text-[#777169] font-normal">/ forever</span>
+                </div>
+                <p className="text-sm text-[#777169] mb-6">
+                  Perfect for local scraping, live price tracking, and personal research workflows.
+                </p>
+                <ul className="space-y-3 text-sm text-black mb-8">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Native Stealth Engine (0 API Keys Needed)
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Unlimited Live Flipkart & Amazon Scraping
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Human Approval Safety Gate
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Full Playwright & Stagehand Support
+                  </li>
+                </ul>
+              </div>
+              <Link
+                href="/automation"
+                className="inline-flex items-center justify-center h-11 px-5 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all text-center"
+              >
+                Start Free in Studio
+              </Link>
+            </div>
+
+            {/* Cloud Pro Plan */}
+            <div className="rounded-2xl border-2 border-black bg-white p-8 shadow-md flex flex-col justify-between relative">
+              <span className="absolute -top-3 right-6 bg-black text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full">
+                Cloud Browser
+              </span>
+              <div>
+                <h3 className="text-xl font-normal text-black mb-2">Cloud Pro</h3>
+                <div className="text-4xl font-light text-black mb-4">
+                  $29 <span className="text-sm text-[#777169] font-normal">/ month</span>
+                </div>
+                <p className="text-sm text-[#777169] mb-6">
+                  For teams needing remote cloud Chromium streaming and persistent authenticated sessions.
+                </p>
+                <ul className="space-y-3 text-sm text-black mb-8">
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Everything in Community
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Browserbase Cloud Streaming & Live View
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Persistent Session State & Cookies
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-emerald-600" /> Automated Recurring Inngest Crons
+                  </li>
+                </ul>
+              </div>
+              <Link
+                href="/automation"
+                className="inline-flex items-center justify-center h-11 px-5 rounded-full bg-black text-white text-sm font-medium hover:bg-[#374151] active:scale-[0.98] transition-all text-center"
+              >
+                Upgrade to Pro
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── 11. FOOTER (ElevenLabs 5-Column Grid Style) ─── */}
+      <footer className="border-t border-[#ebe8e4] bg-[#FDFCFC] py-16 text-xs text-[#777169]">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-8 mb-12">
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Product</h4>
+              <ul className="space-y-2.5">
+                <li><Link href="/automation" className="hover:text-black transition-colors">Browser Studio</Link></li>
+                <li><Link href="/overview" className="hover:text-black transition-colors">Workflow Pipelines</Link></li>
+                <li><Link href="/automation" className="hover:text-black transition-colors">Flipkart Scraper</Link></li>
+                <li><Link href="/automation" className="hover:text-black transition-colors">Amazon Price Tracker</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Solutions</h4>
+              <ul className="space-y-2.5">
+                <li><Link href="/overview" className="hover:text-black transition-colors">E-Commerce Monitoring</Link></li>
+                <li><Link href="/overview" className="hover:text-black transition-colors">Social Auto-Publishing</Link></li>
+                <li><Link href="/overview" className="hover:text-black transition-colors">Job Discovery</Link></li>
+                <li><Link href="/overview" className="hover:text-black transition-colors">Automated QA Testing</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Developers</h4>
+              <ul className="space-y-2.5">
+                <li><Link href="/automation" className="hover:text-black transition-colors">Stagehand SDK</Link></li>
+                <li><Link href="/automation" className="hover:text-black transition-colors">Playwright Adapter</Link></li>
+                <li><Link href="/automation" className="hover:text-black transition-colors">REST API</Link></li>
+                <li><Link href="/automation" className="hover:text-black transition-colors">Architecture</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Company</h4>
+              <ul className="space-y-2.5">
+                <li><Link href="/" className="hover:text-black transition-colors">About Meow</Link></li>
+                <li><Link href="/" className="hover:text-black transition-colors">Security & Ethics</Link></li>
+                <li><Link href="/" className="hover:text-black transition-colors">Changelog</Link></li>
+                <li><Link href="/" className="hover:text-black transition-colors">Terms of Service</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-xs uppercase tracking-wider text-black font-semibold mb-4">Runtime</h4>
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-[#ebe8e4] bg-white text-black font-medium">
+                  <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>Chromium Stealth Live</span>
+                </div>
+                <p className="text-[11px] leading-relaxed">
+                  Dual-mode runtime connecting to Browserbase Cloud or local stealth Playwright runner.
                 </p>
               </div>
             </div>
+          </div>
 
-            {/* Agent Reasoning Steps */}
-            <div className="space-y-3 pl-11">
-              {/* Step 1: Tool Execution */}
-              <div className="rounded-xl border border-white/[0.08] bg-black/40 p-4 space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                    <span className="text-emerald-400 font-bold uppercase tracking-wider text-[10px]">
-                      Tool Execution
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-white/40">Execution Time: 124ms</span>
-                </div>
-                <div className="bg-white/[0.03] p-2.5 rounded border border-white/5 text-indigo-300">
-                  {scenarios[activeScenario].toolCall}
-                </div>
-                <div className="text-white/70 text-[11px] leading-relaxed">
-                  ↳ {scenarios[activeScenario].toolOutput}
-                </div>
+          <div className="pt-8 border-t border-[#ebe8e4] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <div className="h-6 w-6 rounded-full bg-black flex items-center justify-center text-white font-bold text-[10px]">
+                M
               </div>
-
-              {/* Step 2: Action Proposal with Human Gate */}
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-3 font-mono text-xs">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Shield className="h-3.5 w-3.5 text-amber-400" />
-                    <span className="text-amber-400 font-bold uppercase tracking-wider text-[10px]">
-                      Human-in-the-Loop Approval Required
-                    </span>
-                  </div>
-                  <span className="text-[11px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded">
-                    Dangerous Action
-                  </span>
-                </div>
-                <div className="bg-black/50 p-2.5 rounded border border-white/5 text-amber-200 text-[11px]">
-                  {scenarios[activeScenario].actionCall}
-                </div>
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[11px] text-white/50">Policy: Write actions require explicit human sign-off.</span>
-                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-1 rounded-md">
-                    ✓ Approved & Executed
-                  </span>
-                </div>
-              </div>
-
-              {/* Final Success Response */}
-              <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
-                  <span className="text-xs font-semibold text-emerald-300">
-                    {scenarios[activeScenario].result}
-                  </span>
-                </div>
-                <button
-                  onClick={() => runSimulation(activeScenario)}
-                  disabled={isSimulating}
-                  className="inline-flex items-center gap-1.5 text-xs text-white/60 hover:text-white bg-white/5 px-2.5 py-1 rounded border border-white/10"
-                >
-                  <RotateCcw className={`h-3 w-3 ${isSimulating ? "animate-spin" : ""}`} />
-                  <span>Re-run</span>
-                </button>
-              </div>
+              <span className="text-black font-semibold text-sm">Meow</span>
+              <span className="text-[#9E988F]">© {new Date().getFullYear()} Meow Browser Engine. All rights reserved.</span>
             </div>
-          </div>
-        </div>
-      </section>
 
-      {/* ─── LINEAR QUOTE SECTION (FROM USER SCREENSHOT) ─── */}
-      <section className="py-16 px-6 max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-8 space-y-6 flex flex-col justify-between">
-            <p className="text-lg sm:text-xl font-medium text-white/90 leading-relaxed">
-              &ldquo;You&apos;ll probably build a better product, just because of the craft that using Meow infuses on your brain.&rdquo;
-            </p>
-            <div className="flex items-center gap-3 pt-4 border-t border-white/[0.06]">
-              <div className="h-9 w-9 rounded-full bg-white/10 flex items-center justify-center font-bold text-xs">
-                OA
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-white">Staff Software Engineer</h4>
-                <p className="text-[11px] text-white/50">AI Research Lab</p>
-              </div>
+            <div className="flex items-center gap-5 text-[#777169]">
+              <Link href="https://github.com/manish-3d/meow" target="_blank" className="hover:text-black transition-colors">
+                GitHub
+              </Link>
+              <Link href="https://x.com" target="_blank" className="hover:text-black transition-colors">
+                X / Twitter
+              </Link>
+              <Link href="/automation" className="hover:text-black transition-colors">
+                Console
+              </Link>
             </div>
-          </div>
-
-          <div className="rounded-2xl border border-yellow-500/30 bg-[#16150b] p-8 space-y-6 flex flex-col justify-between">
-            <p className="text-lg sm:text-xl font-medium text-yellow-100/90 leading-relaxed">
-              &ldquo;Our execution speed is intense and Meow helps us be completely action-based with real autonomous tool calling.&rdquo;
-            </p>
-            <div className="flex items-center gap-3 pt-4 border-t border-yellow-500/20">
-              <div className="h-9 w-9 rounded-full bg-yellow-400/20 text-yellow-300 flex items-center justify-center font-bold text-xs">
-                ⚡
-              </div>
-              <div>
-                <h4 className="text-xs font-bold text-yellow-200">Head of Engineering</h4>
-                <p className="text-[11px] text-yellow-400/60">Autonomous Infrastructure</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── FEATURE BENTO GRID ─── */}
-      <section id="features" className="py-16 px-6 max-w-6xl mx-auto space-y-12">
-        <div className="text-center space-y-3">
-          <span className="text-xs font-mono uppercase tracking-widest text-indigo-400">Core Architecture</span>
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-            Engineered for high-reliability autonomy
-          </h2>
-          <p className="text-sm text-white/60 max-w-xl mx-auto">
-            Traditional LLM wrappers fail when tasks require multi-step reasoning or real tool execution. Meow delivers a hardened runtime.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Card 1 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-4 hover:border-white/20 transition-all">
-            <div className="h-10 w-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
-              <Cpu className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold">Autonomous ReAct Loop</h3>
-            <p className="text-xs text-white/60 leading-relaxed">
-              Step-by-step reasoning, action emission, observation parsing, and stuck-in-loop detection ensure agents execute complex tasks reliably.
-            </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-4 hover:border-white/20 transition-all">
-            <div className="h-10 w-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-              <Share2 className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold">1-Click Workspace OAuth</h3>
-            <p className="text-xs text-white/60 leading-relaxed">
-              Connect Twitter / X, Instagram, Reddit, and GitHub instantly. No complicated developer portal registrations or API key setups required.
-            </p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-6 space-y-4 hover:border-white/20 transition-all">
-            <div className="h-10 w-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Shield className="h-5 w-5" />
-            </div>
-            <h3 className="text-lg font-bold">Human-in-the-Loop Safety</h3>
-            <p className="text-xs text-white/60 leading-relaxed">
-              Sensitive write actions like posting tweets, publishing code, or triggering payments require explicit human approval before execution.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── PRICING & STRIPE BILLING SECTION ─── */}
-      <section id="pricing" className="py-20 px-6 max-w-6xl mx-auto space-y-12">
-        <div className="text-center space-y-4">
-          <span className="text-xs font-mono uppercase tracking-widest text-indigo-400">Simple, Transparent Pricing</span>
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
-            Ready to deploy autonomous agents?
-          </h2>
-          <p className="text-sm text-white/60 max-w-lg mx-auto">
-            Choose the plan that fits your execution volume. All plans include 1-click OAuth and tool sandboxing.
-          </p>
-
-          {/* Monthly / Annual Billing Toggle */}
-          <div className="pt-4 flex items-center justify-center gap-3">
-            <span className={`text-xs font-medium ${billingCycle === "monthly" ? "text-white" : "text-white/50"}`}>
-              Monthly Billing
-            </span>
-            <button
-              onClick={() => setBillingCycle((prev) => (prev === "monthly" ? "annual" : "monthly"))}
-              className="w-12 h-6 rounded-full bg-white/20 p-1 transition-colors relative"
-            >
-              <div
-                className={`h-4 w-4 rounded-full bg-white transition-transform ${
-                  billingCycle === "annual" ? "translate-x-6 bg-indigo-400" : "translate-x-0"
-                }`}
-              />
-            </button>
-            <div className="flex items-center gap-1.5">
-              <span className={`text-xs font-medium ${billingCycle === "annual" ? "text-white" : "text-white/50"}`}>
-                Annual Billing
-              </span>
-              <span className="text-[10px] font-bold bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">
-                Save 20%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Pricing Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Plan 1: Free */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-8 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white">Hobbyist</h3>
-                <p className="text-xs text-white/50">For individuals exploring agent runtimes.</p>
-              </div>
-              <div className="text-3xl font-extrabold font-mono">$0</div>
-              <ul className="space-y-2.5 text-xs text-white/70 pt-4 border-t border-white/[0.08]">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>50,000 monthly tokens</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>Up to 3 active agents</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>1-Click OAuth Socials (Sandbox)</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>Human approval safety guardrails</span>
-                </li>
-              </ul>
-            </div>
-            <Link
-              href={session ? "/overview" : "/sign-in"}
-              className="w-full py-2.5 rounded-xl border border-white/20 text-xs font-bold hover:bg-white/10 transition-colors text-center"
-            >
-              Get Started Free
-            </Link>
-          </div>
-
-          {/* Plan 2: Pro (Featured) */}
-          <div className="rounded-2xl border-2 border-indigo-500/60 bg-[#0f1117] p-8 space-y-6 flex flex-col justify-between relative shadow-xl shadow-indigo-500/10">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 text-[10px] font-bold uppercase tracking-wider bg-indigo-600 text-white px-3 py-1 rounded-full shadow-sm">
-              Most Popular
-            </span>
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white">Pro</h3>
-                <p className="text-xs text-white/50">For serious builders and scaling applications.</p>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-extrabold font-mono">
-                  ${billingCycle === "annual" ? "24" : "29"}
-                </span>
-                <span className="text-xs text-white/50 font-mono">/month</span>
-              </div>
-              <ul className="space-y-2.5 text-xs text-white/70 pt-4 border-t border-white/[0.08]">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span className="font-semibold text-white">500,000 monthly tokens</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>Unlimited active agents</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>Full live Twitter, Reddit, GitHub posting</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>Custom skills & tool builder</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-indigo-400 shrink-0" />
-                  <span>Stripe automated billing & invoices</span>
-                </li>
-              </ul>
-            </div>
-            <Link
-              href={session ? "/billing" : "/sign-in"}
-              className="w-full py-3 rounded-xl bg-white text-black text-xs font-bold hover:bg-white/90 transition-all text-center shadow-md flex items-center justify-center gap-2 hover:scale-[1.02]"
-            >
-              <CreditCard className="h-4 w-4" />
-              <span>Upgrade to Pro with Stripe</span>
-            </Link>
-          </div>
-
-          {/* Plan 3: Enterprise */}
-          <div className="rounded-2xl border border-white/[0.08] bg-[#0c0d10] p-8 space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white">Enterprise</h3>
-                <p className="text-xs text-white/50">Dedicated infrastructure & custom SLA.</p>
-              </div>
-              <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-extrabold font-mono">
-                  ${billingCycle === "annual" ? "79" : "99"}
-                </span>
-                <span className="text-xs text-white/50 font-mono">/month</span>
-              </div>
-              <ul className="space-y-2.5 text-xs text-white/70 pt-4 border-t border-white/[0.08]">
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span className="font-semibold text-white">2,500,000 monthly tokens</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>Dedicated Neon DB branch & VPC</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>Custom enterprise webhook dispatch</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <Check className="h-4 w-4 text-emerald-400 shrink-0" />
-                  <span>24/7 Priority support & custom SLA</span>
-                </li>
-              </ul>
-            </div>
-            <Link
-              href={session ? "/billing" : "/sign-in"}
-              className="w-full py-2.5 rounded-xl border border-white/20 text-xs font-bold hover:bg-white/10 transition-colors text-center"
-            >
-              Upgrade to Enterprise
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── FOOTER ─── */}
-      <footer className="border-t border-white/[0.08] bg-[#08090a] py-12 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-white/40">
-          <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Meow" className="h-6 w-6 rounded-full border border-white/20" />
-            <span className="font-bold text-white text-sm">Meow Agent OS</span>
-            <span>·</span>
-            <span>Crafted with Linear precision</span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <Link href="/overview" className="hover:text-white transition-colors">Workspace</Link>
-            <Link href="/agents" className="hover:text-white transition-colors">Agents</Link>
-            <Link href="/integrations" className="hover:text-white transition-colors">Integrations</Link>
-            <Link href="/billing" className="hover:text-white transition-colors">Stripe Billing</Link>
-            <Link href="/sign-in" className="hover:text-white transition-colors">Account</Link>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <span className="h-2 w-2 rounded-full bg-emerald-400" />
-            <span className="font-mono text-[11px] text-white/60">All Systems Operational</span>
           </div>
         </div>
       </footer>
     </div>
   );
 }
-

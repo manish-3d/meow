@@ -3,9 +3,9 @@ import "./globals.css";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Meow — The AI Agent Operating System",
+  title: "Meow — Autonomous AI Browser Agent Engine",
   description:
-    "Autonomous multi-tenant AI agent runtime with tool sandboxing, human-in-the-loop approvals, and immutable versioning. Inspired by Linear.",
+    "Operate websites like a human using cloud browsers, Stagehand DOM observation, Playwright automation, and human-in-the-loop safety.",
   icons: {
     icon: "/logo.png",
     shortcut: "/logo.png",
@@ -19,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
-      <body className="bg-[#08090a] text-[#f7f8f8] antialiased selection:bg-indigo-500/30 selection:text-white" style={{ margin: 0, padding: 0 }}>
+    <html lang="en">
+      <body className="antialiased selection:bg-black/10 selection:text-black" style={{ margin: 0, padding: 0 }}>
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
