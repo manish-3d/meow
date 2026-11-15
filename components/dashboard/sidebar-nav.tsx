@@ -33,16 +33,16 @@ const navItems: NavItem[] = [
     exact: true,
   },
   {
+    title: "Browser Agent",
+    href: "/automation",
+    icon: Globe,
+    badge: "Stagehand",
+  },
+  {
     title: "Agents",
     href: "/agents",
     icon: Bot,
     badge: "Runtime",
-  },
-  {
-    title: "Skills & Tools",
-    href: "/tools",
-    icon: Wrench,
-    badge: "14 Active",
   },
   {
     title: "Plugins",
@@ -61,12 +61,6 @@ const navItems: NavItem[] = [
     href: "/billing",
     icon: CreditCard,
     badge: "Stripe",
-  },
-  {
-    title: "Web Automation",
-    href: "/automation",
-    icon: Globe,
-    badge: "Headless",
   },
   {
     title: "Settings",
