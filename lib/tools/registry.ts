@@ -17,6 +17,7 @@ import { executeCodeTool } from "./builtin/execute-code";
 import { searchKnowledgeTool } from "./builtin/search-knowledge";
 import { backgroundTaskTool } from "./builtin/background-task";
 import { browserNavigateTool, browserExtractTool, browserActionTool } from "./builtin/web-automation";
+import { browserAutonomousTaskTool } from "./builtin/browser-agent";
 import { githubCreateIssueTool, githubGetRepoTool } from "./builtin/social-github";
 
 export class ToolRegistry {
@@ -40,6 +41,7 @@ export class ToolRegistry {
     this.register(browserNavigateTool);
     this.register(browserExtractTool);
     this.register(browserActionTool);
+    this.register(browserAutonomousTaskTool);
     this.register(githubCreateIssueTool);
     this.register(githubGetRepoTool);
   }
