@@ -1,1 +1,0 @@
-ALTER TABLE "agent_versions" ADD CONSTRAINT "agent_versions_version_check" CHECK ("agent_versions"."version" > 0);
