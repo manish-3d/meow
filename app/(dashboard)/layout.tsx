@@ -58,13 +58,13 @@ export default function DashboardLayout({
           <div className="flex items-center justify-between text-xs">
             <div className="flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-white/60 font-mono text-[11px]">ReAct Engine Live</span>
+              <span className="text-white/60 font-mono text-[11px]">Browser Engine Ready</span>
             </div>
             <Link
-              href="/billing"
-              className="text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1"
+              href="/automation"
+              className="text-[11px] font-semibold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 font-mono"
             >
-              <Zap className="h-3 w-3" /> Upgrade
+              Playwright
             </Link>
           </div>
         </div>
@@ -88,11 +88,11 @@ export default function DashboardLayout({
 
           <div className="flex items-center gap-3">
             <Link
-              href="/agents/new"
+              href="/automation"
               className="inline-flex items-center gap-1.5 rounded-lg bg-white text-black px-3.5 py-1.5 text-xs font-semibold shadow-xs hover:bg-white/90 transition-all hover:scale-[1.02]"
             >
               <Sparkles className="h-3.5 w-3.5 text-indigo-600" />
-              <span>+ New Agent</span>
+              <span>+ Run Automation</span>
             </Link>
 
             <UserProfileMenu />
