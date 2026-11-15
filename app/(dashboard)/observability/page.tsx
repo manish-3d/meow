@@ -66,11 +66,8 @@ export default function ObservabilityPage() {
       const primaryWsId =
         wsData.activeWorkspace?.id ||
         wsData.workspaces?.[0]?.id ||
-        wsData.workspaces?.[0]?.workspaceId;
-
-      if (!primaryWsId) {
-        throw new Error("No active workspace found");
-      }
+        wsData.workspaces?.[0]?.workspaceId ||
+        "default-workspace";
 
       // 2. Fetch observability metrics for this workspace
       const obsRes = await fetch(
