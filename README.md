@@ -1,0 +1,1 @@
+An AI agent platform built with Next.js, TypeScript, Drizzle ORM, and Neon PostgreSQL. Integrates Gemini-powered tool calling, Composio integrations, and Inngest for durable background workflows and scheduled task execution.
