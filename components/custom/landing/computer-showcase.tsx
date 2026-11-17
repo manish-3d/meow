@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion } from "motion/react";
 import { Hand, Globe, Lock, RefreshCw, ArrowLeft, ArrowRight, ShieldCheck, Check } from "lucide-react";
 
@@ -110,9 +111,15 @@ export function ComputerShowcase() {
 
               {/* Bot Activity Card */}
               <div className="self-start rounded-xl border border-black/8 bg-neutral-50 p-3 flex items-center gap-2.5 font-sans text-xs text-neutral-700">
-                <span className="flex size-5 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-bold text-[10px]">
-                  🐱
-                </span>
+                <div className="relative size-5 shrink-0 rounded-full overflow-hidden ring-1 ring-black/10 bg-black">
+                  <Image
+                    src="/logo.png"
+                    alt="Milo"
+                    width={20}
+                    height={20}
+                    className="size-full object-cover"
+                  />
+                </div>
                 <span>
                   <strong>Milo:</strong> I found the United 8:30 AM nonstop with your preferred aisle seat. Holding fare now.
                 </span>

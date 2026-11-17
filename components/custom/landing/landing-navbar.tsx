@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Menu, X, Bot, Sparkles } from "lucide-react";
 
 export function LandingNavbar() {
@@ -25,8 +26,15 @@ export function LandingNavbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="flex size-8 items-center justify-center rounded-xl bg-purple-100 border border-purple-200 text-sm shadow-2xs group-hover:scale-105 transition-transform">
-            <span>🐱</span>
+          <div className="relative flex size-8 items-center justify-center rounded-full overflow-hidden ring-1 ring-black/10 shadow-xs group-hover:scale-105 transition-transform bg-black">
+            <Image
+              src="/logo.png"
+              alt="Meow Bot"
+              width={32}
+              height={32}
+              className="object-cover size-full"
+              priority
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-sans font-bold text-base tracking-tight text-neutral-900">

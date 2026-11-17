@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   Search, 
@@ -247,10 +248,20 @@ export function HeroAppSimulator() {
                       >
                         {/* Avatar */}
                         <div
-                          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm shadow-xs border border-black/5"
+                          className="flex size-8 shrink-0 items-center justify-center rounded-lg text-sm shadow-xs border border-black/5 overflow-hidden"
                           style={{ backgroundColor: bot.avatarColor + "18" }}
                         >
-                          <span>{bot.avatarChar}</span>
+                          {bot.id === "meow-bot" ? (
+                            <Image
+                              src="/logo.png"
+                              alt={bot.name}
+                              width={32}
+                              height={32}
+                              className="size-full object-cover"
+                            />
+                          ) : (
+                            <span>{bot.avatarChar}</span>
+                          )}
                         </div>
 
                         {/* Bot Text */}
@@ -293,7 +304,17 @@ export function HeroAppSimulator() {
               {/* Chat Header */}
               <div className="flex items-center justify-between pb-3 border-b border-black/6">
                 <div className="flex items-center gap-2">
-                  <span className="text-base">{activeBot.avatarChar}</span>
+                  {activeBot.id === "meow-bot" ? (
+                    <Image
+                      src="/logo.png"
+                      alt={activeBot.name}
+                      width={24}
+                      height={24}
+                      className="size-6 rounded-full object-cover ring-1 ring-black/10"
+                    />
+                  ) : (
+                    <span className="text-base">{activeBot.avatarChar}</span>
+                  )}
                   <div>
                     <h3 className="font-sans text-xs font-bold text-neutral-900">
                       {activeBot.name}
@@ -401,10 +422,20 @@ export function HeroAppSimulator() {
                 {/* Big Pixel Icon of Selected Bot */}
                 <div className="flex flex-col items-center text-center pb-4 border-b border-black/8">
                   <div
-                    className="flex size-14 items-center justify-center rounded-2xl text-2xl shadow-inner border border-black/10 mb-2"
+                    className="flex size-14 items-center justify-center rounded-2xl text-2xl shadow-inner border border-black/10 mb-2 overflow-hidden"
                     style={{ backgroundColor: activeBot.avatarColor + "15" }}
                   >
-                    <span>{activeBot.avatarChar}</span>
+                    {activeBot.id === "meow-bot" ? (
+                      <Image
+                        src="/logo.png"
+                        alt={activeBot.name}
+                        width={56}
+                        height={56}
+                        className="size-full object-cover"
+                      />
+                    ) : (
+                      <span>{activeBot.avatarChar}</span>
+                    )}
                   </div>
                   <h4 className="font-sans font-bold text-sm text-neutral-900">
                     {activeBot.name}

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Github, Twitter, Disc as Discord, ArrowRight, Heart } from "lucide-react";
 
 export function LandingFooter() {
@@ -12,8 +13,14 @@ export function LandingFooter() {
           {/* Brand */}
           <div className="flex flex-col gap-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="relative flex items-center justify-center size-8 rounded-full bg-purple-100 border border-purple-200">
-                <span className="text-sm">🐱</span>
+              <div className="relative flex items-center justify-center size-8 rounded-full overflow-hidden ring-1 ring-black/10 bg-black">
+                <Image
+                  src="/logo.png"
+                  alt="meow bot"
+                  width={32}
+                  height={32}
+                  className="object-cover size-full"
+                />
               </div>
               <span className="font-sans font-bold text-base tracking-tight text-neutral-900">
                 meow bot

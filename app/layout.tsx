@@ -10,6 +10,11 @@ const figtree = Figtree({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Meow Bot - AI Agent Platform",
   description: "Autonomous AI Agents with Cloud VM Desktop and Multi-Tool Automation",
+  icons: {
+    icon: "/logo.png",
+    shortcut: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
