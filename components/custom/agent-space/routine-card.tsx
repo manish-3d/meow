@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Calendar,
   Clock,
@@ -167,32 +168,45 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
   };
 
   return (
-    <div className="my-2 rounded-xl border border-primary/25 bg-card/95 p-4 text-card-foreground shadow-sm transition-all hover:border-primary/40 space-y-3.5">
+    <motion.div
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+      className="my-2 rounded-xl border border-border-subtle bg-surface-1/90 p-4 text-card-foreground shadow-xs transition-all hover:border-foreground/15 space-y-3.5"
+    >
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
-            <span className="flex size-5 items-center justify-center rounded-md bg-primary/10 text-primary">
-              <Sparkles className="size-3" />
+            <span className="flex size-6 items-center justify-center rounded-md bg-surface-2 border border-border-subtle text-foreground shadow-xs">
+              <Sparkles className="size-3 text-foreground" />
             </span>
             <h4 className="text-xs font-semibold text-foreground tracking-tight">
               {title}
             </h4>
           </div>
           {!isCustomizing && prompt && (
-            <p className="text-[11px] text-muted-foreground leading-relaxed pl-7 line-clamp-2">
+            <p className="text-[11px] text-muted-foreground leading-relaxed pl-8 line-clamp-2">
               {prompt}
             </p>
           )}
         </div>
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <Badge
-            variant="outline"
-            className="text-[10px] uppercase font-mono tracking-wider bg-primary/5 text-primary border-primary/20"
+          <span
+            className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase border ${
+              created
+                ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/25"
+                : "bg-amber-500/10 text-amber-500 border-amber-500/25"
+            }`}
           >
+            <span
+              className={`size-1.5 rounded-full ${
+                created ? "bg-emerald-500" : "bg-amber-500 animate-pulse"
+              }`}
+            />
             {created ? "Active Routine" : "Routine Draft"}
-          </Badge>
+          </span>
 
           {!created && (
             <Button
@@ -200,7 +214,7 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
               size="sm"
               variant="ghost"
               onClick={() => setIsCustomizing((prev) => !prev)}
-              className="h-6 px-2 text-[10px] gap-1 text-muted-foreground hover:text-foreground"
+              className="h-6 px-2 text-[10px] gap-1 text-muted-foreground hover:text-foreground hover:bg-surface-2"
             >
               <Settings2 className="size-3" />
               <span>{isCustomizing ? "Close" : "Customize"}</span>
@@ -211,44 +225,44 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
 
       {/* Mode 1: Quick Summary Badges (Default View) */}
       {!isCustomizing && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/40 p-2.5 text-[11px] border border-border/40">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-surface-2/70 px-3 py-2 text-[11px] border border-border-subtle font-mono tabular-nums">
           <div className="flex items-center gap-1.5 text-foreground font-medium">
             {runType === "once" ? (
               <Zap className="size-3.5 text-amber-500" />
             ) : (
-              <Repeat className="size-3.5 text-primary" />
+              <Repeat className="size-3.5 text-foreground" />
             )}
-            <span className="capitalize">
+            <span className="capitalize font-sans font-medium text-xs">
               {runType === "once" ? "Run Once" : `${frequency}`}
             </span>
           </div>
 
-          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground/50">•</span>
 
           <div className="flex items-center gap-1.5 text-foreground font-medium">
-            <Clock className="size-3.5 text-primary" />
-            <span>{scheduledTime}</span>
+            <Clock className="size-3 text-muted-foreground" />
+            <span className="text-xs">{scheduledTime}</span>
           </div>
 
           {timezone && (
             <>
-              <span className="text-muted-foreground">•</span>
-              <span className="text-muted-foreground font-mono text-[10px] flex items-center gap-1">
+              <span className="text-muted-foreground/50">•</span>
+              <span className="text-muted-foreground text-[10px] flex items-center gap-1">
                 <Globe className="size-2.5" />
                 {timezone}
               </span>
             </>
           )}
 
-          <span className="text-muted-foreground">•</span>
+          <span className="text-muted-foreground/50">•</span>
 
-          <Badge variant="outline" className="text-[9px] py-0 px-1 font-mono">
+          <span className="text-[10px] py-0.5 px-1.5 rounded bg-surface-1 border border-border-subtle text-muted-foreground font-mono">
             {runType === "once" || maxRuns === 1
-              ? "⚡ 1 Time Only"
+              ? "⚡ 1-Time"
               : maxRuns
-                ? `🔁 ${maxRuns} Times`
+                ? `🔁 ${maxRuns} Runs`
                 : "♾️ Ongoing"}
-          </Badge>
+          </span>
         </div>
       )}
 
@@ -443,32 +457,33 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
       {/* Required Toolkits & OAuth Status */}
       {requiredTools.length > 0 && (
         <div className="space-y-1.5">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-            Required Tools:
+          <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+            <span>Required Integrations</span>
+            {loadingTools && <Loader2 className="size-2.5 animate-spin text-muted-foreground" />}
           </span>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-1.5">
             {toolStatuses.map((t) => (
               <div
                 key={t.slug}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] border transition-colors ${t.isConnected
-                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-mono border transition-colors ${t.isConnected
+                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/25"
+                  : "bg-amber-500/10 text-amber-500 border-amber-500/25"
                   }`}
               >
                 {t.isConnected ? (
-                  <CheckCircle2 className="size-3 shrink-0" />
+                  <CheckCircle2 className="size-3 shrink-0 text-emerald-500" />
                 ) : (
-                  <AlertCircle className="size-3 shrink-0" />
+                  <AlertCircle className="size-3 shrink-0 text-amber-500" />
                 )}
-                <span className="font-medium">{t.name}</span>
+                <span className="font-semibold">{t.name}</span>
                 <span className="text-[9px] opacity-80">
-                  {t.isConnected ? "Connected" : "Connection Required"}
+                  {t.isConnected ? "Ready" : "Auth Required"}
                 </span>
                 {!t.isConnected && (
                   <button
                     type="button"
                     onClick={() => handleConnectTool(t.slug)}
-                    className="ml-1 text-[9px] underline font-semibold text-amber-700 dark:text-amber-300 hover:text-foreground inline-flex items-center gap-0.5"
+                    className="ml-1 text-[9px] underline font-semibold text-amber-500 hover:text-foreground inline-flex items-center gap-0.5"
                   >
                     + Connect
                   </button>
@@ -481,25 +496,25 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
 
       {/* Error Message if Creation Failed */}
       {error && (
-        <p className="text-[11px] text-destructive bg-destructive/10 p-2 rounded-md">
+        <p className="text-[11px] text-destructive bg-destructive/10 p-2 rounded-md border border-destructive/20 font-mono">
           {error}
         </p>
       )}
 
       {/* Footer Action Button */}
-      <div className="flex items-center justify-between pt-1 border-t border-border/40">
-        <span className="text-[10px] text-muted-foreground">
+      <div className="flex items-center justify-between pt-2 border-t border-border-subtle">
+        <span className="text-[10px] text-muted-foreground font-mono">
           {created
-            ? "Saved to scheduled routines"
+            ? "✓ Scheduled in agent routines"
             : !allToolsConnected
-              ? "Note: Connect missing tools before running."
+              ? "Connect tools before running"
               : runType === "once"
-                ? "Executes once at specified time via Inngest"
-                : "Executes in background via Inngest scheduler"}
+                ? "Executes once via Inngest"
+                : "Executes in background via Inngest"}
         </span>
 
         {created ? (
-          <Button size="sm" disabled className="h-7 text-xs gap-1.5 bg-emerald-600 text-white hover:bg-emerald-600">
+          <Button size="sm" disabled className="h-7 min-w-[130px] text-xs gap-1.5 bg-emerald-600 text-white hover:bg-emerald-600 font-medium">
             <CheckCircle2 className="size-3.5" />
             Routine Active
           </Button>
@@ -508,22 +523,22 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
             size="sm"
             onClick={handleCreateRoutine}
             disabled={isCreating}
-            className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+            className="h-7 min-w-[130px] text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium shadow-xs transition-all active:scale-[0.98]"
           >
             {isCreating ? (
               <>
                 <Loader2 className="size-3.5 animate-spin" />
-                Scheduling...
+                <span>Scheduling...</span>
               </>
             ) : (
               <>
                 <Plus className="size-3.5" />
-                {isCustomizing ? "Save & Create Routine" : "Create Routine"}
+                <span>{isCustomizing ? "Save Routine" : "Create Routine"}</span>
               </>
             )}
           </Button>
         )}
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import {
   Play,
   Clock,
@@ -364,64 +365,69 @@ export function ScheduleTab() {
             return (
               <div
                 key={routine.routineId}
-                className="p-3.5 rounded-xl border border-border/70 bg-card/60 space-y-3 shadow-xs hover:border-border transition-colors"
+                className="p-3.5 rounded-xl border border-border-subtle bg-surface-1 space-y-3 shadow-xs hover:border-foreground/20 transition-all"
               >
                 {/* Top Row: Title, Status Badge & Toggle */}
                 <div className="flex items-start justify-between gap-2">
                   <div className="space-y-1 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-xs font-bold text-foreground">
+                      <span className="text-xs font-semibold text-foreground tracking-tight">
                         {routine.title}
                       </span>
 
                       <button
                         type="button"
                         onClick={() => handleToggleActive(routine)}
-                        className={`text-[9px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors ${
+                        className={`inline-flex items-center gap-1.5 text-[9px] font-mono font-medium px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors ${
                           routine.isActive
-                            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20"
-                            : "bg-muted text-muted-foreground border border-border hover:bg-muted/80"
+                            ? "bg-emerald-500/10 text-emerald-500 border border-emerald-500/25 hover:bg-emerald-500/20"
+                            : "bg-surface-2 text-muted-foreground border border-border-subtle hover:bg-surface-3"
                         }`}
                       >
-                        {routine.isActive ? "Active" : "Paused"}
+                        <span
+                          className={`size-1.5 rounded-full ${
+                            routine.isActive ? "bg-emerald-500" : "bg-muted-foreground"
+                          }`}
+                        />
+                        <span>{routine.isActive ? "Active" : "Paused"}</span>
                       </button>
                     </div>
 
                     {/* Schedule Metadata Badges */}
-                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground pt-0.5">
-                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded border border-border/40 font-medium text-foreground">
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground pt-0.5 font-mono tabular-nums">
+                      <span className="inline-flex items-center gap-1 bg-surface-2 px-2 py-0.5 rounded border border-border-subtle font-medium text-foreground">
                         {routine.runType === "once" ? (
                           <Zap className="size-3 text-amber-500" />
                         ) : (
-                          <Repeat className="size-3 text-primary" />
+                          <Repeat className="size-3 text-foreground" />
                         )}
-                        <span className="capitalize">
+                        <span className="capitalize font-sans">
                           {routine.runType === "once" ? "Run Once" : routine.frequency}
                         </span>
                       </span>
 
-                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded border border-border/40 font-mono">
-                        <Clock className="size-2.5 text-primary" />
+                      <span className="inline-flex items-center gap-1 bg-surface-2 px-2 py-0.5 rounded border border-border-subtle">
+                        <Clock className="size-2.5 text-muted-foreground" />
                         <span>{routine.scheduledTime}</span>
                       </span>
 
                       {routine.timezone && (
-                        <span className="inline-flex items-center gap-1 bg-muted/50 px-1.5 py-0.5 rounded border border-border/40 font-mono text-[9px]">
-                          <Globe className="size-2.5" />
+                        <span className="inline-flex items-center gap-1 bg-surface-2 px-1.5 py-0.5 rounded border border-border-subtle text-[9px]">
+                          <Globe className="size-2.5 text-muted-foreground" />
                           <span>{routine.timezone}</span>
                         </span>
                       )}
 
                       {/* Repetition Count Progress */}
-                      <Badge variant="outline" className="text-[9px] py-0 px-1 font-mono">
+                      <span className="inline-flex items-center text-[9px] py-0.5 px-1.5 rounded bg-surface-2 border border-border-subtle text-muted-foreground">
                         {routine.runType === "once" || routine.maxRuns === 1
                           ? routine.currentRunCount >= 1
-                            ? "✅ Executed (1/1)"
-                            : "⚡ 1 Time Only"
+                            ? "✓ Executed (1/1)"
+                            : "⚡ 1-Time"
                           : routine.maxRuns
                           ? `🔁 ${routine.currentRunCount}/${routine.maxRuns} runs`
                           : `♾️ ${routine.currentRunCount} runs completed`}
-                      </Badge>
+                      </span>
                     </div>
                   </div>
 
@@ -431,7 +437,7 @@ export function ScheduleTab() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleOpenEditModal(routine)}
-                      className="size-6 p-0 text-muted-foreground hover:text-foreground"
+                      className="size-6 p-0 text-muted-foreground hover:text-foreground hover:bg-surface-2"
                       title="Edit Routine"
                     >
                       <Edit2 className="size-3" />
@@ -440,7 +446,7 @@ export function ScheduleTab() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDeleteRoutine(routine.routineId, routine.title)}
-                      className="size-6 p-0 text-muted-foreground hover:text-destructive"
+                      className="size-6 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                       title="Delete Routine"
                     >
                       <Trash2 className="size-3" />
@@ -449,15 +455,15 @@ export function ScheduleTab() {
                 </div>
 
                 {/* Prompt / Instruction Box */}
-                <div className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-lg border border-border/40 leading-relaxed font-mono line-clamp-3">
+                <div className="text-[11px] text-foreground/80 bg-surface-2/60 p-2.5 rounded-lg border border-border-subtle leading-relaxed font-mono line-clamp-3">
                   {routine.prompt}
                 </div>
 
                 {/* Footer: Last Run & Run Now Button */}
-                <div className="flex items-center justify-between pt-1">
-                  <span className="text-[10px] text-muted-foreground">
+                <div className="flex items-center justify-between pt-1 border-t border-border-subtle">
+                  <span className="text-[10px] text-muted-foreground font-mono tabular-nums">
                     Last run:{" "}
-                    <strong className="text-foreground">
+                    <strong className="text-foreground font-medium">
                       {routine.lastRunAt
                         ? new Date(routine.lastRunAt).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -471,8 +477,7 @@ export function ScheduleTab() {
 
                   <Button
                     size="sm"
-                    variant="outline"
-                    className="h-7 text-xs gap-1.5 px-3 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-transparent shadow-xs transition-all disabled:opacity-70"
+                    className="h-7 min-w-[125px] text-xs gap-1.5 px-3 bg-primary text-primary-foreground hover:bg-primary/90 font-medium shadow-xs transition-all active:scale-[0.98] disabled:opacity-70"
                     onClick={() => handleRunNow(routine.routineId)}
                     disabled={Boolean(runningRoutineId)}
                   >
@@ -543,13 +548,13 @@ export function ScheduleTab() {
               return (
                 <div
                   key={log.executionId}
-                  className="rounded-lg border border-border/60 bg-card/40 overflow-hidden text-xs transition-colors hover:border-border"
+                  className="rounded-lg border border-border-subtle bg-surface-1 overflow-hidden text-xs transition-colors hover:border-foreground/20 shadow-2xs"
                 >
                   <div
                     onClick={() =>
                       setExpandedLogId(isExpanded ? null : log.executionId)
                     }
-                    className="p-2.5 flex items-center justify-between gap-2 cursor-pointer hover:bg-muted/30 select-none"
+                    className="p-2.5 flex items-center justify-between gap-2 cursor-pointer hover:bg-surface-2/60 transition-colors select-none"
                   >
                     <div className="flex items-center gap-2">
                       {log.status === "completed" ? (
@@ -560,25 +565,34 @@ export function ScheduleTab() {
                         <Loader2 className="size-3.5 text-primary animate-spin shrink-0" />
                       )}
 
-                      <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                      <div className="flex items-center gap-2 font-mono tabular-nums text-[11px]">
                         <span className="font-semibold text-foreground">
                           Run #{log.executionId.slice(-6)}
                         </span>
                         <span
-                          className={`text-[9px] uppercase px-1.5 py-0.2 rounded-full ${
+                          className={`inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.2 rounded-full border ${
                             log.status === "completed"
-                              ? "bg-emerald-500/10 text-emerald-600"
+                              ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/25"
                               : log.status === "failed"
-                              ? "bg-destructive/10 text-destructive"
-                              : "bg-primary/10 text-primary"
+                              ? "bg-destructive/10 text-destructive border border-destructive/25"
+                              : "bg-primary/10 text-primary border border-primary/25"
                           }`}
                         >
+                          <span
+                            className={`size-1.5 rounded-full ${
+                              log.status === "completed"
+                                ? "bg-emerald-500"
+                                : log.status === "failed"
+                                ? "bg-destructive"
+                                : "bg-primary animate-pulse"
+                            }`}
+                          />
                           {log.status}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono tabular-nums">
                       <span>
                         {new Date(log.startedAt).toLocaleTimeString([], {
                           hour: "2-digit",
@@ -586,50 +600,58 @@ export function ScheduleTab() {
                         })}
                       </span>
                       {isExpanded ? (
-                        <ChevronUp className="size-3" />
+                        <ChevronUp className="size-3 text-muted-foreground" />
                       ) : (
-                        <ChevronDown className="size-3" />
+                        <ChevronDown className="size-3 text-muted-foreground" />
                       )}
                     </div>
                   </div>
 
-                  {/* Expanded Telemetry Details */}
-                  {isExpanded && (
-                    <div className="p-3 border-t border-border/40 bg-muted/20 space-y-2 text-[11px] leading-relaxed">
-                      {log.resultSummary && (
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
-                            <FileText className="size-2.5 text-primary" />
-                            Output Summary:
-                          </span>
-                          <p className="text-foreground whitespace-pre-wrap bg-background/60 p-2 rounded border border-border/40">
-                            {log.resultSummary}
-                          </p>
-                        </div>
-                      )}
-
-                      {log.error && (
-                        <div className="space-y-1">
-                          <span className="text-[10px] font-semibold text-destructive uppercase flex items-center gap-1">
-                            <AlertCircle className="size-2.5" />
-                            Error Diagnostic:
-                          </span>
-                          <p className="text-destructive font-mono text-[10px] bg-destructive/10 p-2 rounded border border-destructive/20 whitespace-pre-wrap">
-                            {log.error}
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1">
-                        <span>Started: {new Date(log.startedAt).toLocaleString()}</span>
-                        {log.completedAt && (
-                          <span>
-                            Completed: {new Date(log.completedAt).toLocaleTimeString()}
-                          </span>
+                  {/* Expanded Telemetry Details with Motion */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                        className="p-3 border-t border-border-subtle bg-surface-2/40 space-y-2 text-[11px] leading-relaxed overflow-hidden"
+                      >
+                        {log.resultSummary && (
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                              <FileText className="size-2.5 text-primary" />
+                              Output Summary:
+                            </span>
+                            <p className="text-foreground whitespace-pre-wrap bg-surface-1 p-2 rounded border border-border-subtle font-mono text-[11px]">
+                              {log.resultSummary}
+                            </p>
+                          </div>
                         )}
-                      </div>
-                    </div>
-                  )}
+
+                        {log.error && (
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-semibold text-destructive uppercase flex items-center gap-1">
+                              <AlertCircle className="size-2.5" />
+                              Error Diagnostic:
+                            </span>
+                            <p className="text-destructive font-mono text-[10px] bg-destructive/10 p-2 rounded border border-destructive/20 whitespace-pre-wrap">
+                              {log.error}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono tabular-nums pt-1 border-t border-border-subtle">
+                          <span>Started: {new Date(log.startedAt).toLocaleString()}</span>
+                          {log.completedAt && (
+                            <span>
+                              Completed: {new Date(log.completedAt).toLocaleTimeString()}
+                            </span>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}

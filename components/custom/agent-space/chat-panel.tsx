@@ -255,12 +255,12 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             className={`flex gap-3 max-w-2xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"}`}
           >
             {/* Avatar */}
-            <div className="size-7 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-xs font-semibold bg-muted border border-border">
+            <div className="size-7 rounded-lg overflow-hidden shrink-0 flex items-center justify-center text-xs font-semibold bg-surface-2 border border-border-subtle shadow-2xs">
               {msg.role === "agent" ? (
                 agent.agentImage ? (
                   <img src={agent.agentImage} alt={agent.name} className="size-full object-cover" />
                 ) : (
-                  <Bot className="size-3.5 text-primary" />
+                  <Bot className="size-3.5 text-foreground" />
                 )
               ) : (
                 <User className="size-3.5 text-muted-foreground" />
@@ -270,15 +270,15 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             {/* Bubble */}
             <div className="space-y-1 max-w-[85%]">
               <div
-                className={`p-3 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap break-words ${
+                className={`px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap break-words ${
                   msg.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-tr-sm"
-                    : "bg-muted/60 text-foreground border border-border/60 rounded-tl-sm shadow-xs"
+                    ? "bg-primary text-primary-foreground rounded-tr-xs shadow-xs"
+                    : "bg-surface-1 text-foreground border border-border-subtle rounded-tl-xs shadow-xs"
                 }`}
               >
                 {/* Streaming Placeholder or Content */}
                 {msg.role === "agent" && msg.isStreaming && !msg.content ? (
-                  <div className="flex items-center gap-2 text-muted-foreground py-0.5">
+                  <div className="flex items-center gap-2 text-muted-foreground py-0.5 font-mono">
                     <Loader2 className="size-3.5 animate-spin text-primary" />
                     <span className="text-[11px]">Executing tools & reasoning...</span>
                   </div>
@@ -297,7 +297,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
                 )}
               </div>
               <span
-                className={`block text-[10px] text-muted-foreground px-1 ${
+                className={`block text-[10px] font-mono tabular-nums text-muted-foreground px-1 ${
                   msg.role === "user" ? "text-right" : "text-left"
                 }`}
               >
@@ -310,7 +310,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
       </div>
 
       {/* Bottom Area: Prompt Chips + Input Area */}
-      <div className="p-4 border-t border-border/50 bg-background/80 backdrop-blur space-y-3 shrink-0">
+      <div className="p-4 border-t border-border-subtle bg-surface-0/90 backdrop-blur space-y-3 shrink-0">
         {/* Paused Agent Notice */}
         {agent.isActive === false && (
           <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
@@ -321,23 +321,25 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
           </div>
         )}
 
-        {/* Suggestion Chips */}
-        <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
-          {quickPromptChips.map((chip, idx) => (
-            <button
-              key={idx}
-              type="button"
-              disabled={isStreaming || agent.isActive === false}
-              onClick={() => handleChipClick(chip)}
-              className="text-[11px] bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-full border border-border/50 whitespace-nowrap transition-colors shrink-0 disabled:opacity-50 disabled:pointer-events-none"
-            >
-              {chip}
-            </button>
-          ))}
+        {/* Suggestion Chips with Gradient Edge Fade */}
+        <div className="relative w-full overflow-hidden">
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mask-fade-right scroll-smooth">
+            {quickPromptChips.map((chip, idx) => (
+              <button
+                key={idx}
+                type="button"
+                disabled={isStreaming || agent.isActive === false}
+                onClick={() => handleChipClick(chip)}
+                className="text-[11px] bg-surface-2 hover:bg-surface-3 text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border-subtle whitespace-nowrap transition-all duration-150 shrink-0 shadow-2xs hover:border-foreground/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Input Bar */}
-        <div className="relative rounded-xl border border-border/70 bg-card focus-within:border-primary/60 transition-colors shadow-sm">
+        <div className="relative rounded-xl border border-border-subtle bg-surface-1 focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/20 transition-all shadow-xs">
           <Textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
@@ -357,7 +359,8 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             size="icon"
             onClick={() => handleSend()}
             disabled={!input.trim() || isStreaming || propLoading || agent.isActive === false}
-            className="absolute bottom-2 right-2 size-7 rounded-lg"
+            aria-label="Send message"
+            className="absolute bottom-2.5 right-2.5 size-7 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-xs"
           >
             {isStreaming ? (
               <Loader2 className="size-3.5 animate-spin" />
