@@ -1,20 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { 
-  Mail, 
-  Calendar, 
-  MessageSquare, 
-  Github, 
-  Music, 
-  Phone, 
-  Globe, 
-  Code2, 
-  Layers, 
-  Check, 
-  Sparkles,
-  ArrowRight
-} from "lucide-react";
+import { Sparkles, ArrowRight } from "lucide-react";
+import { BrandIcon } from "./brand-logos";
 
 interface AppItem {
   name: string;
@@ -63,8 +51,8 @@ export function IntegrationsStrip() {
               onMouseLeave={() => setHoveredApp(null)}
               className="group cursor-pointer rounded-2xl border border-black/8 bg-[#F9F9FB] p-3.5 flex flex-col items-center text-center hover:bg-white hover:border-black/20 hover:shadow-md transition-all duration-200"
             >
-              <div className="flex size-10 items-center justify-center rounded-xl bg-white shadow-2xs border border-black/5 text-lg mb-2 group-hover:scale-110 transition-transform">
-                <span>{app.iconChar}</span>
+              <div className="flex size-10 items-center justify-center rounded-xl bg-white shadow-2xs border border-black/5 mb-2 group-hover:scale-110 transition-transform">
+                <BrandIcon name={app.name} size={22} />
               </div>
               <span className="font-sans font-bold text-xs text-neutral-900">
                 {app.name}
@@ -80,7 +68,7 @@ export function IntegrationsStrip() {
         <div className="mt-8 min-h-[44px] flex items-center justify-center">
           {hoveredApp ? (
             <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-neutral-100 px-4 py-2 text-xs font-sans text-neutral-800 shadow-2xs animate-in fade-in zoom-in-95">
-              <Sparkles className="size-3.5 text-amber-500" />
+              <BrandIcon name={hoveredApp.name} size={15} />
               <span>
                 <strong>{hoveredApp.name}:</strong> "{hoveredApp.commandSnippet}"
               </span>

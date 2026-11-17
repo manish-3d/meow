@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
+import { BrandIcon } from "./brand-logos";
 import { 
   Search, 
   Plus, 
@@ -319,8 +320,13 @@ export function HeroAppSimulator() {
                     <h3 className="font-sans text-xs font-bold text-neutral-900">
                       {activeBot.name}
                     </h3>
-                    <span className="text-[10px] text-neutral-400 font-mono">
-                      {activeBot.role} • {activeBot.model}
+                    <span className="text-[10px] text-neutral-400 font-mono flex items-center gap-1.5">
+                      <span>{activeBot.role}</span>
+                      <span>•</span>
+                      <span className="inline-flex items-center gap-1 text-neutral-600">
+                        <BrandIcon name={activeBot.model} size={11} />
+                        <span>{activeBot.model}</span>
+                      </span>
                     </span>
                   </div>
                 </div>
@@ -509,7 +515,8 @@ export function HeroAppSimulator() {
                 <div className="py-3 border-b border-black/8 flex flex-col gap-1.5">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-neutral-500 font-mono uppercase text-[10px]">Model Brain</span>
-                    <span className="font-semibold text-neutral-800 flex items-center gap-1 font-mono text-[11px]">
+                    <span className="font-semibold text-neutral-800 flex items-center gap-1.5 font-mono text-[11px]">
+                      <BrandIcon name={activeBot.model} size={13} />
                       <span>{activeBot.model}</span>
                       <ChevronDown className="size-3 text-neutral-400" />
                     </span>

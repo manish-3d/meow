@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { HeroAppSimulator } from "./hero-app-simulator";
 import { CharacterFaceFollow } from "./character-face-follow";
+import { ChatGptLogo, ClaudeLogo, GeminiLogo, GrokLogo } from "./brand-logos";
 
 export function HeroSection() {
   return (
@@ -38,22 +39,26 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="mt-6 sm:mt-8 max-w-2xl text-pretty text-neutral-600 text-base sm:text-lg leading-relaxed font-sans"
         >
-          <p>
+          <p className="leading-relaxed">
             your own crew of ai helpers, on the{" "}
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-sm font-mono border border-black/5 font-semibold">
-              chatgpt
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-sans border border-black/8 font-medium shadow-2xs">
+              <ChatGptLogo size={14} />
+              <span>chatgpt</span>
             </span>
             ,{" "}
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-sm font-mono border border-black/5 font-semibold">
-              claude
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-sans border border-black/8 font-medium shadow-2xs">
+              <ClaudeLogo size={14} />
+              <span>claude</span>
             </span>
             ,{" "}
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-sm font-mono border border-black/5 font-semibold">
-              gemini
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-sans border border-black/8 font-medium shadow-2xs">
+              <GeminiLogo size={14} />
+              <span>gemini</span>
             </span>{" "}
             or{" "}
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-neutral-100 text-neutral-800 text-sm font-mono border border-black/5 font-semibold">
-              grok
+            <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-neutral-100 text-neutral-900 text-xs sm:text-sm font-sans border border-black/8 font-medium shadow-2xs">
+              <GrokLogo size={14} />
+              <span>grok</span>
             </span>{" "}
             you already use.
           </p>

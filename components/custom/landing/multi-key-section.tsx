@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Key, ShieldCheck, Zap, Sparkles, Check, ArrowRight } from "lucide-react";
+import { BrandIcon } from "./brand-logos";
 
 interface ModelKeyOption {
   id: string;
@@ -95,10 +96,15 @@ export function MultiKeySection() {
                     </span>
                   </div>
 
-                  {/* Model Name */}
-                  <h3 className="text-2xl font-bold font-sans text-neutral-900 tracking-tight">
-                    {item.model}
-                  </h3>
+                  {/* Model Name with Brand Logo */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex size-10 items-center justify-center rounded-xl bg-neutral-100 border border-black/5 shadow-2xs shrink-0">
+                      <BrandIcon name={item.provider + " " + item.model} size={22} />
+                    </div>
+                    <h3 className="text-2xl font-bold font-sans text-neutral-900 tracking-tight">
+                      {item.model}
+                    </h3>
+                  </div>
 
                   {/* Best For Description */}
                   <p className="mt-3 text-sm text-neutral-600 font-sans leading-relaxed">
