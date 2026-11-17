@@ -12,8 +12,17 @@ import {
   ChevronUp,
   FileText,
   Calendar,
+  Plus,
+  Trash2,
+  Edit2,
+  Repeat,
+  Zap,
+  Globe,
+  X,
+  Settings2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
 import { useAgentConfig } from "@/context/agent-config-context";
 import axios from "axios";
@@ -21,10 +30,17 @@ import axios from "axios";
 interface RoutineItem {
   id: number;
   routineId: string;
+  agentId: string;
   title: string;
   prompt: string;
   frequency: string;
   scheduledTime: string;
+  timezone: string;
+  runType: "recurring" | "once";
+  maxRuns: number | null;
+  currentRunCount: number;
+  daysOfWeek: string | null;
+  targetDate: string | null;
   isActive: boolean;
   lastRunAt: string | null;
   createdAt: string;
@@ -48,28 +64,64 @@ export function ScheduleTab() {
   const [loading, setLoading] = useState(true);
   const [routines, setRoutines] = useState<RoutineItem[]>([]);
   const [logs, setLogs] = useState<ExecutionLogItem[]>([]);
-  const [running, setRunning] = useState(false);
+  const [runningRoutineId, setRunningRoutineId] = useState<string | null>(null);
   const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
+  // Modal State for Create / Edit Routine
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingRoutineId, setEditingRoutineId] = useState<string | null>(null);
+  const [savingRoutine, setSavingRoutine] = useState(false);
+
+  // Form Fields for Modal
+  const [formTitle, setFormTitle] = useState("");
+  const [formPrompt, setFormPrompt] = useState("");
+  const [formRunType, setFormRunType] = useState<"recurring" | "once">("recurring");
+  const [formFrequency, setFormFrequency] = useState("daily");
+  const [formScheduledTime, setFormScheduledTime] = useState("08:00 AM UTC");
+  const [formTimezone, setFormTimezone] = useState(
+    typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC"
+  );
+  const [formMaxRuns, setFormMaxRuns] = useState<number | null>(null);
+  const [formDaysOfWeek, setFormDaysOfWeek] = useState<string[]>(["mon", "tue", "wed", "thu", "fri"]);
+  const [formTargetDate, setFormTargetDate] = useState("today");
+  const [formIsActive, setFormIsActive] = useState(true);
+
+  const daysList = [
+    { label: "Mon", value: "mon" },
+    { label: "Tue", value: "tue" },
+    { label: "Wed", value: "wed" },
+    { label: "Thu", value: "thu" },
+    { label: "Fri", value: "fri" },
+    { label: "Sat", value: "sat" },
+    { label: "Sun", value: "sun" },
+  ];
+
+  const toggleDay = (day: string) => {
+    setFormDaysOfWeek((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
+    );
+  };
+
   // Fetch schedule and logs
-  const fetchScheduleData = useCallback(async () => {
+  const fetchScheduleData = useCallback(async (silent = false) => {
     if (!agentId) return;
 
     try {
+      if (!silent) setLoading(true);
       const res = await axios.get(`/api/agent/schedule?agentId=${agentId}`);
       const data = res.data;
       setRoutines(data.routines || []);
       setLogs(data.logs || []);
 
       // Check if any job is currently running
-      const isAnyRunning = (data.logs || []).some(
+      const runningLog = (data.logs || []).find(
         (l: ExecutionLogItem) => l.status === "running"
       );
-      setRunning(isAnyRunning);
+      setRunningRoutineId(runningLog ? runningLog.routineId : null);
     } catch (err: any) {
       console.error("Failed to load schedule data:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   }, [agentId]);
 
@@ -79,20 +131,128 @@ export function ScheduleTab() {
 
   // Polling while a background job is executing
   useEffect(() => {
-    if (!running) return;
+    if (!runningRoutineId) return;
 
     const interval = setInterval(() => {
-      fetchScheduleData();
+      fetchScheduleData(true);
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [running, fetchScheduleData]);
+  }, [runningRoutineId, fetchScheduleData]);
+
+  // Open modal for Creating a new routine
+  const handleOpenCreateModal = () => {
+    setEditingRoutineId(null);
+    setFormTitle("");
+    setFormPrompt("");
+    setFormRunType("recurring");
+    setFormFrequency("daily");
+    setFormScheduledTime("08:00 AM UTC");
+    setFormTimezone(
+      typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : "UTC"
+    );
+    setFormMaxRuns(null);
+    setFormDaysOfWeek(["mon", "tue", "wed", "thu", "fri"]);
+    setFormTargetDate("today");
+    setFormIsActive(true);
+    setModalOpen(true);
+  };
+
+  // Open modal for Editing an existing routine
+  const handleOpenEditModal = (routine: RoutineItem) => {
+    setEditingRoutineId(routine.routineId);
+    setFormTitle(routine.title);
+    setFormPrompt(routine.prompt);
+    setFormRunType(routine.runType || (routine.frequency === "once" ? "once" : "recurring"));
+    setFormFrequency(routine.frequency || "daily");
+    setFormScheduledTime(routine.scheduledTime || "08:00 AM UTC");
+    setFormTimezone(routine.timezone || "UTC");
+    setFormMaxRuns(routine.maxRuns);
+    setFormDaysOfWeek(
+      routine.daysOfWeek ? routine.daysOfWeek.split(",") : ["mon", "tue", "wed", "thu", "fri"]
+    );
+    setFormTargetDate(routine.targetDate || "today");
+    setFormIsActive(routine.isActive);
+    setModalOpen(true);
+  };
+
+  // Save (Create or Update) Routine
+  const handleSaveRoutine = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!agentId || savingRoutine) return;
+
+    if (!formTitle.trim()) {
+      toast.add({ title: "Validation Error", description: "Routine title is required.", type: "error" });
+      return;
+    }
+    if (!formPrompt.trim()) {
+      toast.add({ title: "Validation Error", description: "Prompt instructions are required.", type: "error" });
+      return;
+    }
+
+    setSavingRoutine(true);
+    try {
+      const routineId = editingRoutineId || `routine_${Date.now()}`;
+      await axios.post("/api/agent/schedule", {
+        routineId,
+        agentId,
+        title: formTitle.trim(),
+        prompt: formPrompt.trim(),
+        frequency: formRunType === "once" ? "once" : formFrequency,
+        scheduledTime: formScheduledTime.trim(),
+        timezone: formTimezone.trim(),
+        runType: formRunType,
+        maxRuns: formRunType === "once" ? 1 : formMaxRuns,
+        daysOfWeek: formFrequency === "weekly" ? formDaysOfWeek.join(",") : null,
+        targetDate: formRunType === "once" ? formTargetDate : null,
+        isActive: formIsActive,
+      });
+
+      toast.add({
+        title: editingRoutineId ? "Routine Updated" : "Routine Created",
+        description: `"${formTitle}" is now configured.`,
+        type: "success",
+      });
+
+      setModalOpen(false);
+      await fetchScheduleData(true);
+    } catch (err: any) {
+      toast.add({
+        title: "Save Failed",
+        description: err?.response?.data?.error || err?.message || "Could not save routine",
+        type: "error",
+      });
+    } finally {
+      setSavingRoutine(false);
+    }
+  };
+
+  // Delete Routine
+  const handleDeleteRoutine = async (routineId: string, title: string) => {
+    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+
+    try {
+      await axios.delete(`/api/agent/schedule?routineId=${routineId}`);
+      toast.add({
+        title: "Routine Deleted",
+        description: `"${title}" was removed.`,
+        type: "info",
+      });
+      setRoutines((prev) => prev.filter((r) => r.routineId !== routineId));
+    } catch (err: any) {
+      toast.add({
+        title: "Deletion Failed",
+        description: err?.response?.data?.error || "Could not delete routine",
+        type: "error",
+      });
+    }
+  };
 
   // Trigger manual "Run Now"
   const handleRunNow = async (routineId: string) => {
-    if (!agentId || running) return;
+    if (!agentId || runningRoutineId) return;
 
-    setRunning(true);
+    setRunningRoutineId(routineId);
     try {
       const res = await axios.post("/api/agent/schedule/run-now", {
         routineId,
@@ -107,8 +267,7 @@ export function ScheduleTab() {
         type: "success",
       });
 
-      // Instantly refresh list so the "running" state appears
-      await fetchScheduleData();
+      await fetchScheduleData(true);
     } catch (err: any) {
       console.error("Run Now error:", err);
       toast.add({
@@ -116,7 +275,7 @@ export function ScheduleTab() {
         description: err.response?.data?.error || "Could not trigger routine.",
         type: "error",
       });
-      setRunning(false);
+      setRunningRoutineId(null);
     }
   };
 
@@ -151,8 +310,6 @@ export function ScheduleTab() {
     }
   };
 
-  const primaryRoutine = routines[0];
-
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center p-8 space-y-2 text-muted-foreground">
@@ -164,82 +321,199 @@ export function ScheduleTab() {
 
   return (
     <div className="space-y-4 pt-2">
-      {/* Primary Routine Card */}
-      {primaryRoutine ? (
-        <div className="p-3.5 rounded-xl border border-border/70 bg-card/60 space-y-3 shadow-xs">
-          <div className="flex items-start justify-between gap-2">
-            <div className="space-y-1">
-              <span className="text-xs font-bold text-foreground">
-                {primaryRoutine.title}
-              </span>
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                <Clock className="size-3 text-primary" />
-                <span>{primaryRoutine.scheduledTime}</span>
+      {/* Header Controls */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-foreground">
+            Scheduled Routines
+          </span>
+          <Badge variant="outline" className="text-[10px] py-0 px-1.5 font-mono">
+            {routines.length} {routines.length === 1 ? "routine" : "routines"}
+          </Badge>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => fetchScheduleData()}
+            className="size-7 p-0 text-muted-foreground hover:text-foreground"
+            title="Refresh list"
+          >
+            <RefreshCw className="size-3.5" />
+          </Button>
+
+          <Button
+            size="sm"
+            onClick={handleOpenCreateModal}
+            className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium px-2.5"
+          >
+            <Plus className="size-3.5" />
+            <span>New Routine</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Routine Cards List (Supports Multiple Routines) */}
+      {routines.length > 0 ? (
+        <div className="space-y-3">
+          {routines.map((routine) => {
+            const isThisRunning = runningRoutineId === routine.routineId;
+
+            return (
+              <div
+                key={routine.routineId}
+                className="p-3.5 rounded-xl border border-border/70 bg-card/60 space-y-3 shadow-xs hover:border-border transition-colors"
+              >
+                {/* Top Row: Title, Status Badge & Toggle */}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-1 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-bold text-foreground">
+                        {routine.title}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleActive(routine)}
+                        className={`text-[9px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors ${
+                          routine.isActive
+                            ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20"
+                            : "bg-muted text-muted-foreground border border-border hover:bg-muted/80"
+                        }`}
+                      >
+                        {routine.isActive ? "Active" : "Paused"}
+                      </button>
+                    </div>
+
+                    {/* Schedule Metadata Badges */}
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-muted-foreground pt-0.5">
+                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded border border-border/40 font-medium text-foreground">
+                        {routine.runType === "once" ? (
+                          <Zap className="size-3 text-amber-500" />
+                        ) : (
+                          <Repeat className="size-3 text-primary" />
+                        )}
+                        <span className="capitalize">
+                          {routine.runType === "once" ? "Run Once" : routine.frequency}
+                        </span>
+                      </span>
+
+                      <span className="inline-flex items-center gap-1 bg-muted/50 px-2 py-0.5 rounded border border-border/40 font-mono">
+                        <Clock className="size-2.5 text-primary" />
+                        <span>{routine.scheduledTime}</span>
+                      </span>
+
+                      {routine.timezone && (
+                        <span className="inline-flex items-center gap-1 bg-muted/50 px-1.5 py-0.5 rounded border border-border/40 font-mono text-[9px]">
+                          <Globe className="size-2.5" />
+                          <span>{routine.timezone}</span>
+                        </span>
+                      )}
+
+                      {/* Repetition Count Progress */}
+                      <Badge variant="outline" className="text-[9px] py-0 px-1 font-mono">
+                        {routine.runType === "once" || routine.maxRuns === 1
+                          ? routine.currentRunCount >= 1
+                            ? "✅ Executed (1/1)"
+                            : "⚡ 1 Time Only"
+                          : routine.maxRuns
+                          ? `🔁 ${routine.currentRunCount}/${routine.maxRuns} runs`
+                          : `♾️ ${routine.currentRunCount} runs completed`}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Edit & Delete Action Icons */}
+                  <div className="flex items-center gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleOpenEditModal(routine)}
+                      className="size-6 p-0 text-muted-foreground hover:text-foreground"
+                      title="Edit Routine"
+                    >
+                      <Edit2 className="size-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDeleteRoutine(routine.routineId, routine.title)}
+                      className="size-6 p-0 text-muted-foreground hover:text-destructive"
+                      title="Delete Routine"
+                    >
+                      <Trash2 className="size-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Prompt / Instruction Box */}
+                <div className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-lg border border-border/40 leading-relaxed font-mono line-clamp-3">
+                  {routine.prompt}
+                </div>
+
+                {/* Footer: Last Run & Run Now Button */}
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[10px] text-muted-foreground">
+                    Last run:{" "}
+                    <strong className="text-foreground">
+                      {routine.lastRunAt
+                        ? new Date(routine.lastRunAt).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            month: "short",
+                            day: "numeric",
+                          })
+                        : "Never executed"}
+                    </strong>
+                  </span>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs gap-1.5 px-3 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-transparent shadow-xs transition-all disabled:opacity-70"
+                    onClick={() => handleRunNow(routine.routineId)}
+                    disabled={Boolean(runningRoutineId)}
+                  >
+                    {isThisRunning ? (
+                      <>
+                        <Loader2 className="size-3 animate-spin" />
+                        <span>Running Inngest...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Play className="size-3 fill-current" />
+                        <span>Run Now</span>
+                      </>
+                    )}
+                  </Button>
+                </div>
               </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => handleToggleActive(primaryRoutine)}
-              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider transition-colors ${
-                primaryRoutine.isActive
-                  ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20"
-                  : "bg-muted text-muted-foreground border border-border hover:bg-muted/80"
-              }`}
-            >
-              {primaryRoutine.isActive ? "Active" : "Paused"}
-            </button>
-          </div>
-
-          <div className="text-[11px] text-muted-foreground bg-muted/40 p-2.5 rounded-lg border border-border/40 leading-relaxed font-mono">
-            {primaryRoutine.prompt}
-          </div>
-
-          <div className="flex items-center justify-between pt-1">
-            <span className="text-[10px] text-muted-foreground">
-              Last run:{" "}
-              <strong className="text-foreground">
-                {primaryRoutine.lastRunAt
-                  ? new Date(primaryRoutine.lastRunAt).toLocaleTimeString([], {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  : "Never executed"}
-              </strong>
-            </span>
-
-            <Button
-              size="sm"
-              variant="outline"
-              className="h-7 text-xs gap-1.5 px-3 bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground border-transparent shadow-xs transition-all disabled:opacity-70"
-              onClick={() => handleRunNow(primaryRoutine.routineId)}
-              disabled={running}
-            >
-              {running ? (
-                <>
-                  <Loader2 className="size-3 animate-spin" />
-                  <span>Running Inngest...</span>
-                </>
-              ) : (
-                <>
-                  <Play className="size-3 fill-current" />
-                  <span>Run Now</span>
-                </>
-              )}
-            </Button>
-          </div>
+            );
+          })}
         </div>
       ) : (
-        <div className="p-4 rounded-xl border border-dashed border-border/80 text-center space-y-2">
-          <Calendar className="size-6 text-muted-foreground mx-auto" />
-          <p className="text-xs text-muted-foreground">No routine found for this agent.</p>
+        <div className="p-6 rounded-xl border border-dashed border-border/80 text-center space-y-3 bg-muted/20">
+          <Calendar className="size-8 text-muted-foreground mx-auto" />
+          <div className="space-y-1">
+            <h5 className="text-xs font-semibold text-foreground">No scheduled routines yet</h5>
+            <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
+              Create an automated routine or ask your agent in chat to schedule tasks like morning email summaries or web alerts.
+            </p>
+          </div>
+          <Button
+            size="sm"
+            onClick={handleOpenCreateModal}
+            className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground font-medium"
+          >
+            <Plus className="size-3.5" />
+            Create First Routine
+          </Button>
         </div>
       )}
 
       {/* Execution Audit Logs */}
-      <div className="space-y-2.5">
+      <div className="space-y-2.5 pt-2">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
             <span>Execution History</span>
@@ -249,112 +523,108 @@ export function ScheduleTab() {
               </span>
             )}
           </span>
-
           <Button
-            variant="ghost"
             size="sm"
-            className="h-6 px-1.5 text-xs text-muted-foreground hover:text-foreground gap-1"
-            onClick={fetchScheduleData}
-            title="Refresh Execution Logs"
+            variant="ghost"
+            onClick={() => fetchScheduleData(true)}
+            className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-foreground gap-1"
           >
-            <RefreshCw className={`size-3 ${running ? "animate-spin text-primary" : ""}`} />
-            <span className="text-[10px]">Refresh</span>
+            <RefreshCw className="size-2.5" />
+            <span>Refresh</span>
           </Button>
         </div>
 
-        {logs.length === 0 ? (
-          <div className="p-4 rounded-lg bg-muted/20 border border-border/40 text-center space-y-1">
-            <p className="text-xs text-muted-foreground">No execution logs yet.</p>
-            <p className="text-[11px] text-muted-foreground/80">
-              Click &quot;Run Now&quot; above to trigger your first background routine.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
+        {logs.length > 0 ? (
+          <div className="space-y-1.5">
             {logs.map((log) => {
               const isExpanded = expandedLogId === log.executionId;
 
               return (
                 <div
                   key={log.executionId}
-                  className="rounded-xl bg-card border border-border/60 overflow-hidden shadow-2xs transition-all"
+                  className="rounded-lg border border-border/60 bg-card/40 overflow-hidden text-xs transition-colors hover:border-border"
                 >
                   <div
                     onClick={() =>
                       setExpandedLogId(isExpanded ? null : log.executionId)
                     }
-                    className="flex items-center justify-between p-2.5 cursor-pointer hover:bg-muted/30 transition-colors gap-2 text-xs"
+                    className="p-2.5 flex items-center justify-between gap-2 cursor-pointer hover:bg-muted/30 select-none"
                   >
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="flex items-center gap-2">
                       {log.status === "completed" ? (
                         <CheckCircle2 className="size-3.5 text-emerald-500 shrink-0" />
-                      ) : log.status === "running" ? (
-                        <Loader2 className="size-3.5 text-blue-500 animate-spin shrink-0" />
+                      ) : log.status === "failed" ? (
+                        <AlertCircle className="size-3.5 text-destructive shrink-0" />
                       ) : (
-                        <AlertCircle className="size-3.5 text-red-500 shrink-0" />
+                        <Loader2 className="size-3.5 text-primary animate-spin shrink-0" />
                       )}
 
-                      <span className="font-medium text-foreground truncate">
-                        Run #{log.executionId.replace("exec_", "").slice(-6)}
-                      </span>
-
-                      <span
-                        className={`text-[10px] px-1.5 py-0.2 rounded-full font-medium ${
-                          log.status === "completed"
-                            ? "bg-emerald-500/10 text-emerald-600"
-                            : log.status === "running"
-                            ? "bg-blue-500/10 text-blue-600"
-                            : "bg-red-500/10 text-red-600"
-                        }`}
-                      >
-                        {log.status}
-                      </span>
+                      <div className="flex items-center gap-1.5 font-mono text-[11px]">
+                        <span className="font-semibold text-foreground">
+                          Run #{log.executionId.slice(-6)}
+                        </span>
+                        <span
+                          className={`text-[9px] uppercase px-1.5 py-0.2 rounded-full ${
+                            log.status === "completed"
+                              ? "bg-emerald-500/10 text-emerald-600"
+                              : log.status === "failed"
+                              ? "bg-destructive/10 text-destructive"
+                              : "bg-primary/10 text-primary"
+                          }`}
+                        >
+                          {log.status}
+                        </span>
+                      </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground shrink-0">
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-mono">
                       <span>
                         {new Date(log.startedAt).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
                         })}
                       </span>
-                      {log.resultSummary && (
-                        isExpanded ? (
-                          <ChevronUp className="size-3 text-muted-foreground" />
-                        ) : (
-                          <ChevronDown className="size-3 text-muted-foreground" />
-                        )
+                      {isExpanded ? (
+                        <ChevronUp className="size-3" />
+                      ) : (
+                        <ChevronDown className="size-3" />
                       )}
                     </div>
                   </div>
 
-                  {/* Expandable Execution Summary */}
+                  {/* Expanded Telemetry Details */}
                   {isExpanded && (
-                    <div className="border-t border-border/40 p-3 bg-muted/20 space-y-2 text-xs">
-                      {log.resultSummary ? (
-                        <div className="space-y-1.5">
-                          <div className="flex items-center gap-1 text-[11px] font-semibold text-foreground">
-                            <FileText className="size-3 text-primary" />
-                            <span>Executive Summary:</span>
-                          </div>
-                          <div className="p-2.5 rounded-lg bg-background border border-border/50 text-[11px] leading-relaxed whitespace-pre-wrap font-sans text-muted-foreground">
+                    <div className="p-3 border-t border-border/40 bg-muted/20 space-y-2 text-[11px] leading-relaxed">
+                      {log.resultSummary && (
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-semibold text-muted-foreground uppercase flex items-center gap-1">
+                            <FileText className="size-2.5 text-primary" />
+                            Output Summary:
+                          </span>
+                          <p className="text-foreground whitespace-pre-wrap bg-background/60 p-2 rounded border border-border/40">
                             {log.resultSummary}
-                          </div>
-                        </div>
-                      ) : log.error ? (
-                        <div className="p-2.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-600 text-[11px]">
-                          <strong>Error:</strong> {log.error}
-                        </div>
-                      ) : (
-                        <div className="text-[11px] text-muted-foreground italic">
-                          Job is currently in progress...
+                          </p>
                         </div>
                       )}
 
-                      <div className="text-[10px] text-muted-foreground flex justify-between pt-1">
+                      {log.error && (
+                        <div className="space-y-1">
+                          <span className="text-[10px] font-semibold text-destructive uppercase flex items-center gap-1">
+                            <AlertCircle className="size-2.5" />
+                            Error Diagnostic:
+                          </span>
+                          <p className="text-destructive font-mono text-[10px] bg-destructive/10 p-2 rounded border border-destructive/20 whitespace-pre-wrap">
+                            {log.error}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground font-mono pt-1">
                         <span>Started: {new Date(log.startedAt).toLocaleString()}</span>
                         {log.completedAt && (
-                          <span>Completed: {new Date(log.completedAt).toLocaleTimeString()}</span>
+                          <span>
+                            Completed: {new Date(log.completedAt).toLocaleTimeString()}
+                          </span>
                         )}
                       </div>
                     </div>
@@ -363,8 +633,263 @@ export function ScheduleTab() {
               );
             })}
           </div>
+        ) : (
+          <div className="p-4 rounded-lg border border-dashed border-border/60 text-center space-y-1 bg-muted/10">
+            <p className="text-xs text-muted-foreground">No executions recorded yet.</p>
+            <p className="text-[10px] text-muted-foreground">
+              Click &quot;Run Now&quot; above to trigger your first background routine.
+            </p>
+          </div>
         )}
       </div>
+
+      {/* Routine Creator / Editor Modal Dialog */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-md bg-card border border-border rounded-xl shadow-2xl p-5 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between border-b border-border/50 pb-2.5">
+              <div className="flex items-center gap-2">
+                <Settings2 className="size-4 text-primary" />
+                <h3 className="text-sm font-bold text-foreground">
+                  {editingRoutineId ? "Edit Routine Details" : "Create New Automated Routine"}
+                </h3>
+              </div>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => setModalOpen(false)}
+                className="size-7 p-0 text-muted-foreground hover:text-foreground"
+              >
+                <X className="size-4" />
+              </Button>
+            </div>
+
+            <form onSubmit={handleSaveRoutine} className="space-y-3.5">
+              {/* Title */}
+              <div>
+                <label className="text-[11px] font-semibold text-foreground block mb-1">
+                  Routine Title
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formTitle}
+                  onChange={(e) => setFormTitle(e.target.value)}
+                  className="w-full text-xs px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="e.g. Daily Briefing to Manish"
+                />
+              </div>
+
+              {/* Prompt / Instruction */}
+              <div>
+                <label className="text-[11px] font-semibold text-foreground block mb-1">
+                  Agent Objective & Instructions
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={formPrompt}
+                  onChange={(e) => setFormPrompt(e.target.value)}
+                  className="w-full text-xs px-3 py-2 rounded-md border border-border bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                  placeholder="e.g. Fetch unread emails, check Google News for AI trends, and send a summary email..."
+                />
+              </div>
+
+              {/* Execution Type: Once vs Recurring */}
+              <div>
+                <label className="text-[11px] font-semibold text-foreground block mb-1.5">
+                  Execution Schedule Mode
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormRunType("once");
+                      setFormFrequency("once");
+                      setFormMaxRuns(1);
+                    }}
+                    className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${
+                      formRunType === "once"
+                        ? "bg-primary/10 border-primary text-primary font-semibold"
+                        : "bg-background border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Zap className="size-3.5 text-amber-500" />
+                    <span>Run Once (One-Time)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFormRunType("recurring");
+                      setFormFrequency("daily");
+                      setFormMaxRuns(null);
+                    }}
+                    className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${
+                      formRunType === "recurring"
+                        ? "bg-primary/10 border-primary text-primary font-semibold"
+                        : "bg-background border-border text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Repeat className="size-3.5 text-primary" />
+                    <span>Recurring Schedule</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* If Recurring: Frequency Options */}
+              {formRunType === "recurring" && (
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-foreground block">
+                    Frequency
+                  </label>
+                  <div className="grid grid-cols-4 gap-1.5">
+                    {[
+                      { id: "hourly", label: "Hourly" },
+                      { id: "daily", label: "Daily" },
+                      { id: "weekly", label: "Weekly" },
+                      { id: "monthly", label: "Monthly" },
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setFormFrequency(item.id)}
+                        className={`py-1.5 text-xs rounded border font-medium text-center transition-all ${
+                          formFrequency === item.id
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background border-border text-muted-foreground hover:bg-muted"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Weekly Days of Week */}
+                  {formFrequency === "weekly" && (
+                    <div className="pt-1 space-y-1">
+                      <span className="text-[10px] text-muted-foreground">
+                        Active Days:
+                      </span>
+                      <div className="flex gap-1">
+                        {daysList.map((day) => {
+                          const isSel = formDaysOfWeek.includes(day.value);
+                          return (
+                            <button
+                              key={day.value}
+                              type="button"
+                              onClick={() => toggleDay(day.value)}
+                              className={`size-7 text-[10px] font-semibold rounded-md border transition-all ${
+                                isSel
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "bg-background border-border text-muted-foreground hover:bg-muted"
+                              }`}
+                            >
+                              {day.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Repetitions (How Many Times) */}
+              <div>
+                <label className="text-[11px] font-semibold text-foreground block mb-1">
+                  Repetitions (How Many Times to Run)
+                </label>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    { label: "1 Time Only", val: 1 },
+                    { label: "3 Times", val: 3 },
+                    { label: "5 Times", val: 5 },
+                    { label: "10 Times", val: 10 },
+                    { label: "Unlimited (♾️)", val: null },
+                  ].map((opt) => (
+                    <button
+                      key={String(opt.val)}
+                      type="button"
+                      onClick={() => {
+                        setFormMaxRuns(opt.val);
+                        if (opt.val === 1) setFormRunType("once");
+                        else setFormRunType("recurring");
+                      }}
+                      className={`px-2.5 py-1 text-[11px] rounded-md border font-medium transition-all ${
+                        formMaxRuns === opt.val
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background border-border text-muted-foreground hover:bg-muted"
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Time & Timezone Inputs */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-semibold text-foreground block mb-1">
+                    Scheduled Time
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formScheduledTime}
+                    onChange={(e) => setFormScheduledTime(e.target.value)}
+                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="e.g. 09:00 PM IST or 08:00 AM UTC"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-semibold text-foreground block mb-1">
+                    Timezone
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formTimezone}
+                    onChange={(e) => setFormTimezone(e.target.value)}
+                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="e.g. Asia/Calcutta, UTC"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/50">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setModalOpen(false)}
+                  className="h-8 text-xs"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={savingRoutine}
+                  className="h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+                >
+                  {savingRoutine ? (
+                    <>
+                      <Loader2 className="size-3 animate-spin mr-1.5" />
+                      Saving...
+                    </>
+                  ) : editingRoutineId ? (
+                    "Update Routine"
+                  ) : (
+                    "Create Routine"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

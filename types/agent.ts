@@ -13,3 +13,23 @@ export type AgentConfigType = {
   isActive?: boolean;
   createdAt?: string | Date;
 };
+
+export type RoutineType = {
+  id?: number;
+  routineId: string;
+  agentId: string;
+  userEmail: string;
+  title: string;
+  prompt: string;
+  frequency: string;
+  scheduledTime: string;
+  timezone: string;
+  runType: "recurring" | "once";
+  maxRuns?: number | null;
+  currentRunCount?: number;
+  daysOfWeek?: string | null;
+  targetDate?: string | null;
+  isActive: boolean;
+  lastRunAt?: string | Date | null;
+  createdAt?: string | Date;
+};

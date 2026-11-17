@@ -62,6 +62,11 @@ export const routines = pgTable("routines", {
   frequency: varchar("frequency", { length: 100 }).default("daily").notNull(),
   scheduledTime: varchar("scheduled_time", { length: 100 }).default("08:00 AM UTC").notNull(),
   timezone: varchar("timezone", { length: 100 }).default("UTC").notNull(),
+  runType: varchar("run_type", { length: 50 }).default("recurring").notNull(), // 'recurring' | 'once'
+  maxRuns: integer("max_runs"), // null = unlimited, or 1, 5, 10
+  currentRunCount: integer("current_run_count").default(0).notNull(),
+  daysOfWeek: varchar("days_of_week", { length: 100 }), // e.g. "mon,wed,fri"
+  targetDate: varchar("target_date", { length: 100 }), // e.g. "today" or "2026-11-17"
   isActive: boolean("is_active").default(true).notNull(),
   lastRunAt: timestamp("last_run_at"),
   nextRunAt: timestamp("next_run_at"),

@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { routines, executionLogs, agentConfig } from "@/db/schema";
 import { eq, and, desc } from "drizzle-orm";
 
+// GET /api/agent/schedule — List all routines and recent telemetry logs for an agent
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // 1. Verify agent exists and belongs to user
+    // 1. Verify agent ownership
     const agentRecords = await db
       .select()
       .from(agentConfig)
@@ -35,8 +36,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Agent not found" }, { status: 404 });
     }
 
-    // 2. Fetch routines for this agent
-    let agentRoutines = await db
+    // 2. Fetch all routines belonging to this agent
+    const agentRoutines = await db
       .select()
       .from(routines)
       .where(
@@ -44,31 +45,10 @@ export async function GET(req: NextRequest) {
           eq(routines.agentId, agentId),
           eq(routines.userEmail, session.user.email)
         )
-      );
+      )
+      .orderBy(desc(routines.createdAt));
 
-    // If no routine exists yet, seed an initial daily routine
-    if (agentRoutines.length === 0) {
-      const initialRoutine = {
-        routineId: `routine_${agentId.slice(0, 8)}`,
-        agentId,
-        userEmail: session.user.email,
-        title: "Daily Unread Email Summary",
-        prompt:
-          "Fetch my unread emails using Gmail, categorize them by importance (Security Alerts, Service Notifications, Updates), and generate an executive summary with action items.",
-        frequency: "daily",
-        scheduledTime: "08:00 AM UTC",
-        timezone: "UTC",
-        isActive: true,
-      };
-
-      await db.insert(routines).values(initialRoutine);
-      agentRoutines = await db
-        .select()
-        .from(routines)
-        .where(eq(routines.routineId, initialRoutine.routineId));
-    }
-
-    // 3. Fetch recent execution logs (last 10 runs)
+    // 3. Fetch recent execution logs (last 15 runs)
     const logs = await db
       .select()
       .from(executionLogs)
@@ -79,7 +59,7 @@ export async function GET(req: NextRequest) {
         )
       )
       .orderBy(desc(executionLogs.startedAt))
-      .limit(10);
+      .limit(15);
 
     return NextResponse.json({
       routines: agentRoutines,
@@ -94,6 +74,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// POST /api/agent/schedule — Create or Update a routine (Upsert)
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -103,21 +84,29 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { routineId, title, prompt, frequency, scheduledTime, isActive } = body;
+    const {
+      routineId,
+      agentId,
+      title,
+      prompt,
+      frequency,
+      scheduledTime,
+      timezone,
+      runType,
+      maxRuns,
+      daysOfWeek,
+      targetDate,
+      isActive,
+    } = body;
 
     if (!routineId) {
       return NextResponse.json({ error: "routineId is required" }, { status: 400 });
     }
 
-    await db
-      .update(routines)
-      .set({
-        ...(title !== undefined && { title }),
-        ...(prompt !== undefined && { prompt }),
-        ...(frequency !== undefined && { frequency }),
-        ...(scheduledTime !== undefined && { scheduledTime }),
-        ...(isActive !== undefined && { isActive }),
-      })
+    // Check if routine already exists
+    const existing = await db
+      .select()
+      .from(routines)
       .where(
         and(
           eq(routines.routineId, routineId),
@@ -125,11 +114,108 @@ export async function POST(req: NextRequest) {
         )
       );
 
-    return NextResponse.json({ success: true });
+    if (existing.length > 0) {
+      // UPDATE existing routine
+      await db
+        .update(routines)
+        .set({
+          ...(title !== undefined && { title }),
+          ...(prompt !== undefined && { prompt }),
+          ...(frequency !== undefined && { frequency }),
+          ...(scheduledTime !== undefined && { scheduledTime }),
+          ...(timezone !== undefined && { timezone }),
+          ...(runType !== undefined && { runType }),
+          ...(maxRuns !== undefined && { maxRuns }),
+          ...(daysOfWeek !== undefined && { daysOfWeek }),
+          ...(targetDate !== undefined && { targetDate }),
+          ...(isActive !== undefined && { isActive }),
+        })
+        .where(
+          and(
+            eq(routines.routineId, routineId),
+            eq(routines.userEmail, session.user.email)
+          )
+        );
+
+      return NextResponse.json({ success: true, action: "updated", routineId });
+    }
+
+    // INSERT new routine
+    if (!agentId || !title || !prompt) {
+      return NextResponse.json(
+        { error: "agentId, title, and prompt are required to create a new routine" },
+        { status: 400 }
+      );
+    }
+
+    await db.insert(routines).values({
+      routineId,
+      agentId,
+      userEmail: session.user.email,
+      title,
+      prompt,
+      frequency: frequency || "daily",
+      scheduledTime: scheduledTime || "08:00 AM UTC",
+      timezone: timezone || "UTC",
+      runType: runType || (frequency === "once" ? "once" : "recurring"),
+      maxRuns: maxRuns !== undefined ? maxRuns : (runType === "once" ? 1 : null),
+      currentRunCount: 0,
+      daysOfWeek: daysOfWeek || null,
+      targetDate: targetDate || null,
+      isActive: isActive !== undefined ? isActive : true,
+    });
+
+    return NextResponse.json({ success: true, action: "created", routineId });
   } catch (error: any) {
     console.error("Error in POST /api/agent/schedule:", error);
     return NextResponse.json(
       { error: error?.message || "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/agent/schedule — Delete a routine and its child execution logs
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const routineId = searchParams.get("routineId");
+
+  if (!routineId) {
+    return NextResponse.json({ error: "routineId is required" }, { status: 400 });
+  }
+
+  try {
+    // 1. Delete child execution logs
+    await db
+      .delete(executionLogs)
+      .where(
+        and(
+          eq(executionLogs.routineId, routineId),
+          eq(executionLogs.userEmail, session.user.email)
+        )
+      );
+
+    // 2. Delete the routine record
+    await db
+      .delete(routines)
+      .where(
+        and(
+          eq(routines.routineId, routineId),
+          eq(routines.userEmail, session.user.email)
+        )
+      );
+
+    return NextResponse.json({ success: true, deletedRoutineId: routineId });
+  } catch (error: any) {
+    console.error("Error in DELETE /api/agent/schedule:", error);
+    return NextResponse.json(
+      { error: error?.message || "Failed to delete routine" },
       { status: 500 }
     );
   }

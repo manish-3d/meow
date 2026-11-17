@@ -178,21 +178,31 @@ Execute the routine prompt thoroughly.`;
     })
     .where(eq(executionLogs.executionId, executionId));
 
-  // 5. Update routine lastRunAt
+  // 5. Update routine lastRunAt, increment currentRunCount, and check maxRuns
+  const nextRunCount = (routine.currentRunCount || 0) + 1;
+  const isTargetRunsReached =
+    Boolean(routine.maxRuns && nextRunCount >= routine.maxRuns) ||
+    routine.runType === "once";
+
   await db
     .update(routines)
     .set({
       lastRunAt: new Date(),
+      currentRunCount: nextRunCount,
+      ...(isTargetRunsReached && { isActive: false }),
     })
     .where(eq(routines.routineId, routineId));
 
   // 6. Deliver routine summary directly into user's chat history
   try {
+    const statusNote = isTargetRunsReached
+      ? `\n\n*(🏁 Completed target execution count: ${nextRunCount}/${routine.maxRuns || 1} runs. Routine automatically concluded.)*`
+      : "";
     await db.insert(agentChatHistory).values({
       agentId,
       userEmail,
       role: "agent",
-      content: `### 🤖 Autonomous Routine Completed: ${routine.title}\n\n${summary}`,
+      content: `### 🤖 Autonomous Routine Completed: ${routine.title}\n\n${summary}${statusNote}`,
     });
   } catch (chatHistErr) {
     console.warn("Could not append routine summary to chat history:", chatHistErr);
