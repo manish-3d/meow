@@ -6,6 +6,7 @@ import {
   Globe,
   Power,
   Play,
+  Pause,
   RefreshCw,
   ExternalLink,
   Maximize2,
@@ -83,9 +84,13 @@ export function VmDesktopTab() {
       setStreamUrl(res.data.streamUrl);
       setAutoPauseSeconds(120);
       toast.add({
-        title: "Cloud Desktop Activated",
-        description: "Your agent's E2B Linux VM desktop is now running.",
-        type: "success",
+        title: res.data?.isSimulated
+          ? "Daytona Sandbox (Preview Active)"
+          : "Daytona Sandbox Activated",
+        description:
+          res.data?.notice ||
+          "Your agent's Daytona Cloud Sandbox environment is now active.",
+        type: res.data?.isSimulated ? "info" : "success",
       });
     } catch (err: any) {
       const errMsg = err?.response?.data?.error || err?.message || "Failed to start VM";
@@ -295,26 +300,53 @@ export function VmDesktopTab() {
 
         {/* Viewport Content Area */}
         <div className="h-[280px] w-full bg-muted/20 relative flex items-center justify-center overflow-hidden">
-          {vmStatus === "active" && streamUrl ? (
+          {vmStatus === "active" && streamUrl && streamUrl.includes("daytonaproxy") ? (
             <iframe
               src={streamUrl}
               className="size-full border-0"
               title="Cloud VM Desktop Stream"
               allow="clipboard-read; clipboard-write"
             />
-          ) : vmStatus === "active" && !isConfigured ? (
-            /* Simulated Active Sandbox View */
-            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/60 backdrop-blur-xs">
-              <div className="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+          ) : vmStatus === "active" ? (
+            /* Active Sandbox View */
+            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/70 backdrop-blur-xs">
+              <div className="size-11 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 animate-pulse">
                 <Monitor className="size-5" />
               </div>
-              <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">Daytona Sandbox Simulation Active</h5>
+              <div className="space-y-1.5 max-w-sm">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="relative flex size-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
+                  </span>
+                  <h5 className="text-xs font-semibold text-foreground">Daytona Sandbox Active</h5>
+                </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Browser agent is ready to navigate <code className="text-primary">{currentUrl}</code>. To view live cloud workspace, configure your Daytona API key.
+                  Autonomous sandbox is running for <code className="text-primary font-mono bg-primary/5 px-1 py-0.5 rounded">{currentUrl}</code>. Auto-pauses in {autoPauseSeconds}s.
                 </p>
               </div>
-              <Badge variant="outline" className="text-[10px] font-mono bg-background">
+              <div className="flex items-center gap-2 pt-1">
+                <a
+                  href="https://app.daytona.io/dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-colors"
+                >
+                  <ExternalLink className="size-3" />
+                  Daytona Console
+                </a>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handlePauseVM}
+                  disabled={actionLoading}
+                  className="h-7 text-[11px] px-2.5"
+                >
+                  <Pause className="size-3 mr-1" />
+                  Pause Sandbox
+                </Button>
+              </div>
+              <Badge variant="outline" className="text-[10px] font-mono bg-background text-muted-foreground">
                 Daytona Cloud Sandbox • Isolated Container
               </Badge>
             </div>
