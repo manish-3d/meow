@@ -40,9 +40,6 @@ export function LandingNavbar() {
             <span className="font-sans font-bold text-base tracking-tight text-neutral-900">
               meow bot
             </span>
-            <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase bg-emerald-500/15 text-emerald-600 border border-emerald-500/30">
-              web cloud
-            </span>
           </div>
         </Link>
 

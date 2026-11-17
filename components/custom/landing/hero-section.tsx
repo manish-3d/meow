@@ -7,8 +7,7 @@ import {
   ArrowRight, 
   Star, 
   ExternalLink, 
-  Sparkles,
-  Globe
+  Sparkles
 } from "lucide-react";
 import { HeroAppSimulator } from "./hero-app-simulator";
 import { CharacterFaceFollow } from "./character-face-follow";
@@ -20,21 +19,6 @@ export function HeroSection() {
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(124,92,252,0.08),transparent_80%)]" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
-        {/* Top Platform Support Capsule - 100% Web Cloud Truth */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-black/8 bg-neutral-100/80 px-4 py-1.5 text-xs font-sans text-neutral-600 shadow-2xs hover:border-black/15 transition-colors"
-        >
-          <Globe className="size-3 text-emerald-600" />
-          <span>ai agent cloud</span>
-          <span>•</span>
-          <span className="font-semibold text-neutral-900">runs 100% in your browser</span>
-          <span>•</span>
-          <span className="text-emerald-700 font-medium">zero install needed</span>
-        </motion.div>
-
         {/* H1 Headline with Interactive Cursor-Tracking Man Face in the Center! */}
         <motion.h1
           initial={{ opacity: 0, y: 12 }}
