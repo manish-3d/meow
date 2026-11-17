@@ -9,6 +9,7 @@ export type AgentConfigType = {
   e2bSandboxId?: string | null;
   vmStatus?: "active" | "paused" | "inactive";
   vmLastActive?: string | Date | null;
+  browserMode?: "browserbase" | "local";
   isActive?: boolean;
   createdAt?: string | Date;
 };

@@ -122,7 +122,15 @@ export async function runAgentRoutineLogic({
             .describe("What information to extract or analyze from the webpage"),
         }),
         execute: async ({ url, objective }: { url: string; objective?: string }) => {
-          return await runPlaywrightBrowserTask(agentId, userEmail, url, objective);
+          // Inngest background routine runs autonomously in the cloud even when PC is off
+          return await runPlaywrightBrowserTask(
+            agentId,
+            userEmail,
+            url,
+            objective,
+            "browserbase",
+            true
+          );
         },
       });
     } catch (e2bErr) {

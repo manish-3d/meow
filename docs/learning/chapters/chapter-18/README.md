@@ -136,10 +136,63 @@ User Clicks "Delete Agent"
 
 ---
 
-## 7. Engineering Trade-offs
+## 8. Dual-Mode Browser Engine: Local Chrome ($0 Free) vs. Browserbase Cloud (Default)
+
+### A. The Motivation: Cost vs. 24/7 Cloud Autonomy
+1. **The Cost Dilemma:** Testing autonomous browser navigation in production cloud containers consumes cloud hours / API credits quickly. During development, developers want to test locally on their desktop with $0 costs.
+2. **The Offline Dilemma:** Conversely, when an autonomous agent is scheduled to run a daily morning routine (via Inngest cron jobs), it cannot spawn a browser on the developer's local PC if the machine is turned off, asleep, or disconnected.
+3. **The Architectural Solution: Dual-Mode Routing with Smart Cloud Fallback**
+   - **Local Chrome ($0 Free):** Powered by `playwright-core`. Launches host Chrome/Edge directly in a local process with zero API quota consumption and captures base64 viewport screenshots for the UI.
+   - **Browserbase Cloud (Default):** Runs an isolated remote Chromium container in the cloud via Chrome DevTools Protocol (CDP), providing an interactive fullscreen live debugger stream iframe.
+   - **Autonomous Background Routing:** When Inngest invokes scheduled routines in `lib/inngest/routine-runner.ts`, the browser engine automatically routes execution to `Browserbase Cloud` (`isBackgroundRoutine = true`), guaranteeing 24/7 background execution even when the user's PC is completely shut down.
+
+```
+                     ┌────────────────────────────────────────────────────────┐
+                     │             Agent Execution Context                    │
+                     └──────────────────────────┬─────────────────────────────┘
+                                                │
+                                    ┌───────────┴───────────┐
+                                    ▼                       ▼
+                           Interactive Chat          Scheduled Routine
+                             or UI Launch            (Inngest Background)
+                                    │                       │
+                     ┌──────────────┴──────────────┐        │ (isBackgroundRoutine: true)
+                     ▼                             ▼        ▼
+            Mode: "browserbase"              Mode: "local"  │
+             (Cloud Sandbox)                  ($0 Free)     │
+                     │                             │        │
+                     ▼                             ▼        ▼
+          Browserbase Cloud CDP          Host Local Chrome  │
+          (Remote Headless Pod)            (Desktop Edge)   │
+                     │                             │        │
+                     ▼                             ▼        ▼
+          Interactive Debugger Stream      Base64 Screenshot│
+              (Embedded Iframe)            (Visual Canvas)  │
+                     │                             │        │
+                     └──────────────┬──────────────┘        │
+                                    │                       │
+                                    ▼                       ▼
+                       DOM Analysis & Text Extraction ◄─────┘
+```
+
+### B. Implementation Details
+- **Database Schema:** Added `browserMode: varchar("browser_mode", { length: 50 }).default("browserbase").notNull()` to `agent_config` in `db/schema.ts`.
+- **Mode Switching Endpoint:** Created `POST /api/agent/browser/mode` to persist the user's preferred mode and cleanly terminate any running session with a conflicting engine.
+- **UI Mode Selector (`components/custom/agent-space/vm-desktop-tab.tsx`):**
+  - Segmented toggle pill selector for instant switching between `Browserbase (Cloud - Default)` and `Local Chrome ($0 Free)`.
+  - Contextual banner dynamically informing the user of quota usage and offline reliability.
+  - Dynamic viewport empty states adjusting to the selected runtime mode.
+- **Inngest Routine Runner (`lib/inngest/routine-runner.ts`):** Automatically passes `preferredMode: "browserbase"` and `isBackgroundRoutine: true` to ensure unattended cloud execution.
+
+---
+
+## 9. Engineering Trade-offs
 1. **Soft Delete vs. Hard Cascading Delete:**
    - Soft deletes (`deleted_at: timestamp`) preserve historical data for audit/compliance.
    - For a SaaS agent platform, users expect "Delete Agent" to purge API tokens, conversation secrets, and automated tasks completely. We implemented hard cascading deletion with double confirmation to guarantee complete privacy and zero orphan cron executions.
 2. **Client-Side vs. Database-Level Cascade:**
    - DB-level cascades (`ON DELETE CASCADE`) are faster but cannot execute side-effects (like pausing cloud microVMs).
    - Application-level cascades allow coordinating third-party cloud infrastructure (E2B sandbox teardown) before committing SQL deletions.
+3. **Local Chrome vs. Cloud Browserbase Engine:**
+   - Local Playwright mode offers instantaneous feedback (<2.5s execution) with $0 external billing, making it ideal for continuous local iteration and testing.
+   - Browserbase Cloud CDP eliminates OS-specific dependencies (such as headless Chrome on cloud container hosts or missing X11/Wayland display servers) and guarantees that scheduled background tasks succeed even when user endpoints are powered off.

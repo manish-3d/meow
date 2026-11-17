@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { agentId, headless } = await req.json();
+    const { agentId, headless, mode: requestedMode } = await req.json();
 
     if (!agentId) {
       return NextResponse.json({ error: "agentId is required" }, { status: 400 });
@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     const { streamUrl, sessionId, mode } = await getOrCreateBrowserSession(
       agentId,
       session.user.email,
-      headless ?? false
+      headless ?? false,
+      requestedMode
     );
 
     return NextResponse.json({

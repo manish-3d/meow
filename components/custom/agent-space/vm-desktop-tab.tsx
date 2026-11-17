@@ -36,7 +36,9 @@ export function VmDesktopTab() {
   const [sessionStatus, setSessionStatus] = useState<"idle" | "running" | "interrupted" | "closed" | "active" | "paused">("idle");
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
   const [lastScreenshot, setLastScreenshot] = useState<string | null>(null);
-  const [mode, setMode] = useState<"browserbase" | "local">("local");
+  const [mode, setMode] = useState<"browserbase" | "local">("browserbase");
+  const [configuredMode, setConfiguredMode] = useState<"browserbase" | "local">("browserbase");
+  const [switchingMode, setSwitchingMode] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("https://news.google.com");
   const [autoPauseSeconds, setAutoPauseSeconds] = useState(180);
@@ -55,7 +57,12 @@ export function VmDesktopTab() {
       if (res.data.currentUrl) {
         setCurrentUrl(res.data.currentUrl);
       }
-      setMode(res.data.mode || "local");
+      if (res.data.configuredMode) {
+        setConfiguredMode(res.data.configuredMode);
+      } else if (res.data.mode) {
+        setConfiguredMode(res.data.mode);
+      }
+      setMode(res.data.mode || res.data.configuredMode || "browserbase");
     } catch (err: any) {
       console.warn("Could not fetch browser status:", err);
     } finally {
@@ -83,16 +90,56 @@ export function VmDesktopTab() {
     return () => clearInterval(interval);
   }, [sessionStatus]);
 
-  // 3. Start / Launch Browser Session
+  // 3. Switch preferred browser execution mode (Cloud vs Local)
+  const handleSwitchMode = async (targetMode: "browserbase" | "local") => {
+    if (!agentId || switchingMode || targetMode === configuredMode) return;
+    setSwitchingMode(true);
+
+    try {
+      await axios.post("/api/agent/browser/mode", {
+        agentId,
+        browserMode: targetMode,
+      });
+
+      setConfiguredMode(targetMode);
+      setMode(targetMode);
+
+      toast.add({
+        title: targetMode === "browserbase" ? "Browserbase Cloud Selected" : "Local Playwright Selected",
+        description:
+          targetMode === "browserbase"
+            ? "Default mode: Cloud container with live debugger stream. Offline background routines run 24/7."
+            : "Local mode: Runs on your host Google Chrome with $0 API quota consumption.",
+        type: "success",
+      });
+
+      // Refresh session status to reflect updated configuration
+      await fetchStatus(true);
+    } catch (err: any) {
+      toast.add({
+        title: "Mode Switch Failed",
+        description: err?.response?.data?.error || err?.message || "Could not switch mode",
+        type: "error",
+      });
+    } finally {
+      setSwitchingMode(false);
+    }
+  };
+
+  // 4. Start / Launch Browser Session
   const handleStartBrowser = async (headless = false) => {
     if (!agentId || actionLoading) return;
     setActionLoading(true);
 
     try {
-      const res = await axios.post("/api/agent/browser/start", { agentId, headless });
+      const res = await axios.post("/api/agent/browser/start", {
+        agentId,
+        headless,
+        mode: configuredMode,
+      });
       setSessionStatus("active");
       setStreamUrl(res.data.streamUrl);
-      setMode(res.data.mode || "local");
+      setMode(res.data.mode || configuredMode);
       setAutoPauseSeconds(180);
 
       toast.add({
@@ -115,7 +162,7 @@ export function VmDesktopTab() {
     }
   };
 
-  // 4. Close Browser Session
+  // 5. Close Browser Session
   const handleCloseBrowser = async () => {
     if (!agentId || actionLoading) return;
     setActionLoading(true);
@@ -140,7 +187,7 @@ export function VmDesktopTab() {
     }
   };
 
-  // 5. Human-in-the-Loop: Take Control / Interrupt or Resume
+  // 6. Human-in-the-Loop: Take Control / Interrupt or Resume
   const handleToggleInterrupt = async () => {
     if (!agentId || actionLoading) return;
     setActionLoading(true);
@@ -173,7 +220,7 @@ export function VmDesktopTab() {
     }
   };
 
-  // 6. Quick URL Navigation
+  // 7. Quick URL Navigation
   const handleLaunchUrl = async (urlToOpen: string) => {
     if (!agentId) return;
     setCurrentUrl(urlToOpen);
@@ -189,6 +236,7 @@ export function VmDesktopTab() {
       const res = await axios.post("/api/agent/browser/execute", {
         agentId,
         targetUrl: urlToOpen,
+        mode: configuredMode,
       });
 
       if (res.data.screenshotUrl) {
@@ -240,12 +288,14 @@ export function VmDesktopTab() {
                 <Badge
                   variant="outline"
                   className={`text-[9px] font-mono py-0 px-1.5 ${
-                    mode === "browserbase"
+                    (sessionStatus === "active" || sessionStatus === "running" ? mode : configuredMode) === "browserbase"
                       ? "bg-primary/10 text-primary border-primary/20"
                       : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                   }`}
                 >
-                  {mode === "browserbase" ? "Browserbase CDP" : "Local Playwright ($0 Free)"}
+                  {(sessionStatus === "active" || sessionStatus === "running" ? mode : configuredMode) === "browserbase"
+                    ? "☁️ Browserbase CDP"
+                    : "💻 Local Chrome ($0 Free)"}
                 </Badge>
               </div>
               <span className="text-[10px] text-muted-foreground mt-0.5">
@@ -253,7 +303,7 @@ export function VmDesktopTab() {
                   ? "User is in manual control. Click Resume to return control to agent."
                   : sessionStatus === "active" || sessionStatus === "running"
                   ? `Active session • Auto-pauses in ${Math.floor(autoPauseSeconds / 60)}:${(autoPauseSeconds % 60).toString().padStart(2, "0")}`
-                  : "Ready to launch local Chrome or Browserbase cloud session."}
+                  : `Ready to launch (${configuredMode === "browserbase" ? "Browserbase Cloud" : "Local Chrome"}).`}
               </span>
             </div>
           </div>
@@ -317,6 +367,63 @@ export function VmDesktopTab() {
             )}
           </div>
         </div>
+
+        {/* Dual-Mode Selector: Cloud vs Local */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-1.5 rounded-lg bg-muted/50 border border-border/60">
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => handleSwitchMode("browserbase")}
+              disabled={switchingMode}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all ${
+                configuredMode === "browserbase"
+                  ? "bg-background text-primary font-semibold shadow-xs border border-primary/20"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Cloud className="size-3.5 text-primary" />
+              <span>Browserbase (Cloud - Default)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSwitchMode("local")}
+              disabled={switchingMode}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all ${
+                configuredMode === "local"
+                  ? "bg-background text-emerald-600 dark:text-emerald-400 font-semibold shadow-xs border border-emerald-500/20"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Laptop className="size-3.5 text-emerald-500" />
+              <span>Local Chrome ($0 Free)</span>
+            </button>
+          </div>
+
+          <span className="text-[10px] text-muted-foreground px-1 sm:text-right">
+            {configuredMode === "browserbase"
+              ? "☁️ Cloud sandbox with live debugger"
+              : "💻 Free host Chrome (saves quota)"}
+          </span>
+        </div>
+
+        {/* Mode-specific Contextual Banner */}
+        {configuredMode === "browserbase" ? (
+          <div className="flex items-start gap-2 p-2 rounded-lg bg-primary/5 border border-primary/15 text-[11px] text-muted-foreground leading-relaxed">
+            <Cloud className="size-3.5 text-primary shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold text-foreground">Browserbase Cloud Sandbox: </span>
+              Autonomous browsing runs in a managed remote Chromium instance. Scheduled background routines (Inngest) execute 24/7 automatically even if your PC is off.
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-[11px] text-muted-foreground leading-relaxed">
+            <Laptop className="size-3.5 text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <span className="font-semibold text-foreground">Local Playwright Mode: </span>
+              Runs directly on your machine's Google Chrome / Edge with zero API quota usage. Offline scheduled routines will still safely route to Browserbase Cloud.
+            </div>
+          </div>
+        )}
 
         <p className="text-[11px] text-muted-foreground leading-relaxed">
           Autonomous browser execution powered by <strong>Playwright</strong>. Connects locally to your host Google Chrome with $0 API costs, or cloud sessions via Browserbase. You can take over control anytime to solve logins or inspect actions.
@@ -407,17 +514,33 @@ export function VmDesktopTab() {
           ) : sessionStatus === "active" || sessionStatus === "running" ? (
             /* Active but waiting for navigation */
             <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/60 backdrop-blur-xs">
-              <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
-                <Laptop className="size-5" />
+              <div
+                className={`size-10 rounded-full flex items-center justify-center ${
+                  mode === "browserbase"
+                    ? "bg-primary/10 text-primary"
+                    : "bg-emerald-500/10 text-emerald-600"
+                }`}
+              >
+                {mode === "browserbase" ? (
+                  <Cloud className="size-5" />
+                ) : (
+                  <Laptop className="size-5" />
+                )}
               </div>
               <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">Playwright Browser Ready</h5>
+                <h5 className="text-xs font-semibold text-foreground">
+                  {mode === "browserbase"
+                    ? "Browserbase Cloud Ready"
+                    : "Local Chrome Ready"}
+                </h5>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
                   Browser session is live. Click a shortcut or ask your agent in chat to navigate any webpage.
                 </p>
               </div>
               <Badge variant="outline" className="text-[10px] font-mono bg-background">
-                Host Chrome / Edge • 100% Free
+                {mode === "browserbase"
+                  ? "Cloud CDP Session • Debugger Stream"
+                  : "Host Chrome / Edge • 100% Free"}
               </Badge>
             </div>
           ) : (

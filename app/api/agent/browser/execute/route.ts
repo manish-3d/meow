@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { agentId, targetUrl, objective } = await req.json();
+    const { agentId, targetUrl, objective, mode } = await req.json();
 
     if (!agentId || !targetUrl) {
       return NextResponse.json(
@@ -24,7 +24,8 @@ export async function POST(req: NextRequest) {
       agentId,
       session.user.email,
       targetUrl,
-      objective
+      objective,
+      mode
     );
 
     return NextResponse.json(result);

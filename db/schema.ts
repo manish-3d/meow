@@ -22,6 +22,7 @@ export const agentConfig = pgTable("agent_config", {
   e2bSandboxId: varchar("e2b_sandbox_id", { length: 255 }),
   vmStatus: varchar("vm_status", { length: 50 }).default("inactive").notNull(),
   vmLastActive: timestamp("vm_last_active"),
+  browserMode: varchar("browser_mode", { length: 50 }).default("browserbase").notNull(),
   // Agent Lifecycle state (Chapter 18)
   isActive: boolean("is_active").default(true).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

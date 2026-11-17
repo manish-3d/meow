@@ -23,6 +23,7 @@ export function isBrowserbaseConfigured(): boolean {
 export interface BrowserSessionState {
   sessionId: string;
   mode: "browserbase" | "local";
+  configuredMode?: "browserbase" | "local";
   status: "idle" | "running" | "interrupted" | "closed";
   streamUrl: string | null;
   lastScreenshot?: string | null;
@@ -76,13 +77,46 @@ async function launchLocalBrowser(headless = true): Promise<Browser> {
 }
 
 /**
+ * Updates agent's preferred browser execution mode (Cloud Browserbase vs Local Playwright)
+ */
+export async function setAgentBrowserMode(
+  agentId: string,
+  userEmail: string,
+  browserMode: "browserbase" | "local"
+): Promise<void> {
+  await db
+    .update(agentConfig)
+    .set({
+      browserMode,
+    })
+    .where(
+      and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
+    );
+
+  // If there's an active session with a different mode, close it cleanly
+  const sessionKey = `${userEmail}:${agentId}`;
+  const existing = activeSessions.get(sessionKey);
+  if (existing && existing.mode !== browserMode) {
+    try {
+      await existing.browser.close();
+    } catch (e) {
+      // ignore
+    }
+    activeSessions.delete(sessionKey);
+  }
+}
+
+/**
  * Gets or initializes an active browser session for an agent.
- * Automatically chooses Browserbase Cloud if configured, or Local Playwright.
+ * Respects user's preferred mode (Cloud vs Local) and intelligently routes
+ * background routines to Browserbase so they succeed even if the user's PC is offline.
  */
 export async function getOrCreateBrowserSession(
   agentId: string,
   userEmail: string,
-  headless = true
+  headless = true,
+  preferredMode?: "browserbase" | "local",
+  isBackgroundRoutine = false
 ): Promise<{
   page: Page;
   mode: "browserbase" | "local";
@@ -92,8 +126,38 @@ export async function getOrCreateBrowserSession(
   const sessionKey = `${userEmail}:${agentId}`;
   const existing = activeSessions.get(sessionKey);
 
-  // Return existing session if open and healthy
-  if (existing && existing.browser.isConnected() && !existing.page.isClosed()) {
+  // Determine which mode to use
+  let modeToUse: "browserbase" | "local" = preferredMode || "browserbase";
+  if (!preferredMode) {
+    try {
+      const records = await db
+        .select({ browserMode: agentConfig.browserMode })
+        .from(agentConfig)
+        .where(
+          and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
+        );
+      if (records[0]?.browserMode) {
+        modeToUse = records[0].browserMode as "browserbase" | "local";
+      }
+    } catch (e) {
+      modeToUse = isBrowserbaseConfigured() ? "browserbase" : "local";
+    }
+  }
+
+  // Offline / Background Routine Guard:
+  // If running in background worker (e.g. Inngest scheduled routine while PC is off),
+  // automatically route to cloud Browserbase!
+  if (isBackgroundRoutine && isBrowserbaseConfigured()) {
+    modeToUse = "browserbase";
+  }
+
+  // Return existing session if open, healthy, and matching the requested mode
+  if (
+    existing &&
+    existing.mode === modeToUse &&
+    existing.browser.isConnected() &&
+    !existing.page.isClosed()
+  ) {
     existing.lastActive = Date.now();
     return {
       page: existing.page,
@@ -101,10 +165,18 @@ export async function getOrCreateBrowserSession(
       streamUrl: existing.streamUrl,
       sessionId: existing.sessionId,
     };
+  } else if (existing) {
+    // If mode changed (e.g. user toggled from cloud to local), close previous instance
+    try {
+      await existing.browser.close();
+    } catch (e) {
+      // ignore
+    }
+    activeSessions.delete(sessionKey);
   }
 
-  // 1. Check if Browserbase cloud credentials exist
-  if (isBrowserbaseConfigured()) {
+  // 1. Browserbase Cloud Execution (Default Cloud Sandbox)
+  if (modeToUse === "browserbase" && isBrowserbaseConfigured()) {
     try {
       const bb = new Browserbase({ apiKey: getBrowserbaseApiKey() });
       const projectId = getBrowserbaseProjectId();
@@ -145,6 +217,7 @@ export async function getOrCreateBrowserSession(
           e2bSandboxId: session.id,
           vmStatus: "active",
           vmLastActive: new Date(),
+          browserMode: "browserbase",
         })
         .where(
           and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
@@ -161,7 +234,7 @@ export async function getOrCreateBrowserSession(
     }
   }
 
-  // 2. Local Playwright Execution (Free, Zero-Card, Host Chrome/Edge)
+  // 2. Local Playwright Execution (Free Host Chrome/Edge, Zero Quota Consumption)
   const browser = await launchLocalBrowser(headless);
   const context = await browser.newContext({
     viewport: { width: 1280, height: 720 },
@@ -176,7 +249,7 @@ export async function getOrCreateBrowserSession(
     context,
     page,
     mode: "local",
-    streamUrl: null, // Local mode renders live screenshot stream in UI
+    streamUrl: null, // Local mode streams real screenshots to UI
     status: "idle",
     lastScreenshot: null,
     currentUrl: "about:blank",
@@ -191,6 +264,7 @@ export async function getOrCreateBrowserSession(
       e2bSandboxId: localSessionId,
       vmStatus: "active",
       vmLastActive: new Date(),
+      browserMode: "local",
     })
     .where(
       and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
@@ -212,7 +286,9 @@ export async function runPlaywrightBrowserTask(
   agentId: string,
   userEmail: string,
   targetUrl: string,
-  objective?: string
+  objective?: string,
+  preferredMode?: "browserbase" | "local",
+  isBackgroundRoutine = false
 ): Promise<{
   success: boolean;
   summary: string;
@@ -221,7 +297,13 @@ export async function runPlaywrightBrowserTask(
   currentUrl: string;
 }> {
   const sessionKey = `${userEmail}:${agentId}`;
-  const { page, mode } = await getOrCreateBrowserSession(agentId, userEmail);
+  const { page, mode } = await getOrCreateBrowserSession(
+    agentId,
+    userEmail,
+    true,
+    preferredMode,
+    isBackgroundRoutine
+  );
 
   try {
     const session = activeSessions.get(sessionKey);
@@ -371,10 +453,38 @@ export async function getBrowserSessionStatus(
   const sessionKey = `${userEmail}:${agentId}`;
   const session = activeSessions.get(sessionKey);
 
+  // Fetch persisted configuredMode from agentConfig
+  let configuredMode: "browserbase" | "local" = "browserbase";
+  let lastActiveTimestamp: string = new Date().toISOString();
+  let dbStatus = "idle";
+  let dbSandboxId = "none";
+
+  try {
+    const records = await db
+      .select()
+      .from(agentConfig)
+      .where(
+        and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
+      )
+      .limit(1);
+
+    if (records.length > 0) {
+      configuredMode = (records[0].browserMode as "browserbase" | "local") || "browserbase";
+      dbStatus = records[0].vmStatus || "idle";
+      dbSandboxId = records[0].e2bSandboxId || "none";
+      if (records[0].vmLastActive) {
+        lastActiveTimestamp = new Date(records[0].vmLastActive).toISOString();
+      }
+    }
+  } catch (err) {
+    console.warn("Could not read agent browser config:", err);
+  }
+
   if (session && session.browser.isConnected() && !session.page.isClosed()) {
     return {
       sessionId: session.sessionId,
       mode: session.mode,
+      configuredMode,
       status: session.status,
       streamUrl: session.streamUrl,
       lastScreenshot: session.lastScreenshot,
@@ -383,23 +493,14 @@ export async function getBrowserSessionStatus(
     };
   }
 
-  // Check DB state if memory is clear
-  const records = await db
-    .select()
-    .from(agentConfig)
-    .where(
-      and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
-    );
-
-  const current = records[0];
-
   return {
-    sessionId: current?.e2bSandboxId || "none",
-    mode: isBrowserbaseConfigured() ? "browserbase" : "local",
-    status: (current?.vmStatus as any) || "idle",
+    sessionId: dbSandboxId,
+    mode: configuredMode,
+    configuredMode,
+    status: dbStatus as any,
     streamUrl: null,
     lastScreenshot: null,
     currentUrl: undefined,
-    lastActive: current?.vmLastActive ? new Date(current.vmLastActive).toISOString() : new Date().toISOString(),
+    lastActive: lastActiveTimestamp,
   };
 }
