@@ -8,7 +8,7 @@ import { streamText, isStepCount, tool } from "ai";
 import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
-import { runAgentBrowserTask, isE2BConfigured } from "@/lib/e2b/client";
+import { runAgentBrowserTask, isDaytonaConfigured } from "@/lib/daytona/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -158,11 +158,11 @@ export async function POST(req: NextRequest) {
             ),
         }),
         execute: async ({ url, objective }: { url: string; objective?: string }) => {
-          if (!isE2BConfigured()) {
+          if (!isDaytonaConfigured()) {
             return {
               status: "simulated",
               message:
-                "Cloud VM Desktop is ready. E2B_API_KEY is not yet configured in .env, so live remote desktop execution is simulated. Add E2B_API_KEY to enable live VM browsing.",
+                "Daytona Cloud Sandbox is ready. Set DAYTONA_API_KEY in .env to activate live execution.",
               url,
               objective,
             };

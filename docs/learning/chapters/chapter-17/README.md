@@ -1,12 +1,12 @@
-# Chapter 17: Cloud VM Desktop Sandbox (E2B.dev) & Autonomous Browser Agent
+# Chapter 17: Cloud Sandbox & VM Desktop (Daytona & E2B)
 
 ## 1. Chapter Objectives
-1. Understand why autonomous SaaS agents require sandboxed virtual machine execution environments.
-2. Integrate E2B (`@e2b/desktop`) microVM cloud sandboxes running a full Linux desktop with Chrome and X11.
-3. Stream the live desktop display directly into the Next.js React frontend via noVNC over secure WebSockets.
-4. Implement automatic timeout management (2-minute inactivity auto-pause) to prevent credit exhaustion.
-5. Provide a bidirectional browser automation tool (`cloud_browser`) to Google Gemini 3 Flash in chat and Inngest background routines.
-6. Build a dual-mode interactive UI (compact preview card and full-screen workspace overlay).
+1. Understand why autonomous SaaS agents require secure, isolated cloud sandbox environments.
+2. Integrate **Daytona Cloud Sandbox (`@daytona/sdk`)** for programmatic environment provisioning, shell command execution, file management, and git workflows.
+3. Support microVM desktop execution and browser automation via dedicated cloud runners.
+4. Implement automatic timeout management (2-minute inactivity auto-pause) to conserve compute resources.
+5. Provide a bidirectional execution tool (`cloud_browser`) to Google Gemini 3 Flash in chat and Inngest background routines.
+6. Build a dual-mode interactive UI (compact preview card and full-screen workspace overlay) with graceful simulation fallbacks.
 
 ---
 
@@ -14,36 +14,29 @@
 Modern AI agents frequently encounter three insurmountable barriers when relying solely on HTTP REST APIs:
 1. **The Long-Tail Web Gap:** 99% of websites and SaaS applications do not have public APIs, Composio integrations, or OAuth apps. An agent restricted to REST APIs cannot search niche forums, read arbitrary blogs, or inspect dynamic web pages.
 2. **Dynamic Client-Side Rendering (CSR):** Simple `fetch()` or `curl` calls return empty HTML shells (`<div id="root"></div>`) because single-page applications (SPAs) require a JavaScript runtime to render content.
-3. **Security & Sandbox Isolation:** Running arbitrary web scrapers or browser engines inside our primary Next.js server risks CPU starvation, memory leaks, and remote code execution vulnerabilities.
+3. **Security & Sandbox Isolation:** Running arbitrary web scrapers or user-generated code inside our primary Next.js server risks CPU starvation, memory leaks, and remote code execution vulnerabilities.
 
-### The Solution:
-We provision dedicated, isolated microVMs via **E2B.dev**. Each agent gets its own virtual Linux computer with a virtual display (Xvfb), a real Google Chrome browser, and a WebSocket-based noVNC streaming server on port 6080. The agent can navigate, take screenshots, extract text, and stream its visual desktop to the human user in real time.
+### The Architectural Solution:
+We integrate dedicated cloud sandbox environments via **Daytona (`@daytona/sdk`)**. Each agent gets an isolated, ephemeral Linux workspace container with a dedicated filesystem (`sandbox.fs`), process execution engine (`sandbox.process`), and git integration (`sandbox.git`). The agent can execute commands, inspect web pages, run scripts, and stream status back to the frontend.
 
 ---
 
-## 3. Core Theoretical Concepts
+## 3. Core Theoretical Concepts: Daytona vs. Traditional Containers
 
-### A. MicroVMs vs. Traditional Docker Containers
-Traditional Docker containers share the host operating system kernel (`/sys`, `/proc`). If a process escapes via a kernel exploit, the entire host is compromised. Furthermore, running a desktop GUI (X11, window manager, Chrome) inside standard containers requires complex privilege escalation.
-* **E2B MicroVMs:** Built on lightweight virtualization technologies (such as Firecracker/QEMU). Each sandbox is a hardware-isolated virtual machine with its own Linux kernel, memory boundary, and dedicated IP address. Booting takes ~1-2 seconds.
+### A. The Evolution of Cloud Sandboxes
+1. **Standard Docker Containers:** Share the host kernel. Spawning containers manually requires complex Docker daemon management, network bridging, and privilege escalation.
+2. **E2B MicroVMs:** Lightweight virtual machines (Firecracker/QEMU) optimized for remote desktop (VNC) streaming.
+3. **Daytona Cloud Sandboxes (`@daytona/sdk`):** An open-source, enterprise development environment orchestrator that provisions elastic workspaces for code execution, AI agent workflows, and sandboxed tasks with native support for:
+   - `sandbox.process.executeCommand()`: Running shell pipelines in isolation.
+   - `sandbox.fs`: Programmatic file reading, writing, and uploads.
+   - `sandbox.git`: Version control repository cloning and inspection.
 
-### B. Remote Framebuffer (RFB) Protocol & noVNC
-How does a browser display a remote Linux desktop with zero desktop software installed?
-1. An X-server (`Xvfb`) renders the desktop to a virtual framebuffer in memory.
-2. An RFB server (VNC server) captures framebuffer changes and transmits them.
-3. A WebSocket proxy (`websockify`) converts raw TCP VNC traffic to WebSockets.
-4. `noVNC` in the browser receives RFB packets and renders them to an HTML5 `<canvas>`.
-E2B exposes this directly on port 6080:
-```
-https://${sandboxId}-6080.e2b.dev/vnc.html?autoconnect=true&resize=remote
-```
-
-### C. Resource Governance & Cost Control
-Cloud compute is charged per active second. If a user closes the browser while an agent's VM is active, it would burn credits indefinitely.
+### B. Resource Governance & Cost Control
+Cloud compute is charged per active second. If a user closes the browser while an agent's sandbox is active, compute resources could be consumed indefinitely.
 * **The Solution:** We implement a **2-minute auto-pause policy**.
-  1. The VM sandbox is instantiated with `timeoutMs: 120_000`.
-  2. Every user interaction or agent command extends the timeout by 120 seconds.
-  3. If 2 minutes elapse with no activity, the sandbox automatically pauses and transitions to `paused` in PostgreSQL.
+  1. The sandbox status is tracked via `vmLastActive` in PostgreSQL.
+  2. Every user interaction or agent command updates `vmLastActive = NOW()`.
+  3. If 2 minutes elapse with no activity, the client auto-pauses the sandbox, transitioning to `paused` state.
 
 ---
 
@@ -64,18 +57,18 @@ Cloud compute is charged per active second. If a user closes the browser while a
          │
          │ 2. Read/Write Sandbox ID & State
          ▼
-┌───────────────────────────┐    3. API Key Auth    ┌───────────────────────────┐
-│     Neon PostgreSQL       │◄─────────────────────►│      E2B Cloud SDK        │
-│  (agent_config columns:   │                       │    (@e2b/desktop Sandbox) │
-│   e2bSandboxId, vmStatus) │                       └─────────────┬─────────────┘
-└───────────────────────────┘                                     │
-                                                                  │ 4. Spin up MicroVM
+┌───────────────────────────┐    3. Daytona API Key ┌───────────────────────────┐
+│     Neon PostgreSQL       │◄─────────────────────►│     Daytona Cloud SDK     │
+│  (agent_config columns:   │                       │      (@daytona/sdk)       │
+│  daytonaSandboxId,        │                       └─────────────┬─────────────┘
+│  vmStatus, vmLastActive)  │                                     │
+└───────────────────────────┘                                     │ 4. Provision Workspace
                                                                   ▼
                                                     ┌───────────────────────────┐
-                                                    │   E2B Linux MicroVM       │
-                                                    │  • Port 6080: noVNC HTTP  │
-                                                    │  • Google Chrome Browser  │
-                                                    │  • X11 Display Server     │
+                                                    │  Daytona Cloud Workspace  │
+                                                    │  • Process Execution      │
+                                                    │  • Isolated Linux FS      │
+                                                    │  • Git Repository Clone   │
                                                     └───────────────────────────┘
 ```
 
@@ -83,53 +76,44 @@ Cloud compute is charged per active second. If a user closes the browser while a
 
 ## 5. File Walkthrough
 
-### 1. `db/schema.ts` (`agentConfig` Extensions)
-Added 3 fields to persist VM lifecycle:
-* `e2bSandboxId`: The persistent cloud VM ID (`varchar("e2b_sandbox_id", { length: 255 })`).
-* `vmStatus`: Current state machine indicator (`"active" | "paused" | "inactive"`).
-* `vmLastActive`: Timestamp of last command execution (`timestamp("vm_last_active")`).
+### 1. `lib/daytona/client.ts`
+The primary Daytona infrastructure abstraction:
+* `isDaytonaConfigured()`: Checks if `DAYTONA_API_KEY` exists in environment variables.
+* `getOrCreateAgentSandbox()`: Reconnects to an existing sandbox if active, or provisions a new one via `daytona.create({ language: 'typescript' })`, persisting the resulting `daytonaSandboxId` to PostgreSQL.
+* `pauseAgentSandbox()`: Invokes `sandbox.stop()` and updates DB status to `"paused"`.
+* `getAgentVMStatus()`: Calculates elapsed inactivity and returns live session details.
+* `runAgentBrowserTask()`: Runs secure extraction commands inside the Daytona container.
 
-### 2. `lib/e2b/client.ts`
-The core infrastructure abstraction:
-* `isE2BConfigured()`: Gracefully checks if `E2B_API_KEY` exists in environment variables.
-* `getOrCreateAgentSandbox()`: Connects to an existing paused sandbox if valid, or creates a new one with a 120-second timeout, persisting the new `sandboxId` to PostgreSQL.
-* `pauseAgentSandbox()`: Sends a pause signal to the E2B control plane and updates DB status to `"paused"`.
-* `getAgentVMStatus()`: Calculates elapsed time and reports live stream URL if active.
-* `runAgentBrowserTask()`: Automates browser navigation via `google-chrome --no-sandbox`, takes base64 screenshots, and extracts visible page content.
+### 2. API Route Handlers (`app/api/agent/vm/`)
+* `GET /api/agent/vm/status`: Queries DB & Daytona, returning workspace status.
+* `POST /api/agent/vm/start`: Activates Daytona sandbox.
+* `POST /api/agent/vm/pause`: Pauses active sandbox to conserve resources.
+* `POST /api/agent/vm/execute`: Executes web extraction or script commands inside the sandbox.
 
-### 3. API Route Handlers (`app/api/agent/vm/`)
-* `GET /api/agent/vm/status`: Authenticates session, queries DB & E2B, returns status and stream URL.
-* `POST /api/agent/vm/start`: Provisions or resumes VM sandbox, returns noVNC embed URL.
-* `POST /api/agent/vm/pause`: Pauses active VM sandbox to preserve credits.
-* `POST /api/agent/vm/execute`: Executes a direct navigation task on the remote browser.
-
-### 4. `components/custom/agent-space/vm-desktop-tab.tsx`
-Production-grade client UI:
-* Real-time pulsing status indicator (green = active, amber = paused, gray = inactive).
+### 3. `components/custom/agent-space/vm-desktop-tab.tsx`
+Production-grade Daytona workspace client:
+* Live pulsing status indicator (green = active, amber = paused, gray = inactive).
 * Countdown timer calculating time until auto-pause.
-* Live `iframe` embedding noVNC stream from port 6080.
-* Quick launch chips (Google News, GitHub Trending, Tube Guruji).
-* Fullscreen immersive modal for interactive mouse and keyboard remote control.
-* Built-in simulated preview when `E2B_API_KEY` is not yet configured, preventing onboarding friction.
+* Live workspace preview / simulation mode when API credentials are pending.
+* Quick launch shortcuts (Google News, GitHub Trending, Tube Guruji).
+* Fullscreen immersive modal.
 
-### 5. AI Tool Integration (`app/api/agent/chat/route.ts` & `lib/inngest/routine-runner.ts`)
+### 4. AI Tool Integration (`app/api/agent/chat/route.ts` & `lib/inngest/routine-runner.ts`)
 * Registered `cloud_browser` tool in the dynamic toolset using Vercel AI SDK `tool({...})`.
-* Accepts `url` and optional `objective`.
-* Gemini 3 Flash autonomously invokes `cloud_browser` when users ask to browse websites, read articles, or inspect dynamic pages.
+* Gemini 3 Flash autonomously invokes the tool when users ask to browse websites, inspect web content, or run isolated tasks.
 
 ---
 
 ## 6. Testing & Verification
 1. **TypeScript Static Analysis:** Verified with `npx tsc --noEmit` — 0 errors across all routes and components.
-2. **Database Schema Verification:** Pushed to Neon PostgreSQL via `npm run db:push` (`[i] No changes detected`).
-3. **Database Query Verification:** Executed live query on Neon DB confirming `e2b_sandbox_id`, `vm_status`, and `vm_last_active` columns exist and update without errors.
+2. **Database Push:** Verified `daytona_sandbox_id` pushed to Neon PostgreSQL via `npm run db:push`.
+3. **Graceful Fallbacks:** Verified system enters simulation mode if API key is unconfigured or credentials require review.
 
 ---
 
 ## 7. Engineering Trade-offs
-1. **MicroVM Startup Latency vs. Credit Cost:**
-   * Keeping a VM running continuously yields instant (<50ms) tool calls, but costs ~$0.05-$0.10/hour continuously.
-   * Auto-pausing after 120 seconds reduces idle costs to zero, with an acceptable 1-2 second resume latency on subsequent requests.
-2. **WebSocket Video Stream (noVNC) vs. Headless Puppeteer:**
-   * Headless Puppeteer generates smaller network payloads (only DOM text or single snapshots).
-   * However, noVNC gives the user **real-time visual transparency** into what the agent is doing, creating high trust and SaaS "magic".
+1. **Daytona Workspaces vs. E2B Desktop VMs:**
+   - E2B focuses on headful desktop streaming (port 6080 noVNC), which requires credit card verification for microVM compute.
+   - Daytona focuses on elastic developer sandboxes, command execution, and code interpretation, providing a versatile, open-source-aligned foundation for AI agent workloads.
+2. **Auto-Pause vs. Always-On:**
+   - Auto-pausing after 120 seconds reduces idle compute consumption to zero while retaining persistent workspace configuration.

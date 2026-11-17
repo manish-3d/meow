@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { runAgentBrowserTask } from "@/lib/e2b/client";
+import { runAgentBrowserTask } from "@/lib/daytona/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);

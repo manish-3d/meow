@@ -149,18 +149,18 @@ export function VmDesktopTab() {
 
   return (
     <div className="space-y-4 pt-2">
-      {/* Configuration Advisory if E2B Key Missing */}
+      {/* Configuration Advisory if Daytona Key Missing */}
       {!isConfigured && (
         <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-card-foreground space-y-2">
           <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs">
             <AlertCircle className="size-4 shrink-0" />
-            <span>E2B.dev API Key Not Configured</span>
+            <span>Daytona Cloud Sandbox API Key Not Configured</span>
           </div>
           <p className="text-[11px] text-muted-foreground leading-relaxed">
-            To connect a live cloud VM sandbox with real Chrome/Firefox desktop streaming, add your free key to <code className="bg-muted px-1.5 py-0.5 rounded text-[10px]">.env</code>:
+            To connect a live Daytona cloud sandbox for autonomous code execution and web tasks, configure your key in <code className="bg-muted px-1.5 py-0.5 rounded text-[10px]">.env</code>:
             <br />
-            <code className="text-foreground font-mono text-[10px] block mt-1">E2B_API_KEY=e2b_...</code>
-            Get $100 free credits at <a href="https://e2b.dev" target="_blank" rel="noreferrer" className="underline font-medium text-primary inline-flex items-center gap-0.5">e2b.dev <ExternalLink className="size-2.5" /></a>.
+            <code className="text-foreground font-mono text-[10px] block mt-1">DAYTONA_API_KEY=dtn_...</code>
+            Manage your workspace and keys at <a href="https://app.daytona.io" target="_blank" rel="noreferrer" className="underline font-medium text-primary inline-flex items-center gap-0.5">app.daytona.io <ExternalLink className="size-2.5" /></a>.
           </p>
         </div>
       )}
@@ -180,7 +180,7 @@ export function VmDesktopTab() {
             />
             <div className="flex flex-col">
               <span className="text-xs font-bold leading-none text-foreground capitalize">
-                Cloud Desktop: {vmStatus}
+                Daytona Sandbox: {vmStatus}
               </span>
               {vmStatus === "active" && (
                 <span className="text-[10px] text-muted-foreground mt-0.5">
@@ -197,7 +197,7 @@ export function VmDesktopTab() {
               className="size-7 p-0 text-muted-foreground hover:text-foreground"
               onClick={() => fetchStatus()}
               disabled={loading}
-              title="Refresh VM Status"
+              title="Refresh Sandbox Status"
             >
               <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
             </Button>
@@ -211,7 +211,7 @@ export function VmDesktopTab() {
                 disabled={actionLoading}
               >
                 <Power className="size-3" />
-                Pause VM
+                Pause Sandbox
               </Button>
             ) : (
               <Button
@@ -225,14 +225,14 @@ export function VmDesktopTab() {
                 ) : (
                   <Play className="size-3" />
                 )}
-                Activate VM
+                Activate Sandbox
               </Button>
             )}
           </div>
         </div>
 
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          Provides your AI agent with a dedicated Linux desktop machine. The agent can open real browsers, navigate dynamic sites, and extract unstructured web data. Auto-pauses after 2 minutes of inactivity to conserve free credits.
+          Provides your AI agent with an isolated Daytona Cloud Sandbox environment for autonomous browsing, code execution, and web scraping. Auto-pauses after 2 minutes of inactivity to conserve resources.
         </p>
 
         {/* Quick Launch Shortcuts */}
@@ -309,13 +309,13 @@ export function VmDesktopTab() {
                 <Monitor className="size-5" />
               </div>
               <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">Sandbox Simulation Active</h5>
+                <h5 className="text-xs font-semibold text-foreground">Daytona Sandbox Simulation Active</h5>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Browser agent is ready to navigate <code className="text-primary">{currentUrl}</code>. To view live noVNC video stream, configure your E2B API key.
+                  Browser agent is ready to navigate <code className="text-primary">{currentUrl}</code>. To view live cloud workspace, configure your Daytona API key.
                 </p>
               </div>
               <Badge variant="outline" className="text-[10px] font-mono bg-background">
-                Resolution: 1920x1080 • Chrome / Firefox
+                Daytona Cloud Sandbox • Isolated Container
               </Badge>
             </div>
           ) : (
@@ -326,10 +326,10 @@ export function VmDesktopTab() {
               </div>
               <div className="space-y-1 max-w-xs">
                 <h5 className="text-xs font-semibold text-foreground">
-                  {vmStatus === "paused" ? "Sandbox Inactive (Paused)" : "Cloud Desktop Off"}
+                  {vmStatus === "paused" ? "Daytona Sandbox Inactive (Paused)" : "Daytona Cloud Sandbox Off"}
                 </h5>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Click activate to start the cloud virtual machine desktop and resume previous browser sessions.
+                  Click activate to provision or resume the Daytona cloud environment for autonomous execution.
                 </p>
               </div>
               <Button
@@ -339,7 +339,7 @@ export function VmDesktopTab() {
                 className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground font-medium"
               >
                 {actionLoading ? <Loader2 className="size-3 animate-spin" /> : <Play className="size-3" />}
-                Activate Cloud Desktop
+                Activate Daytona Sandbox
               </Button>
             </div>
           )}
@@ -355,11 +355,11 @@ export function VmDesktopTab() {
               <div className="flex items-center gap-2">
                 <Monitor className="size-4 text-primary" />
                 <span className="text-xs font-bold text-foreground">
-                  Meow Cloud VM Desktop — {agentConfig?.name || "Agent"}
+                  Meow Daytona Sandbox — {agentConfig?.name || "Agent"}
                 </span>
               </div>
               <Badge variant="outline" className="text-[10px] font-mono bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                Live Interactive Stream (Port 6080)
+                Daytona Cloud Workspace
               </Badge>
             </div>
 

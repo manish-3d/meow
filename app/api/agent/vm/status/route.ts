@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getAgentVMStatus } from "@/lib/e2b/client";
+import { getAgentVMStatus } from "@/lib/daytona/client";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);

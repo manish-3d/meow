@@ -5,7 +5,7 @@ import { generateText, isStepCount, tool } from "ai";
 import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
-import { runAgentBrowserTask, isE2BConfigured } from "@/lib/e2b/client";
+import { runAgentBrowserTask, isDaytonaConfigured } from "@/lib/daytona/client";
 
 export async function runAgentRoutineLogic({
   routineId,
@@ -122,11 +122,11 @@ export async function runAgentRoutineLogic({
             .describe("What information to extract or analyze from the webpage"),
         }),
         execute: async ({ url, objective }: { url: string; objective?: string }) => {
-          if (!isE2BConfigured()) {
+          if (!isDaytonaConfigured()) {
             return {
               status: "simulated",
               message:
-                "Cloud VM Desktop is ready. E2B_API_KEY is not configured in .env, so live VM execution is simulated.",
+                "Daytona Cloud Sandbox is ready. Set DAYTONA_API_KEY in .env to activate live execution.",
               url,
               objective,
             };

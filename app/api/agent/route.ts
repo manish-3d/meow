@@ -4,7 +4,7 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { db } from "@/db";
 import { agentConfig, routines, executionLogs, agentChatHistory } from "@/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
-import { pauseAgentSandbox } from "@/lib/e2b/client";
+import { pauseAgentSandbox } from "@/lib/daytona/client";
 
 // POST /api/agent — Create a new agent configuration
 export async function POST(req: NextRequest) {
