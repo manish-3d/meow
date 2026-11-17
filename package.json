@@ -3,13 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node -r ./scripts/dns-fix.cjs ./node_modules/next/dist/bin/next dev",
+    "dev": "node --require ./scripts/dns-fix.cjs ./node_modules/next/dist/bin/next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:generate": "node -r ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs generate",
-    "db:push": "node -r ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs push",
-    "db:studio": "node -r ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs studio",
+    "db:generate": "node --require ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs generate",
+    "db:push": "node --require ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs push",
+    "db:studio": "node --require ./scripts/dns-fix.cjs ./node_modules/drizzle-kit/bin.cjs studio",
     "inngest:dev": "npx inngest-cli@latest dev -u http://localhost:3000/api/inngest"
   },
   "dependencies": {
