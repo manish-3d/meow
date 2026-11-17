@@ -235,47 +235,67 @@ export async function getOrCreateBrowserSession(
   }
 
   // 2. Local Playwright Execution (Free Host Chrome/Edge, Zero Quota Consumption)
-  const browser = await launchLocalBrowser(headless);
-  const context = await browser.newContext({
-    viewport: { width: 1280, height: 720 },
-    userAgent:
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-  });
-  const page = await context.newPage();
-  const localSessionId = `local-${Date.now()}`;
+  try {
+    const browser = await launchLocalBrowser(headless);
+    const context = await browser.newContext({
+      viewport: { width: 1280, height: 720 },
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    });
+    const page = await context.newPage();
+    const localSessionId = `local-${Date.now()}`;
 
-  activeSessions.set(sessionKey, {
-    browser,
-    context,
-    page,
-    mode: "local",
-    streamUrl: null, // Local mode streams real screenshots to UI
-    status: "idle",
-    lastScreenshot: null,
-    currentUrl: "about:blank",
-    lastActive: Date.now(),
-    sessionId: localSessionId,
-  });
+    activeSessions.set(sessionKey, {
+      browser,
+      context,
+      page,
+      mode: "local",
+      streamUrl: null, // Local mode streams real screenshots to UI
+      status: "idle",
+      lastScreenshot: null,
+      currentUrl: "about:blank",
+      lastActive: Date.now(),
+      sessionId: localSessionId,
+    });
 
-  // Update DB state
-  await db
-    .update(agentConfig)
-    .set({
-      e2bSandboxId: localSessionId,
-      vmStatus: "active",
-      vmLastActive: new Date(),
-      browserMode: "local",
-    })
-    .where(
-      and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
+    // Update DB state
+    await db
+      .update(agentConfig)
+      .set({
+        e2bSandboxId: localSessionId,
+        vmStatus: "active",
+        vmLastActive: new Date(),
+        browserMode: "local",
+      })
+      .where(
+        and(eq(agentConfig.agentId, agentId), eq(agentConfig.userEmail, userEmail))
+      );
+
+    return {
+      page,
+      mode: "local",
+      streamUrl: null,
+      sessionId: localSessionId,
+    };
+  } catch (localErr: any) {
+    // If local execution fails (e.g., serverless Vercel host without Chrome) and Browserbase is configured, fall back to cloud
+    if (isBrowserbaseConfigured()) {
+      console.warn(
+        "Local browser launch failed, automatically falling back to Browserbase Cloud:",
+        localErr?.message
+      );
+      return await getOrCreateBrowserSession(
+        agentId,
+        userEmail,
+        headless,
+        "browserbase",
+        true
+      );
+    }
+    throw new Error(
+      `Browser launch failed: ${localErr?.message || "Local browser unavailable"}. Ensure Google Chrome is installed or configure BROWSERBASE_API_KEY.`
     );
-
-  return {
-    page,
-    mode: "local",
-    streamUrl: null,
-    sessionId: localSessionId,
-  };
+  }
 }
 
 /**

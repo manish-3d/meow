@@ -1,0 +1,15 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "functions": {
+    "app/api/agent/chat/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/agent/browser/execute/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/inngest/route.ts": {
+      "maxDuration": 60
+    }
+  }
+}
