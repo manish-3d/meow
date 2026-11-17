@@ -1,6 +1,7 @@
 import { Figtree } from "next/font/google";
 import { AuthProvider } from "@/components/session-provider";
-import { Toaster } from "@/components/ui/toast";
+import { Toaster as BaseUiToaster } from "@/components/ui/toast";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import "./globals.css";
 import type { Metadata } from "next";
 
@@ -19,10 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={figtree.className} style={{ margin: 0, padding: 0 }}>
-        <AuthProvider>
-          {children}
-          <Toaster />
-        </AuthProvider>
+        <div data-vaul-drawer-wrapper="" className="min-h-screen bg-background">
+          <AuthProvider>
+            {children}
+            <BaseUiToaster />
+            <SonnerToaster />
+          </AuthProvider>
+        </div>
       </body>
     </html>
   );
