@@ -11,44 +11,44 @@ interface FaqItem {
 
 const FAQS: FaqItem[] = [
   {
-    question: "Do I have to switch to a new AI to use Meow Bot?",
+    question: "What is Meow Bot?",
     answer:
-      "No. Meow Bot connects to whatever AI you already use — Claude, ChatGPT, Cursor, Gemini, or custom LLMs. You get 1,700+ tools, durable background scheduling, and auth guardrails without changing your workflow.",
+      "Meow Bot is an autonomous AI agent platform that allows you to create specialized agents equipped with remote Chromium cloud VM desktops, durable Inngest background schedulers, and 1,700+ native tool integrations. It connects multi-model AI reasoning to real-world browser and API execution.",
   },
   {
-    question: "Which AI assistants does Meow Bot work with?",
+    question: "How does Meow Bot schedule background routines?",
     answer:
-      "Meow Bot works seamlessly with Anthropic Claude Desktop, OpenAI ChatGPT, Google Gemini 2.5, Cursor IDE, Codex CLI, Grok, and any client compatible with the Model Context Protocol (MCP).",
+      "When you instruct your agent to perform recurring work (e.g., 'send email at 9 PM IST daily' or 'fetch weekly revenue on Monday'), Meow Bot prepares an automated routine draft. Once confirmed, it registers with our Inngest serverless workflow engine, guaranteeing zero dropped runs, exponential backoff retries, and accurate continent-aware timezone offsets.",
   },
   {
-    question: "Which apps can I connect to?",
+    question: "What is the Cloud VM Desktop feature?",
     answer:
-      "Meow Bot supports 1,700+ apps including Gmail, Google Calendar, Slack, Notion, GitHub, Google Drive, HubSpot, Salesforce, Stripe, PostgreSQL, Linear, and Jira.",
+      "Meow Bot provides a dedicated remote Chromium browser sandbox powered by Browserbase. Agents can autonomously navigate sites, click elements, extract data, and fill forms. You can watch the live video stream in your browser or click 'Take Over Control' to manually interact with the session at any time.",
   },
   {
-    question: "The app I need isn't listed. Can I still use it?",
+    question: "Which AI models power Meow Bot?",
     answer:
-      "Yes. If the service has a REST API, OpenAPI schema, or MCP server, you can connect it to Meow Bot in minutes for free.",
+      "Meow Bot comes out-of-the-box with Google Gemini 2.5 Flash, Anthropic Claude 3.7 Sonnet, OpenAI GPT-4o, and supports custom models via the universal Model Context Protocol (MCP) gateway.",
   },
   {
-    question: "Do I need to know how to code?",
+    question: "How do tool connections work?",
     answer:
-      "Not at all. You can use the Meow Bot visual web app to create agents, connect tools with one-click OAuth, and set up recurring scheduled routines using plain English. If you are a developer, our SDK and CLI provide full programmatic control.",
+      "Meow Bot provides one-click OAuth connectors for 1,700+ services including Gmail, Google Calendar, Slack, GitHub, Linear, Stripe, and PostgreSQL. Credentials are stored in encrypted hardware vaults with zero token exposure to the LLM prompt context.",
   },
   {
-    question: "How is Meow Bot different from the connectors already built into my AI?",
+    question: "Can I take over the browser when an agent gets stuck?",
     answer:
-      "Built-in connectors usually give one AI access to a very limited set of apps with no durable scheduling, multi-account handling, or team governance. Meow Bot provides 1,700+ apps, multi-account session multiplexing, Inngest durable cron routines, and human-in-the-loop permission enforcement.",
+      "Yes! In the VM Desktop tab, you have full human-in-the-loop control. Click 'Take Over Control' to pause the agent and manually complete 2FA challenges, solve captchas, or inspect web elements before letting the agent resume.",
   },
   {
-    question: "What access does Meow Bot get to my accounts?",
+    question: "How does continent-based timezone scheduling work?",
     answer:
-      "Only what you approve. You sign in on each app's official OAuth consent screen. Meow Bot stores resulting tokens in encrypted hardware vaults. Your LLM never sees raw credentials or secret tokens.",
+      "To eliminate confusing UTC offset calculations, Meow Bot provides a continent-grouped selector (Asia, America, Europe, Australia, Africa). Choose your continent and city (e.g., Asia/Calcutta), and Meow Bot automatically handles Daylight Savings Time conversions.",
   },
   {
-    question: "How much does Meow Bot cost?",
+    question: "How do I get started?",
     answer:
-      "Meow Bot has a generous free Hobby plan that includes 100,000 tool calls per month. Most individual users and small teams never need to exceed the free plan.",
+      "Simply click 'Launch Workspace'. You can immediately start chatting with pre-configured agents, connect your preferred tools, and create automated background routines in minutes.",
   },
 ];
 
@@ -64,6 +64,9 @@ export function FaqSection() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="flex flex-col items-center text-center mb-16 sm:mb-20">
+          <span className="font-mono text-xs uppercase tracking-widest text-emerald-600 mb-2 font-semibold">
+            COMMON QUESTIONS
+          </span>
           <h2 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#0F0F0F] font-sans">
             Frequently asked questions
           </h2>

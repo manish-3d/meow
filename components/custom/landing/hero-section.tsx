@@ -3,25 +3,25 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, ShieldCheck, Terminal, Bot, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Bot, Sparkles, CheckCircle2, Cpu, Clock, ShieldCheck } from "lucide-react";
 
 const ROTATING_TARGETS = [
-  "a sandbox",
-  "1,700+ tools",
-  "a browser VM",
-  "proven skills",
-  "your accounts",
+  "a Cloud VM Desktop",
+  "durable cron routines",
+  "1,700+ connected tools",
+  "Gemini & Claude brains",
+  "zero-leak auth vaults",
 ];
 
-const TRUSTED_LOGOS = [
-  { name: "Anthropic Claude", label: "CLAUDE" },
-  { name: "OpenAI", label: "OPENAI" },
-  { name: "Google Gemini", label: "GEMINI 2.5" },
-  { name: "Vercel", label: "VERCEL" },
-  { name: "Inngest", label: "INNGEST" },
-  { name: "Supabase", label: "SUPABASE" },
-  { name: "Groq", label: "GROQ" },
-  { name: "Mistral AI", label: "MISTRAL" },
+const POWERED_BY_LOGOS = [
+  { name: "Google Gemini 2.5", label: "GEMINI 2.5 FLASH" },
+  { name: "Anthropic Claude", label: "CLAUDE 3.7 SONNET" },
+  { name: "Inngest Workflows", label: "INNGEST DURABLE ENGINE" },
+  { name: "Browserbase", label: "BROWSERBASE CLOUD VM" },
+  { name: "Composio Hub", label: "1,700+ COMPOSIO TOOLS" },
+  { name: "E2B Sandbox", label: "E2B CODE SANDBOX" },
+  { name: "Supabase DB", label: "SUPABASE STORAGE" },
+  { name: "Vercel Edge", label: "VERCEL RUNTIME" },
 ];
 
 export function HeroSection() {
@@ -65,22 +65,22 @@ export function HeroSection() {
         >
           <span className="size-2 rounded-full bg-[#00D26A] animate-pulse" />
           <span className="font-mono text-xs uppercase tracking-wider text-neutral-300">
-            Meow Bot 2.0 • Autonomous Agents & Inngest Scheduler
+            Meow Bot 2.0 • Autonomous Multi-Agent Cloud Platform
           </span>
           <ArrowRight className="size-3 text-neutral-400" />
         </motion.div>
 
-        {/* Composio Clone Exact Headline Structure */}
+        {/* Composio-Style Exact Kinetic Headline */}
         <motion.h1
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
           className="text-balance text-center text-white leading-[1.08] text-4xl sm:text-6xl md:text-7xl font-sans font-medium tracking-tight"
         >
-          <span className="block">Give your AI secure access</span>
+          <span className="block">Deploy autonomous AI agents</span>
           <span className="flex flex-wrap items-baseline justify-center gap-x-[0.28em] gap-y-[0.14em] mt-2 sm:mt-3">
-            <span className="text-white/60 font-normal">to</span>
-            <span className="relative inline-flex items-center justify-center min-w-[220px] sm:min-w-[320px] overflow-hidden py-1 px-3 sm:px-4 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
+            <span className="text-white/60 font-normal">with</span>
+            <span className="relative inline-flex items-center justify-center min-w-[240px] sm:min-w-[400px] overflow-hidden py-1 px-3 sm:px-4 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={ROTATING_TARGETS[index]}
@@ -88,27 +88,27 @@ export function HeroSection() {
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -24, opacity: 0 }}
                   transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                  className="font-mono text-white text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight whitespace-nowrap"
+                  className="font-mono text-white text-2xl sm:text-4xl md:text-5xl font-bold tracking-tight whitespace-nowrap"
                 >
                   {ROTATING_TARGETS[index]}
                 </motion.span>
               </AnimatePresence>
             </span>
             <span className="inline-block bg-[#00D26A] text-black font-mono font-bold text-2xl sm:text-4xl md:text-5xl px-3 py-1 rounded-lg leading-none shadow-sm">
-              in minutes
+              in seconds
             </span>
           </span>
         </motion.h1>
 
-        {/* Subtitle */}
+        {/* Authentic Meow Bot Subtitle */}
         <motion.p
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
           className="mt-6 sm:mt-8 max-w-2xl text-pretty text-neutral-400 text-sm sm:text-base md:text-lg leading-relaxed font-sans"
         >
-          Put Claude, Gemini, or custom LLMs to work across your email, APIs, browser, and cloud desktop.
-          Zero auth leaks, human permission gates, and durable background routine execution.
+          Meow Bot is your agent cloud: create specialized agents equipped with remote Chromium browser desktops,
+          durable Inngest background cron routines, and 1,700+ OAuth tools. Turn complex tasks into automated habits.
         </motion.p>
 
         {/* Dual CTAs */}
@@ -123,17 +123,17 @@ export function HeroSection() {
               type="button"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white px-6 py-3.5 font-mono text-sm font-semibold uppercase tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-[0.98] shadow-lg"
             >
-              <span>GET STARTED FOR FREE</span>
+              <span>LAUNCH YOUR FIRST AGENT</span>
               <ArrowRight className="size-4" />
             </button>
           </Link>
 
-          <Link href="#use-cases" className="w-full sm:w-auto">
+          <Link href="#simulator" className="w-full sm:w-auto">
             <button
               type="button"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 bg-transparent px-6 py-3.5 font-mono text-sm text-neutral-300 uppercase tracking-wider transition-all hover:bg-white/10 hover:text-white"
             >
-              <span>EXPLORE ARCHITECTURE</span>
+              <span>SEE INNGEST SIMULATOR</span>
             </button>
           </Link>
         </motion.div>
@@ -147,29 +147,29 @@ export function HeroSection() {
         >
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="size-3.5 text-[#00D26A]" />
-            100,000 Free Tool Calls
+            Durable Inngest Serverless Cron
           </span>
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="size-3.5 text-[#00D26A]" />
-            SOC 2 Type II Encrypted
+            Live Cloud VM with Takeover
           </span>
           <span className="flex items-center gap-1.5">
             <CheckCircle2 className="size-3.5 text-[#00D26A]" />
-            No API Keys Needed
+            1,700+ Native OAuth Integrations
           </span>
         </motion.div>
       </div>
 
-      {/* Trusted By Logo Loop Marquee */}
+      {/* Powered By Logo Loop Marquee */}
       <div className="relative z-10 w-full mt-12 sm:mt-16 pt-8 border-t border-white/10">
         <div className="max-w-6xl mx-auto px-4 flex flex-col items-center">
           <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500 mb-5">
-            TRUSTED BY DEVELOPERS & INTEGRATED WITH
+            POWERED BY STATE-OF-THE-ART AGENT INFRASTRUCTURE
           </span>
           
           <div className="w-full overflow-hidden mask-fade-x">
             <div className="flex items-center gap-10 sm:gap-16 animate-marquee whitespace-nowrap py-1">
-              {[...TRUSTED_LOGOS, ...TRUSTED_LOGOS].map((logo, idx) => (
+              {[...POWERED_BY_LOGOS, ...POWERED_BY_LOGOS].map((logo, idx) => (
                 <div
                   key={`${logo.name}-${idx}`}
                   className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors cursor-pointer group"

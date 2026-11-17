@@ -26,7 +26,7 @@ export function LandingFooter() {
       return;
     }
     setSubscribed(true);
-    toast.success("Subscribed to product updates & practical agent guides!");
+    toast.success("Subscribed to Meow Bot engineering updates!");
     setEmail("");
   };
 
@@ -37,10 +37,10 @@ export function LandingFooter() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start pb-16 border-b border-white/10">
           <div>
             <h3 className="text-xl sm:text-2xl font-medium tracking-tight text-white font-sans">
-              Subscribe to our newsletter
+              Subscribe to Meow Bot updates
             </h3>
             <p className="mt-2 text-sm text-neutral-400 leading-relaxed max-w-md">
-              Get product updates, practical guides, and engineering patterns for building reliable AI agents.
+              Get product updates, autonomous agent recipes, and practical engineering guides for background workflows.
             </p>
           </div>
 
@@ -63,81 +63,75 @@ export function LandingFooter() {
 
         {/* Directory Links Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8 py-16 text-xs font-mono">
-          {/* Column 1: PRODUCTS */}
+          {/* Column 1: PLATFORM */}
           <div className="flex flex-col gap-3">
-            <span className="font-semibold text-white/50 tracking-wider">PRODUCTS</span>
+            <span className="font-semibold text-white/50 tracking-wider">PLATFORM</span>
             <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
-              MEOW CLOUD
+              AGENT WORKSPACE
             </Link>
             <Link href="#cloud-vm" className="text-neutral-400 hover:text-white transition-colors">
               CLOUD VM DESKTOP
             </Link>
-            <Link href="#integrations" className="text-neutral-400 hover:text-white transition-colors">
-              1,700+ TOOLS
+            <Link href="#simulator" className="text-neutral-400 hover:text-white transition-colors">
+              INNGEST SCHEDULER
+            </Link>
+            <Link href="#tools" className="text-neutral-400 hover:text-white transition-colors">
+              1,700+ TOOL VAULT
+            </Link>
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              AGENT MARKETPLACE
             </Link>
             <Link href="#build" className="text-neutral-400 hover:text-white transition-colors">
               MCP GATEWAY
             </Link>
-            <Link href="#harder-jobs" className="text-neutral-400 hover:text-white transition-colors">
-              INSTANT TOOLS
+          </div>
+
+          {/* Column 2: AGENTS */}
+          <div className="flex flex-col gap-3">
+            <span className="font-semibold text-white/50 tracking-wider">PRE-CONFIGURED AGENTS</span>
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              SOCIAL MEDIA BOT
             </Link>
-            <Link href="#use-cases" className="text-neutral-400 hover:text-white transition-colors">
-              DURABLE INNGEST CRON
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              SPORTS ANALYSIS
+            </Link>
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              EXECUTIVE ASSISTANT
+            </Link>
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              RESEARCH SCRAPER
+            </Link>
+            <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
+              FINANCIAL ANALYST
             </Link>
           </div>
 
-          {/* Column 2: SOLUTIONS */}
+          {/* Column 3: DEVELOPERS */}
           <div className="flex flex-col gap-3">
-            <span className="font-semibold text-white/50 tracking-wider">SOLUTIONS</span>
-            <Link href="#agents" className="text-neutral-400 hover:text-white transition-colors">
-              FOR CLAUDE & CODEX
+            <span className="font-semibold text-white/50 tracking-wider">DEVELOPERS</span>
+            <Link href="#build" className="text-neutral-400 hover:text-white transition-colors">
+              TYPESCRIPT SDK
             </Link>
-            <Link href="#agents" className="text-neutral-400 hover:text-white transition-colors">
-              FOR CURSOR
+            <Link href="#build" className="text-neutral-400 hover:text-white transition-colors">
+              REST API & WEBHOOKS
             </Link>
-            <Link href="#teams" className="text-neutral-400 hover:text-white transition-colors">
-              FOR ENGINEERING TEAMS
-            </Link>
-            <Link href="#trust" className="text-neutral-400 hover:text-white transition-colors">
-              SECURITY & PERMISSIONS
-            </Link>
-            <Link href="#teams" className="text-neutral-400 hover:text-white transition-colors">
-              BUDGET GOVERNANCE
-            </Link>
-          </div>
-
-          {/* Column 3: RESOURCES */}
-          <div className="flex flex-col gap-3">
-            <span className="font-semibold text-white/50 tracking-wider">RESOURCES</span>
-            <a
-              href="https://github.com/composiohq/composio"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-neutral-400 hover:text-white transition-colors flex items-center gap-1"
-            >
-              <span>DOCUMENTATION</span>
-              <ExternalLink className="size-2.5 opacity-50" />
-            </a>
             <Link href="#faq" className="text-neutral-400 hover:text-white transition-colors">
               FAQ
             </Link>
-            <Link href="#frameworks" className="text-neutral-400 hover:text-white transition-colors">
-              QUICKSTART EXAMPLES
-            </Link>
             <Link href="/workspace" className="text-neutral-400 hover:text-white transition-colors">
-              PLAYGROUND
+              TELEMETRY & LOGS
             </Link>
           </div>
 
-          {/* Column 4: BRAND & LEGAL */}
+          {/* Column 4: BRAND & STATUS */}
           <div className="flex flex-col gap-3">
-            <span className="font-semibold text-white/50 tracking-wider">MEOW BOT</span>
+            <span className="font-semibold text-white/50 tracking-wider">MEOW BOT INC.</span>
             <div className="flex items-center gap-2">
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-neutral-400">All systems normal</span>
+              <span className="text-neutral-400">All systems operational</span>
             </div>
             <span className="text-neutral-500 text-[11px] font-sans mt-2">
-              Autonomous AI agent platform powered by Google Gemini, Claude, Composio, and durable Inngest background orchestration.
+              Autonomous AI agent cloud powered by Google Gemini, Claude, Composio OAuth, and Inngest durable serverless orchestration.
             </span>
           </div>
         </div>
@@ -160,7 +154,7 @@ export function LandingFooter() {
 
           <div className="flex items-center gap-5">
             <a
-              href="https://github.com/composiohq/composio"
+              href="https://github.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-400 hover:text-white transition-colors"
@@ -169,7 +163,7 @@ export function LandingFooter() {
               <Github className="size-4" />
             </a>
             <a
-              href="https://x.com/composio"
+              href="https://twitter.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-400 hover:text-white transition-colors"
@@ -178,7 +172,7 @@ export function LandingFooter() {
               <Twitter className="size-4" />
             </a>
             <a
-              href="https://dub.composio.dev/discord"
+              href="https://discord.com"
               target="_blank"
               rel="noopener noreferrer"
               className="text-neutral-400 hover:text-white transition-colors"
