@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { sql } from "drizzle-orm";
-import { isBrowserbaseConfigured } from "@/lib/browser/client";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +30,7 @@ export async function GET() {
   const isAuthReady = Boolean(process.env.NEXTAUTH_SECRET);
   const isGeminiReady = Boolean(process.env.GEMINI_API_KEY);
   const isComposioReady = Boolean(process.env.COMPOSIO_API_KEY);
-  const isBrowserbaseReady = isBrowserbaseConfigured();
+  const isBrowserbaseReady = Boolean(process.env.BROWSERBASE_API_KEY);
   const isInngestReady = Boolean(
     process.env.INNGEST_EVENT_KEY || process.env.INNGEST_SIGNING_KEY
   );

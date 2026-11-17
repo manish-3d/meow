@@ -1,8 +1,13 @@
-import { chromium, Browser, BrowserContext, Page } from "playwright-core";
+import type { Browser, BrowserContext, Page } from "playwright-core";
 import Browserbase from "@browserbasehq/sdk";
 import { db } from "@/db";
 import { agentConfig } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
+
+async function getChromium() {
+  const { chromium } = await import("playwright-core");
+  return chromium;
+}
 
 function getBrowserbaseApiKey(): string {
   return process.env.BROWSERBASE_API_KEY || "";
@@ -52,6 +57,7 @@ const activeSessions = new Map<
  * Finds a suitable local Chromium/Chrome/Edge executable on the host
  */
 async function launchLocalBrowser(headless = true): Promise<Browser> {
+  const chromium = await getChromium();
   // Try system Google Chrome first, fallback to Microsoft Edge on Windows
   try {
     return await chromium.launch({
@@ -184,6 +190,7 @@ export async function getOrCreateBrowserSession(
         projectId: projectId || undefined,
       });
 
+      const chromium = await getChromium();
       const browser = await chromium.connectOverCDP(session.connectUrl);
       const context = browser.contexts()[0] || (await browser.newContext());
       const page = context.pages()[0] || (await context.newPage());
