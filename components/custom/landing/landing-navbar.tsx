@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Menu, X, Download } from "lucide-react";
+import { ArrowRight, Menu, X, Bot, Sparkles } from "lucide-react";
 
 export function LandingNavbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -28,15 +28,20 @@ export function LandingNavbar() {
           <div className="flex size-8 items-center justify-center rounded-xl bg-purple-100 border border-purple-200 text-sm shadow-2xs group-hover:scale-105 transition-transform">
             <span>🐱</span>
           </div>
-          <span className="font-sans font-bold text-base tracking-tight text-neutral-900">
-            meow bot
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="font-sans font-bold text-base tracking-tight text-neutral-900">
+              meow bot
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-mono tracking-wider uppercase bg-emerald-500/15 text-emerald-600 border border-emerald-500/30">
+              web cloud
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-8 text-xs font-mono text-neutral-600">
           <Link href="/workspace" className="hover:text-black transition-colors">
-            download
+            workspace
           </Link>
           <Link href="#bots" className="hover:text-black transition-colors">
             bots
@@ -57,9 +62,10 @@ export function LandingNavbar() {
           <Link href="/workspace">
             <button
               type="button"
-              className="rounded-full bg-[#131316] px-4 py-2 text-xs font-mono font-semibold uppercase tracking-wider text-white hover:bg-black transition-all active:scale-95 shadow-sm"
+              className="inline-flex items-center gap-2 rounded-full bg-[#131316] px-5 py-2 text-xs font-mono font-semibold uppercase tracking-wider text-white hover:bg-black transition-all active:scale-95 shadow-sm"
             >
-              launch workspace
+              <span>launch workspace</span>
+              <ArrowRight className="size-3.5" />
             </button>
           </Link>
         </div>
@@ -79,7 +85,7 @@ export function LandingNavbar() {
       {mobileOpen && (
         <div className="mt-2 mx-4 rounded-2xl bg-white border border-black/10 p-4 shadow-xl flex flex-col gap-3 md:hidden font-mono text-xs text-neutral-800">
           <Link href="/workspace" onClick={() => setMobileOpen(false)} className="py-1">
-            download
+            workspace
           </Link>
           <Link href="#bots" onClick={() => setMobileOpen(false)} className="py-1">
             bots

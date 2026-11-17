@@ -18,7 +18,7 @@ export function PricingSection() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-16 sm:mb-20 gap-6">
           <div className="max-w-2xl">
             <h2 className="text-4xl sm:text-6xl font-sans font-medium tracking-tight text-[#131316] leading-none">
-              start free. add meow cloud to keep it always available.
+              start free. add cloud power as you scale.
             </h2>
           </div>
 
@@ -75,7 +75,7 @@ export function PricingSection() {
                 free
               </h3>
               <p className="mt-1 text-sm text-neutral-500 font-sans">
-                your bots, on your own computer.
+                your agents, in the cloud web workspace.
               </p>
 
               <div className="mt-6 flex items-baseline gap-2">
@@ -83,7 +83,7 @@ export function PricingSection() {
                   $0
                 </span>
                 <span className="text-xs text-neutral-500 font-sans">
-                  forever. no card, no account.
+                  forever. no card required.
                 </span>
               </div>
 
@@ -91,7 +91,7 @@ export function PricingSection() {
               <div className="mt-6 pt-6 border-t border-black/6 flex flex-col gap-2.5 text-xs text-neutral-600 font-sans">
                 <div className="flex items-center gap-2">
                   <Check className="size-4 text-emerald-600 shrink-0" />
-                  <span>Unlimited bots on your laptop</span>
+                  <span>Unlimited web agents in workspace</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="size-4 text-emerald-600 shrink-0" />
@@ -99,11 +99,11 @@ export function PricingSection() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="size-4 text-emerald-600 shrink-0" />
-                  <span>Local Chromium desktop execution</span>
+                  <span>Cloud VM browser automation</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Check className="size-4 text-emerald-600 shrink-0" />
-                  <span>Basic daily routines</span>
+                  <span>Daily scheduled Inngest routines</span>
                 </div>
               </div>
             </div>
@@ -114,7 +114,7 @@ export function PricingSection() {
                   type="button"
                   className="w-full rounded-full bg-black py-3 text-xs font-mono font-semibold uppercase tracking-wider text-white hover:bg-neutral-800 transition-colors shadow-sm"
                 >
-                  get started
+                  open web workspace
                 </button>
               </Link>
             </div>
@@ -136,7 +136,7 @@ export function PricingSection() {
                 plus
               </h3>
               <p className="mt-1 text-sm text-neutral-500 font-sans">
-                your bots keep working with the laptop shut.
+                for active daily workflows & background routines.
               </p>
 
               <div className="mt-6 flex items-baseline gap-2">
@@ -199,7 +199,7 @@ export function PricingSection() {
                 pro
               </h3>
               <p className="mt-1 text-sm text-neutral-500 font-sans">
-                for heavy workloads, and for work.
+                for heavy workloads & team collaboration.
               </p>
 
               <div className="mt-6 flex items-baseline gap-2">

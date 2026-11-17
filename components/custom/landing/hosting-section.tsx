@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Laptop, Cloud, Server, Check } from "lucide-react";
+import { Globe, Cloud, ShieldCheck, Zap } from "lucide-react";
 
 export function HostingSection() {
   return (
@@ -10,16 +10,16 @@ export function HostingSection() {
         {/* Section Header */}
         <div className="max-w-3xl mb-14 sm:mb-20">
           <h2 className="text-4xl sm:text-6xl font-sans font-medium tracking-tight text-[#131316] leading-none">
-            where your bots live.
+            how your bots run.
           </h2>
           <p className="mt-4 text-base sm:text-xl text-neutral-600 font-sans">
-            run them on your laptop for total privacy, or keep them on a meow cloud server so they never stop working.
+            100% web-first. access from any browser, while background workers run 24/7 in our cloud.
           </p>
         </div>
 
-        {/* 3 Hosting Cards */}
+        {/* 3 Hosting Pillars */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          {/* Card 1: On Your Computer */}
+          {/* Card 1: Browser Web Workspace */}
           <div className="rounded-3xl bg-white p-6 sm:p-7 border border-black/8 shadow-2xs flex flex-col justify-between overflow-hidden relative">
             <div>
               {/* Pixel Art Mini Banner */}
@@ -33,24 +33,24 @@ export function HostingSection() {
 
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xl font-bold font-sans text-neutral-900">
-                  on your computer
+                  instant web workspace
                 </h3>
-                <span className="font-mono text-[10px] text-neutral-500 bg-neutral-100 px-2 py-0.5 rounded-full">
-                  catnapping 💤
+                <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
+                  zero install
                 </span>
               </div>
 
               <p className="text-sm text-neutral-600 font-sans leading-relaxed">
-                Free forever. Runs directly on your Mac, Windows, or Linux machine. Stops when you shut your laptop lid.
+                Open Meow Bot in Chrome, Safari, or mobile. Create agents, chat with your crew, and configure routines in seconds.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-black/6 font-mono text-xs text-neutral-500">
-              Zero cloud cost • 100% private
+              Works on any device • Instant access
             </div>
           </div>
 
-          {/* Card 2: On a Meow Cloud Server */}
+          {/* Card 2: 24/7 Cloud Background Workers */}
           <div className="rounded-3xl bg-white p-6 sm:p-7 border border-black/8 shadow-2xs flex flex-col justify-between overflow-hidden relative">
             <div>
               {/* Pixel Art Green Meadow Banner */}
@@ -64,24 +64,24 @@ export function HostingSection() {
 
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xl font-bold font-sans text-neutral-900">
-                  on a meow cloud server
+                  always-on cloud engine
                 </h3>
                 <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
-                  awake 24/7 ⚡
+                  runs 24/7 ⚡
                 </span>
               </div>
 
               <p className="text-sm text-neutral-600 font-sans leading-relaxed">
-                Dedicated 2 vCPU cloud VM. Bots keep working through the night and trigger morning briefs with your laptop closed.
+                Your routines execute on our durable cloud servers. Morning briefs deliver and emails are triaged even when your laptop is shut off.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-black/6 font-mono text-xs text-neutral-500">
-              Inngest durable cron • Always online
+              Inngest durable cron • Zero dropped runs
             </div>
           </div>
 
-          {/* Card 3: On Your Own Server */}
+          {/* Card 3: Cloud VM Remote Browser */}
           <div className="rounded-3xl bg-white p-6 sm:p-7 border border-black/8 shadow-2xs flex flex-col justify-between overflow-hidden relative">
             <div>
               {/* Pixel Art Purple Mountain Banner */}
@@ -93,20 +93,20 @@ export function HostingSection() {
 
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-xl font-bold font-sans text-neutral-900">
-                  on your own server
+                  remote browser desktop
                 </h3>
                 <span className="font-mono text-[10px] text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full font-bold">
-                  self-hosted 🐳
+                  browserbase VM 🖥️
                 </span>
               </div>
 
               <p className="text-sm text-neutral-600 font-sans leading-relaxed">
-                One-line Docker compose for engineering teams who need total self-hosted isolation and enterprise compliance.
+                When agents navigate websites, they run inside secure cloud Chromium sandboxes. Watch the live stream or take the mouse anytime.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-black/6 font-mono text-xs text-neutral-500">
-              Open source CLI • Self-directed
+              Live streaming • Human takeover
             </div>
           </div>
         </div>

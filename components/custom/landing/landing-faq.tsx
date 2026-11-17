@@ -11,6 +11,16 @@ interface FaqItem {
 
 const FAQS: FaqItem[] = [
   {
+    question: "do i need to download or install any software?",
+    answer:
+      "no. meow bot is 100% web-first. you can access your workspace, manage your agents, and view your remote browser desktop directly in chrome, safari, or any modern browser without downloading software.",
+  },
+  {
+    question: "does it work when my computer is turned off?",
+    answer:
+      "yes! because meow bot runs in the cloud with inngest serverless orchestration, your scheduled routines and background tasks execute 24/7 even when your computer is asleep or completely powered off.",
+  },
+  {
     question: "does it do things without asking?",
     answer:
       "never. if an action involves spending money, deleting files, sending emails to external clients, or modifying production code, meow bot stops and asks for your approval first.",
@@ -19,11 +29,6 @@ const FAQS: FaqItem[] = [
     question: "can i use it with my existing chatgpt, claude, or gemini subscription?",
     answer:
       "yes! just bring your own api keys. meow bot connects directly to openai, anthropic, or google ai with zero token markup. you can also run 100% free offline models via ollama.",
-  },
-  {
-    question: "what happens when my laptop goes to sleep?",
-    answer:
-      "on the free plan, your local bots catnap until you open your laptop lid again. on plus and pro, your bots run on a dedicated 24/7 cloud server, so morning briefs and routines execute smoothly even while you sleep.",
   },
   {
     question: "can i take over the browser when a bot gets stuck?",

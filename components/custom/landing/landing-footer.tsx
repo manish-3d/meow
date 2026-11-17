@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { Github, Twitter, Disc as Discord, ArrowRight, Heart } from "lucide-react";
 
 export function LandingFooter() {
@@ -28,7 +27,7 @@ export function LandingFooter() {
           {/* Links */}
           <div className="flex flex-wrap items-center gap-6 text-xs font-mono text-neutral-600">
             <Link href="/workspace" className="hover:text-black transition-colors">
-              download
+              workspace
             </Link>
             <Link href="#pricing" className="hover:text-black transition-colors">
               pricing
@@ -38,9 +37,6 @@ export function LandingFooter() {
             </Link>
             <Link href="#faq" className="hover:text-black transition-colors">
               faq
-            </Link>
-            <Link href="/workspace" className="hover:text-black transition-colors">
-              web app
             </Link>
           </div>
 

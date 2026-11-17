@@ -2,32 +2,32 @@
 
 import React from "react";
 import Link from "next/link";
-import { Download, Key, Bot, Sparkles, ArrowRight } from "lucide-react";
+import { Globe, Key, Bot, Sparkles, ArrowRight } from "lucide-react";
 
 export function OnboardingSteps() {
   const steps = [
     {
       num: "1",
-      title: "download it and open it",
-      desc: "Normal desktop installer for Mac, Windows, or Linux. No credit card, no account required.",
-      icon: <Download className="size-4" />,
+      title: "open the web workspace",
+      desc: "Instant access in any modern browser on laptop, tablet, or phone. No downloads or installations required.",
+      icon: <Globe className="size-4" />,
     },
     {
       num: "2",
       title: "add your ai key",
-      desc: "Connect your OpenAI, Claude, or Gemini key, or run offline with local Ollama models.",
+      desc: "Connect your OpenAI, Claude, or Gemini key at raw wholesale rates, or use our free starter tier.",
       icon: <Key className="size-4" />,
     },
     {
       num: "3",
       title: "make a bot",
-      desc: "Give it a name, pick an avatar, and tell it what job it owns. Or pick from 20+ templates.",
+      desc: "Give it a name, pick an avatar, and tell it what job it owns. Or choose from 20+ pre-built personas.",
       icon: <Bot className="size-4" />,
     },
     {
       num: "4",
       title: "hand it something real",
-      desc: "The task you've been putting off. It does the busywork and asks before anything scary.",
+      desc: "The task you've been putting off. It does the busywork in the background and asks before anything scary.",
       icon: <Sparkles className="size-4" />,
     },
   ];
@@ -41,7 +41,7 @@ export function OnboardingSteps() {
             ready in under two minutes.
           </h2>
           <p className="mt-4 text-base sm:text-xl text-neutral-600 font-sans">
-            start with one helper today and build your crew as you go.
+            start with one helper on the web today and build your crew as you go.
           </p>
         </div>
 
