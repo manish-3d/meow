@@ -1,203 +1,160 @@
 "use client";
 
-import React from "react";
-import {
-  Monitor,
-  Clock,
-  ShieldCheck,
-  Activity,
-  Terminal,
-  Globe,
+import React, { useState } from "react";
+import Link from "next/link";
+import { 
+  Terminal, 
+  Cpu, 
+  Workflow, 
+  Sparkles, 
+  ShieldCheck, 
+  Search, 
+  Database, 
+  Play, 
+  ArrowRight,
   CheckCircle2,
-  Cpu,
   Layers,
-  ArrowUpRight,
-  Database,
-  RefreshCw,
+  FileSpreadsheet,
+  Globe,
+  Radio
 } from "lucide-react";
 
 export function BentoFeatures() {
+  const [activeTab, setActiveTab] = useState<"skills" | "vm" | "instant">("skills");
+
   return (
-    <section id="platform" className="py-20 px-4 sm:px-6 lg:px-8 border-t border-border-subtle bg-surface-0">
-      <div className="max-w-6xl mx-auto space-y-12">
+    <section id="harder-jobs" className="relative bg-[#F6F6F6] text-[#0F0F0F] py-24 sm:py-32 border-b border-black/10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
-        <div className="text-center space-y-4 max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-surface-2 border border-border-subtle text-muted-foreground shadow-2xs">
-            <Cpu className="size-3 text-primary" />
-            <span>Autonomous Execution Engine</span>
-          </div>
-
-          <h2 className="text-3xl sm:text-4xl font-semibold tracking-[-0.03em] text-foreground">
-            Built for tasks that can't be solved with a simple text reply
+        <div className="flex flex-col items-center text-center mb-16 sm:mb-20">
+          <h2 className="text-3xl sm:text-5xl font-medium tracking-tight text-[#0F0F0F] font-sans">
+            Don’t settle for AI that stops halfway
           </h2>
-
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xl mx-auto">
-            Real work requires clicking buttons, navigating authenticated portals, scheduling crons across timezones, and inspecting execution telemetry.
+          <p className="mt-4 max-w-2xl text-neutral-600 text-base sm:text-lg leading-relaxed">
+            Long jobs are where AI stalls. Meow Bot gives it proven steps, a place to run code,
+            and the tools to fill any gap.
           </p>
         </div>
 
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          {/* Card 1: Cloud VM Desktop (8 cols) */}
-          <div className="col-span-12 md:col-span-8 rounded-2xl border border-border-subtle bg-surface-1 p-6 space-y-5 shadow-xs hover:border-foreground/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-surface-2 border border-border-subtle text-foreground shadow-2xs">
-                  <Monitor className="size-4.5" />
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded bg-surface-2 border border-border-subtle">
-                  Browserbase CDP
-                </span>
+        {/* 3 Bento Cards Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+          {/* Card 1: Tested Skills for Recurring Work */}
+          <div className="flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow">
+            <div>
+              <div className="inline-flex size-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-200 mb-5">
+                <Workflow className="size-5" />
               </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-foreground tracking-tight">
-                  Cloud VM Desktop & Browser Automation
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  When a task requires interacting with a visual web page, your agent spins up a dedicated headless browser sandbox, types inputs, inspects DOM trees, and takes full-page screenshots.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold font-sans text-neutral-900 tracking-tight">
+                Tested skills for recurring work
+              </h3>
+              <p className="mt-3 text-sm text-neutral-600 leading-relaxed font-sans">
+                Meow Bot gives your AI skills: tested ways to do a job, so it knows what to check
+                and what to avoid before taking action.
+              </p>
             </div>
 
-            {/* Simulated Cloud Browser Mockup */}
-            <div className="rounded-xl border border-border-subtle bg-surface-2/80 p-3 space-y-2.5 font-mono text-xs shadow-inner">
-              <div className="flex items-center justify-between pb-2 border-b border-border-subtle text-[11px] text-muted-foreground">
+            {/* Interactive Preview Mock */}
+            <div className="mt-8 rounded-2xl border border-black/8 bg-neutral-50 p-4 flex flex-col gap-2.5 font-mono text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-black/6">
+                <span className="text-neutral-500 font-semibold uppercase text-[10px]">
+                  SKILL PIPELINE
+                </span>
+                <span className="text-emerald-600 font-semibold text-[10px] bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  VERIFIED
+                </span>
+              </div>
+              <div className="flex items-center gap-2 text-neutral-700">
+                <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 text-[10px]">
+                  1
+                </span>
+                <span>Scan unread customer support tickets</span>
+              </div>
+              <div className="flex items-center gap-2 text-neutral-700">
+                <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 text-[10px]">
+                  2
+                </span>
+                <span>Enrich sender domain via Clearbit</span>
+              </div>
+              <div className="flex items-center gap-2 text-neutral-700">
+                <span className="flex size-5 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-600 text-[10px]">
+                  3
+                </span>
+                <span>Draft high-priority response for review</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: A Computer for the Heavy Work */}
+          <div className="flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow">
+            <div>
+              <div className="inline-flex size-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-200 mb-5">
+                <Cpu className="size-5" />
+              </div>
+              <h3 className="text-xl font-bold font-sans text-neutral-900 tracking-tight">
+                A computer for the heavy work
+              </h3>
+              <p className="mt-3 text-sm text-neutral-600 leading-relaxed font-sans">
+                When a task means thousands of rows, your AI runs code in a private workspace
+                and brings back just the answer.
+              </p>
+            </div>
+
+            {/* Interactive Preview Mock: Terminal Sandbox */}
+            <div className="mt-8 rounded-2xl border border-black/8 bg-[#0D0D10] text-neutral-200 p-4 font-mono text-[11px] flex flex-col gap-2">
+              <div className="flex items-center justify-between pb-2 border-b border-white/10">
                 <div className="flex items-center gap-1.5">
-                  <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span className="text-foreground">Session #vm-4491-cdp</span>
+                  <span className="size-2 rounded-full bg-red-500/80" />
+                  <span className="size-2 rounded-full bg-amber-500/80" />
+                  <span className="size-2 rounded-full bg-emerald-500/80" />
                 </div>
-                <span>1440x900 • 60 FPS</span>
+                <span className="text-neutral-500 text-[10px]">sandbox:vm-desktop-01</span>
               </div>
-
-              <div className="bg-surface-1 p-2.5 rounded-lg border border-border-subtle space-y-1.5 text-[11px]">
-                <div className="flex items-center gap-2 text-foreground font-medium">
-                  <span className="text-emerald-500">▶</span>
-                  <span>Navigating to Google News & scraping AI breakthroughs...</span>
-                </div>
-                <div className="text-[10px] text-muted-foreground flex items-center justify-between">
-                  <span>Extracted 12 headlines • Formatted markdown</span>
-                  <span className="text-emerald-500 font-bold">100% Success</span>
-                </div>
+              <div className="text-emerald-400">$ python -m analysis.process_transactions</div>
+              <div className="text-neutral-400">Loading 240,000 rows into Pandas memory...</div>
+              <div className="text-white">✓ Outlier anomalies detected: 3 transactions flagged</div>
+              <div className="text-neutral-500 text-[10px] mt-1 pt-1 border-t border-white/10 flex items-center justify-between">
+                <span>Memory: 184MB / 4GB</span>
+                <span className="text-emerald-400">Exit 0 (Success)</span>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Durable Inngest Scheduler (4 cols) */}
-          <div className="col-span-12 md:col-span-4 rounded-2xl border border-border-subtle bg-surface-1 p-6 space-y-5 shadow-xs hover:border-foreground/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-surface-2 border border-border-subtle text-foreground shadow-2xs">
-                  <Clock className="size-4.5" />
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded bg-surface-2 border border-border-subtle">
-                  Inngest Engine
-                </span>
+          {/* Card 3: Instant Tools, No Sign-ups */}
+          <div className="flex flex-col justify-between rounded-3xl border border-black/10 bg-white p-6 sm:p-8 shadow-xs hover:shadow-md transition-shadow">
+            <div>
+              <div className="inline-flex size-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600 border border-purple-200 mb-5">
+                <Sparkles className="size-5" />
               </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-foreground tracking-tight">
-                  Durable Background Schedulers
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  Recurring background routines survive server restarts, network blips, and rate limits with zero dropped jobs.
-                </p>
-              </div>
+              <h3 className="text-xl font-bold font-sans text-neutral-900 tracking-tight">
+                Instant tools, no sign-ups
+              </h3>
+              <p className="mt-3 text-sm text-neutral-600 leading-relaxed font-sans">
+                1,700+ tools for search, web scraping, transcription and execution, ready when
+                a task needs them. Pay per use with zero accounts to create.
+              </p>
             </div>
 
-            {/* Visual Schedule Pill Block */}
-            <div className="p-3.5 rounded-xl border border-border-subtle bg-surface-2/70 space-y-2 font-mono text-[11px]">
-              <div className="flex items-center justify-between">
-                <span className="text-foreground font-semibold font-sans text-xs">Morning Briefing</span>
-                <span className="text-emerald-500 text-[9px] uppercase px-1.5 py-0.2 rounded bg-emerald-500/10 border border-emerald-500/20">
-                  Active
+            {/* Interactive Preview Mock: Instant Tools Chips */}
+            <div className="mt-8 rounded-2xl border border-black/8 bg-neutral-50 p-4 flex flex-col gap-2 font-mono text-xs">
+              <div className="flex items-center justify-between pb-2 border-b border-black/6">
+                <span className="text-neutral-500 font-semibold uppercase text-[10px]">
+                  ON-DEMAND PROVIDERS
+                </span>
+                <span className="text-purple-600 font-semibold text-[10px] bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
+                  NO API KEYS
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 text-muted-foreground text-[10px] tabular-nums">
-                <Clock className="size-3" />
-                <span>08:00 AM UTC • Asia/Calcutta</span>
+              <div className="flex items-center justify-between py-1 border-b border-black/4">
+                <span className="text-neutral-800">Tavily Deep Search</span>
+                <span className="text-neutral-400 text-[11px]">$0.001 / req</span>
               </div>
-              <div className="pt-1.5 border-t border-border-subtle flex items-center justify-between text-[10px] text-muted-foreground">
-                <span>Daily • 10 Runs Max</span>
-                <span className="text-foreground font-medium">Auto-retry: On</span>
+              <div className="flex items-center justify-between py-1 border-b border-black/4">
+                <span className="text-neutral-800">Firecrawl LLM Scraper</span>
+                <span className="text-neutral-400 text-[11px]">$0.002 / page</span>
               </div>
-            </div>
-          </div>
-
-          {/* Card 3: 1-Click Composio Auth Vault (4 cols) */}
-          <div className="col-span-12 md:col-span-4 rounded-2xl border border-border-subtle bg-surface-1 p-6 space-y-5 shadow-xs hover:border-foreground/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-surface-2 border border-border-subtle text-foreground shadow-2xs">
-                  <ShieldCheck className="size-4.5" />
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded bg-surface-2 border border-border-subtle">
-                  OAuth Vault
-                </span>
-              </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-foreground tracking-tight">
-                  1-Click Secure Auth
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  Connect personal or team accounts through Composio OAuth. Tokens are encrypted and refreshed automatically without manual credential management.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between p-2 rounded-lg bg-surface-2/60 border border-border-subtle text-xs">
-                <span className="font-medium text-foreground">Google Workspace</span>
-                <span className="text-emerald-500 text-[10px] font-mono">Connected</span>
-              </div>
-              <div className="flex items-center justify-between p-2 rounded-lg bg-surface-2/60 border border-border-subtle text-xs">
-                <span className="font-medium text-foreground">GitHub Enterprise</span>
-                <span className="text-emerald-500 text-[10px] font-mono">Connected</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Card 4: Observability & Telemetry (8 cols) */}
-          <div className="col-span-12 md:col-span-8 rounded-2xl border border-border-subtle bg-surface-1 p-6 space-y-5 shadow-xs hover:border-foreground/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="flex size-9 items-center justify-center rounded-xl bg-surface-2 border border-border-subtle text-foreground shadow-2xs">
-                  <Activity className="size-4.5" />
-                </span>
-                <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground px-2 py-0.5 rounded bg-surface-2 border border-border-subtle">
-                  Observability
-                </span>
-              </div>
-
-              <div>
-                <h3 className="text-base font-semibold text-foreground tracking-tight">
-                  Real-Time Audit Logs & Telemetry
-                </h3>
-                <p className="text-xs text-muted-foreground leading-relaxed mt-1">
-                  Inspect every thought, tool call, API latency, and failure diagnostic with monospace precision. No black boxes.
-                </p>
-              </div>
-            </div>
-
-            {/* Live Logs Stream */}
-            <div className="space-y-1.5 font-mono text-[11px] tabular-nums">
-              <div className="p-2 rounded-lg bg-surface-2/70 border border-border-subtle flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3 text-emerald-500" />
-                  <span className="text-foreground font-semibold">Run #662540</span>
-                  <span className="text-muted-foreground text-[10px]">Gmail • 12 unread categorized</span>
-                </div>
-                <span className="text-muted-foreground text-[10px]">2,104ms</span>
-              </div>
-
-              <div className="p-2 rounded-lg bg-surface-2/70 border border-border-subtle flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="size-3 text-emerald-500" />
-                  <span className="text-foreground font-semibold">Run #662539</span>
-                  <span className="text-muted-foreground text-[10px]">Slack • Alert sent to #engineering</span>
-                </div>
-                <span className="text-muted-foreground text-[10px]">892ms</span>
+              <div className="flex items-center justify-between py-1">
+                <span className="text-neutral-800">Whisper Voice Transcription</span>
+                <span className="text-neutral-400 text-[11px]">$0.006 / min</span>
               </div>
             </div>
           </div>

@@ -3,16 +3,25 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { ArrowRight, Bot, Sparkles, Terminal, Shield, Zap, Globe, Cpu, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { HeroStageshowDemo } from "./hero-stageshow-demo";
+import { ArrowRight, ShieldCheck, Terminal, Bot, Sparkles, CheckCircle2 } from "lucide-react";
 
 const ROTATING_TARGETS = [
-  "1,700+ SaaS apps",
-  "cloud browser tasks",
-  "daily email routines",
-  "GitHub PR reviews",
-  "scheduled research",
+  "a sandbox",
+  "1,700+ tools",
+  "a browser VM",
+  "proven skills",
+  "your accounts",
+];
+
+const TRUSTED_LOGOS = [
+  { name: "Anthropic Claude", label: "CLAUDE" },
+  { name: "OpenAI", label: "OPENAI" },
+  { name: "Google Gemini", label: "GEMINI 2.5" },
+  { name: "Vercel", label: "VERCEL" },
+  { name: "Inngest", label: "INNGEST" },
+  { name: "Supabase", label: "SUPABASE" },
+  { name: "Groq", label: "GROQ" },
+  { name: "Mistral AI", label: "MISTRAL" },
 ];
 
 export function HeroSection() {
@@ -26,96 +35,154 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative pt-16 pb-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-surface-0">
-      {/* Background Micro Glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+    <section className="relative min-h-[92vh] flex flex-col items-center justify-between overflow-hidden bg-[#070709] text-white pt-32 pb-12 sm:pt-40 sm:pb-16">
+      {/* Ambient Grid Background */}
+      <div 
+        className="pointer-events-none absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `
+            linear-gradient(to right, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.07) 1px, transparent 1px)
+          `,
+          backgroundSize: "40px 40px",
+          maskImage: "radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse at 50% 40%, black 20%, transparent 75%)",
+        }}
+      />
 
-      <div className="max-w-6xl mx-auto space-y-12">
-        {/* Eyebrow, Title & CTAs */}
-        <div className="text-center space-y-6 max-w-4xl mx-auto">
-          {/* Eyebrow Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-surface-2 border border-border-subtle shadow-2xs">
-            <span className="flex size-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-muted-foreground">Autonomous Multi-Tool Agent Platform</span>
-            <span className="text-muted-foreground/40">•</span>
-            <span className="text-foreground font-medium">Gemini 2.5 Flash</span>
-          </div>
+      {/* Subtle Radial Glow */}
+      <div className="pointer-events-none absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 size-[600px] rounded-full bg-emerald-500/10 blur-[130px]" />
+      <div className="pointer-events-none absolute top-1/3 left-1/3 size-[400px] rounded-full bg-blue-500/8 blur-[120px]" />
 
-          {/* Main Display Headline with Dynamic Slot */}
-          <h1 className="text-4xl sm:text-6xl font-semibold tracking-[-0.03em] text-foreground leading-[1.1]">
-            Give your AI the power to execute{" "}
-            <span className="relative inline-block text-foreground border-b-2 border-primary/40 pb-0.5">
+      {/* Hero Content */}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center my-auto">
+        {/* Release Pill Badge */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 backdrop-blur-md"
+        >
+          <span className="size-2 rounded-full bg-[#00D26A] animate-pulse" />
+          <span className="font-mono text-xs uppercase tracking-wider text-neutral-300">
+            Meow Bot 2.0 • Autonomous Agents & Inngest Scheduler
+          </span>
+          <ArrowRight className="size-3 text-neutral-400" />
+        </motion.div>
+
+        {/* Composio Clone Exact Headline Structure */}
+        <motion.h1
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
+          className="text-balance text-center text-white leading-[1.08] text-4xl sm:text-6xl md:text-7xl font-sans font-medium tracking-tight"
+        >
+          <span className="block">Give your AI secure access</span>
+          <span className="flex flex-wrap items-baseline justify-center gap-x-[0.28em] gap-y-[0.14em] mt-2 sm:mt-3">
+            <span className="text-white/60 font-normal">to</span>
+            <span className="relative inline-flex items-center justify-center min-w-[220px] sm:min-w-[320px] overflow-hidden py-1 px-3 sm:px-4 rounded-xl border border-white/20 bg-white/10 backdrop-blur-md">
               <AnimatePresence mode="wait">
                 <motion.span
                   key={ROTATING_TARGETS[index]}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -12 }}
-                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                  className="inline-block"
+                  initial={{ y: 24, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -24, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  className="font-mono text-white text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight whitespace-nowrap"
                 >
                   {ROTATING_TARGETS[index]}
                 </motion.span>
               </AnimatePresence>
-            </span>{" "}
-            in minutes.
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Stop settling for chatbots that stop halfway. Meow Bot deploys autonomous AI agents connected to real SaaS tools, cloud browser desktops, and durable background schedulers that finish what you ask.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-            <Link href="/workspace">
-              <Button
-                size="lg"
-                className="h-11 px-6 text-sm gap-2 bg-primary text-primary-foreground hover:bg-primary/90 font-medium shadow-sm transition-all active:scale-[0.98]"
-              >
-                <span>Launch Free Workspace</span>
-                <ArrowRight className="size-4" />
-              </Button>
-            </Link>
-
-            <a href="#integrations">
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-11 px-6 text-sm gap-2 border-border-subtle bg-surface-1 hover:bg-surface-2 text-foreground font-medium shadow-2xs transition-all active:scale-[0.98]"
-              >
-                <span>Explore 1,700+ Tools</span>
-                <span className="font-mono text-xs text-muted-foreground">↓</span>
-              </Button>
-            </a>
-          </div>
-
-          {/* Stack Capability Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs font-mono text-muted-foreground">
-            <span className="flex items-center gap-1.5">
-              <Cpu className="size-3.5 text-foreground" />
-              <span>Gemini 2.5 Flash</span>
             </span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="flex items-center gap-1.5">
-              <Zap className="size-3.5 text-amber-500" />
-              <span>Composio 1,700+ Native Tools</span>
+            <span className="inline-block bg-[#00D26A] text-black font-mono font-bold text-2xl sm:text-4xl md:text-5xl px-3 py-1 rounded-lg leading-none shadow-sm">
+              in minutes
             </span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="flex items-center gap-1.5">
-              <Clock className="size-3.5 text-emerald-500" />
-              <span>Inngest Durable Cron</span>
-            </span>
-            <span className="text-muted-foreground/30">•</span>
-            <span className="flex items-center gap-1.5">
-              <Globe className="size-3.5 text-sky-500" />
-              <span>Browserbase Cloud VM</span>
-            </span>
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
+          className="mt-6 sm:mt-8 max-w-2xl text-pretty text-neutral-400 text-sm sm:text-base md:text-lg leading-relaxed font-sans"
+        >
+          Put Claude, Gemini, or custom LLMs to work across your email, APIs, browser, and cloud desktop.
+          Zero auth leaks, human permission gates, and durable background routine execution.
+        </motion.p>
+
+        {/* Dual CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3, ease: "easeOut" }}
+          className="mt-8 sm:mt-10 flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto"
+        >
+          <Link href="/workspace" className="w-full sm:w-auto">
+            <button
+              type="button"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white px-6 py-3.5 font-mono text-sm font-semibold uppercase tracking-wider text-black transition-all hover:bg-neutral-200 active:scale-[0.98] shadow-lg"
+            >
+              <span>GET STARTED FOR FREE</span>
+              <ArrowRight className="size-4" />
+            </button>
+          </Link>
+
+          <Link href="#use-cases" className="w-full sm:w-auto">
+            <button
+              type="button"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 bg-transparent px-6 py-3.5 font-mono text-sm text-neutral-300 uppercase tracking-wider transition-all hover:bg-white/10 hover:text-white"
+            >
+              <span>EXPLORE ARCHITECTURE</span>
+            </button>
+          </Link>
+        </motion.div>
+
+        {/* Quick Highlights Checkpoints */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-8 flex flex-wrap items-center justify-center gap-5 sm:gap-8 font-mono text-xs text-neutral-400"
+        >
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="size-3.5 text-[#00D26A]" />
+            100,000 Free Tool Calls
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="size-3.5 text-[#00D26A]" />
+            SOC 2 Type II Encrypted
+          </span>
+          <span className="flex items-center gap-1.5">
+            <CheckCircle2 className="size-3.5 text-[#00D26A]" />
+            No API Keys Needed
+          </span>
+        </motion.div>
+      </div>
+
+      {/* Trusted By Logo Loop Marquee */}
+      <div className="relative z-10 w-full mt-12 sm:mt-16 pt-8 border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col items-center">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-neutral-500 mb-5">
+            TRUSTED BY DEVELOPERS & INTEGRATED WITH
+          </span>
+          
+          <div className="w-full overflow-hidden mask-fade-x">
+            <div className="flex items-center gap-10 sm:gap-16 animate-marquee whitespace-nowrap py-1">
+              {[...TRUSTED_LOGOS, ...TRUSTED_LOGOS].map((logo, idx) => (
+                <div
+                  key={`${logo.name}-${idx}`}
+                  className="flex items-center gap-2 text-neutral-400 hover:text-white transition-colors cursor-pointer group"
+                >
+                  <span className="font-mono text-xs font-semibold tracking-wider text-neutral-400 group-hover:text-white transition-colors">
+                    {logo.label}
+                  </span>
+                  <span className="text-[10px] text-neutral-600 font-mono">↗</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-
-        {/* Hero Interactive Stageshow Window */}
-        <HeroStageshowDemo />
       </div>
     </section>
   );
