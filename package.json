@@ -22,7 +22,6 @@
     "@daytona/sdk": "^0.232.0",
     "@e2b/desktop": "^2.5.0",
     "@langchain/core": "^1.4.1",
-    "@rive-app/react-canvas": "^4.39.0",
     "ai": "^7.0.173",
     "axios": "^1.21.1",
     "class-variance-authority": "^0.7.1",

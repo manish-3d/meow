@@ -2,7 +2,6 @@
 
 import React from "react";
 import Link from "next/link";
-import dynamic from "next/dynamic";
 import { motion } from "motion/react";
 import { 
   ArrowRight, 
@@ -12,18 +11,7 @@ import {
   Globe
 } from "lucide-react";
 import { HeroAppSimulator } from "./hero-app-simulator";
-
-const RiveCharacterFollow = dynamic(
-  () => import("./rive-character-follow").then((mod) => mod.RiveCharacterFollow),
-  {
-    ssr: false,
-    loading: () => (
-      <span className="inline-flex size-20 sm:size-24 items-center justify-center align-middle">
-        <span className="size-16 rounded-full bg-purple-100/60 animate-pulse" />
-      </span>
-    ),
-  }
-);
+import { CharacterFaceFollow } from "./character-face-follow";
 
 export function HeroSection() {
   return (
@@ -47,7 +35,7 @@ export function HeroSection() {
           <span className="text-emerald-700 font-medium">zero install needed</span>
         </motion.div>
 
-        {/* H1 Headline with Interactive Cursor-Tracking Rive Character Mascot in the Center! */}
+        {/* H1 Headline with Interactive Cursor-Tracking Man Face in the Center! */}
         <motion.h1
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -55,7 +43,7 @@ export function HeroSection() {
           className="text-center font-sans tracking-tight text-neutral-900 font-normal text-5xl sm:text-7xl lg:text-[96px] leading-[0.98] flex items-center justify-center flex-wrap gap-x-2 sm:gap-x-4 select-none"
         >
           <span className="tracking-tighter">meet</span>
-          <RiveCharacterFollow size={96} />
+          <CharacterFaceFollow size={96} />
           <span className="tracking-tighter font-medium">meow bot</span>
         </motion.h1>
 
