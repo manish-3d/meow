@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
 import { useAgentConfig } from "@/context/agent-config-context";
+import { TimezoneContinentSelect } from "./timezone-select";
 import axios from "axios";
 
 interface RoutineItem {
@@ -828,36 +829,27 @@ export function ScheduleTab() {
                 </div>
               </div>
 
-              {/* Time & Timezone Inputs */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-semibold text-foreground block mb-1">
-                    Scheduled Time
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formScheduledTime}
-                    onChange={(e) => setFormScheduledTime(e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="e.g. 09:00 PM IST or 08:00 AM UTC"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-semibold text-foreground block mb-1">
-                    Timezone
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formTimezone}
-                    onChange={(e) => setFormTimezone(e.target.value)}
-                    className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
-                    placeholder="e.g. Asia/Calcutta, UTC"
-                  />
-                </div>
+              {/* Scheduled Time */}
+              <div>
+                <label className="text-[11px] font-semibold text-foreground block mb-1">
+                  Scheduled Time
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formScheduledTime}
+                  onChange={(e) => setFormScheduledTime(e.target.value)}
+                  className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary"
+                  placeholder="e.g. 09:00 PM or 08:00 AM"
+                />
               </div>
+
+              {/* Timezone: Continent & Region Selector */}
+              <TimezoneContinentSelect
+                value={formTimezone}
+                onChange={setFormTimezone}
+                label="Continent & Region Timezone"
+              />
 
               {/* Action Buttons */}
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-border/50">

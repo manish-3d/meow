@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RoutineSchemaType } from "@/lib/ai/agent_response_schema";
+import { TimezoneContinentSelect } from "./timezone-select";
 import axios from "axios";
 
 interface RoutineCardProps {
@@ -37,7 +38,7 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
 
   // Customization state
   const [isCustomizing, setIsCustomizing] = useState(false);
-  
+
   // Auto-detect if user prompt implied one-time (e.g. "in 9 pm today" or "once")
   const defaultIsOnce =
     routine.frequency === "once" ||
@@ -245,8 +246,8 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
             {runType === "once" || maxRuns === 1
               ? "⚡ 1 Time Only"
               : maxRuns
-              ? `🔁 ${maxRuns} Times`
-              : "♾️ Ongoing"}
+                ? `🔁 ${maxRuns} Times`
+                : "♾️ Ongoing"}
           </Badge>
         </div>
       )}
@@ -301,11 +302,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                   setFrequency("once");
                   setMaxRuns(1);
                 }}
-                className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${
-                  runType === "once"
-                    ? "bg-primary/10 border-primary text-primary font-semibold"
-                    : "bg-background border-border text-muted-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${runType === "once"
+                  ? "bg-primary/10 border-primary text-primary font-semibold"
+                  : "bg-background border-border text-muted-foreground hover:bg-muted"
+                  }`}
               >
                 <Zap className="size-3.5" />
                 <span>Run Once (One-Time)</span>
@@ -318,11 +318,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                   setFrequency("daily");
                   setMaxRuns(null);
                 }}
-                className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${
-                  runType === "recurring"
-                    ? "bg-primary/10 border-primary text-primary font-semibold"
-                    : "bg-background border-border text-muted-foreground hover:bg-muted"
-                }`}
+                className={`flex items-center justify-center gap-1.5 p-2 rounded-md border text-xs font-medium transition-all ${runType === "recurring"
+                  ? "bg-primary/10 border-primary text-primary font-semibold"
+                  : "bg-background border-border text-muted-foreground hover:bg-muted"
+                  }`}
               >
                 <Repeat className="size-3.5" />
                 <span>Recurring Automation</span>
@@ -347,11 +346,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                     key={item.id}
                     type="button"
                     onClick={() => setFrequency(item.id)}
-                    className={`py-1 text-[11px] rounded border font-medium text-center transition-all ${
-                      frequency === item.id
-                        ? "bg-primary text-primary-foreground border-primary"
-                        : "bg-background border-border text-muted-foreground hover:bg-muted"
-                    }`}
+                    className={`py-1 text-[11px] rounded border font-medium text-center transition-all ${frequency === item.id
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-background border-border text-muted-foreground hover:bg-muted"
+                      }`}
                   >
                     {item.label}
                   </button>
@@ -372,11 +370,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                           key={day.value}
                           type="button"
                           onClick={() => toggleDay(day.value)}
-                          className={`size-7 text-[10px] font-semibold rounded-md border transition-all ${
-                            isSel
-                              ? "bg-primary text-primary-foreground border-primary"
-                              : "bg-background border-border text-muted-foreground hover:bg-muted"
-                          }`}
+                          className={`size-7 text-[10px] font-semibold rounded-md border transition-all ${isSel
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-background border-border text-muted-foreground hover:bg-muted"
+                            }`}
                         >
                           {day.label}
                         </button>
@@ -409,11 +406,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                     if (opt.val === 1) setRunType("once");
                     else setRunType("recurring");
                   }}
-                  className={`px-2.5 py-1 text-[11px] rounded-md border font-medium transition-all ${
-                    maxRuns === opt.val
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-background border-border text-muted-foreground hover:bg-muted"
-                  }`}
+                  className={`px-2.5 py-1 text-[11px] rounded-md border font-medium transition-all ${maxRuns === opt.val
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background border-border text-muted-foreground hover:bg-muted"
+                    }`}
                 >
                   {opt.label}
                 </button>
@@ -421,36 +417,26 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
             </div>
           </div>
 
-          {/* Time & Timezone Inputs */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-            <div>
-              <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block mb-1">
-                Execution Time
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={scheduledTime}
-                  onChange={(e) => setScheduledTime(e.target.value)}
-                  className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-mono"
-                  placeholder="e.g. 09:00 PM IST or 08:00 AM UTC"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block mb-1">
-                Timezone
-              </label>
-              <input
-                type="text"
-                value={timezone}
-                onChange={(e) => setTimezone(e.target.value)}
-                className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-mono"
-                placeholder="e.g. Asia/Calcutta, UTC, America/New_York"
-              />
-            </div>
+          {/* Execution Time */}
+          <div>
+            <label className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider block mb-1">
+              Execution Time
+            </label>
+            <input
+              type="text"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              className="w-full text-xs px-2.5 py-1.5 rounded-md border border-border bg-background focus:outline-none focus:ring-1 focus:ring-primary text-foreground font-mono"
+              placeholder="e.g. 09:00 PM or 08:00 AM"
+            />
           </div>
+
+          {/* Continent & Region Timezone Selector */}
+          <TimezoneContinentSelect
+            value={timezone}
+            onChange={setTimezone}
+            label="Continent & Timezone"
+          />
         </div>
       )}
 
@@ -464,11 +450,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
             {toolStatuses.map((t) => (
               <div
                 key={t.slug}
-                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] border transition-colors ${
-                  t.isConnected
-                    ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
-                    : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
-                }`}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] border transition-colors ${t.isConnected
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30"
+                  : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/30"
+                  }`}
               >
                 {t.isConnected ? (
                   <CheckCircle2 className="size-3 shrink-0" />
@@ -507,10 +492,10 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
           {created
             ? "Saved to scheduled routines"
             : !allToolsConnected
-            ? "Note: Connect missing tools before running."
-            : runType === "once"
-            ? "Executes once at specified time via Inngest"
-            : "Executes in background via Inngest scheduler"}
+              ? "Note: Connect missing tools before running."
+              : runType === "once"
+                ? "Executes once at specified time via Inngest"
+                : "Executes in background via Inngest scheduler"}
         </span>
 
         {created ? (
