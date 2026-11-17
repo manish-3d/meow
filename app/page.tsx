@@ -1,7 +1,7 @@
 import React from "react";
 import { LandingNavbar } from "@/components/custom/landing/landing-navbar";
 import { HeroSection } from "@/components/custom/landing/hero-section";
-import { BotCrewGrid } from "@/components/custom/landing/bot-crew-grid";
+import { MinecraftBotsSection } from "@/components/custom/landing/minecraft-bots-section";
 import { ComputerShowcase } from "@/components/custom/landing/computer-showcase";
 import { MultiKeySection } from "@/components/custom/landing/multi-key-section";
 import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
@@ -18,11 +18,11 @@ export default function Home() {
       <LandingNavbar />
 
       <main>
-        {/* 2. Hero with Cursor-Following Pixel Cat Mascot in Title & Live Desktop App Simulator */}
+        {/* 2. Hero Section (Reference Image 2 Restructure: meet [Character with Laptop] meow bot, 4-provider pill, dual CTAs) */}
         <HeroSection />
 
-        {/* 3. Give each bot a job (6 Specialized Roles Grid) */}
-        <BotCrewGrid />
+        {/* 3. Different Bots. Different Superpowers. (Procedural 3D Minecraft Voxel Bots Section) */}
+        <MinecraftBotsSection />
 
         {/* 4. Each bot gets its own computer (Live Cloud VM & Interactive Takeover) */}
         <ComputerShowcase />

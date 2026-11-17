@@ -10,7 +10,7 @@ export function ComputerShowcase() {
   const [activeTab, setActiveTab] = useState("kayak");
 
   return (
-    <section className="py-24 sm:py-32 bg-white text-[#131316]">
+    <section id="computer-showcase" className="py-24 sm:py-32 bg-white text-[#131316]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl mb-14 sm:mb-18">
