@@ -4,14 +4,20 @@ import { db } from "@/db";
 import { agentConfig } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 
-const browserbaseApiKey = process.env.BROWSERBASE_API_KEY || "";
-const browserbaseProjectId = process.env.BROWSERBASE_PROJECT_ID || "";
+function getBrowserbaseApiKey(): string {
+  return process.env.BROWSERBASE_API_KEY || "";
+}
+
+function getBrowserbaseProjectId(): string {
+  return process.env.BROWSERBASE_PROJECT_ID || "";
+}
 
 /**
  * Checks whether Browserbase Cloud is configured
  */
 export function isBrowserbaseConfigured(): boolean {
-  return !!browserbaseApiKey && browserbaseApiKey.trim().length > 0;
+  const key = getBrowserbaseApiKey();
+  return !!key && key.trim().length > 0;
 }
 
 export interface BrowserSessionState {
@@ -100,9 +106,10 @@ export async function getOrCreateBrowserSession(
   // 1. Check if Browserbase cloud credentials exist
   if (isBrowserbaseConfigured()) {
     try {
-      const bb = new Browserbase({ apiKey: browserbaseApiKey });
+      const bb = new Browserbase({ apiKey: getBrowserbaseApiKey() });
+      const projectId = getBrowserbaseProjectId();
       const session = await bb.sessions.create({
-        projectId: browserbaseProjectId || undefined,
+        projectId: projectId || undefined,
       });
 
       const browser = await chromium.connectOverCDP(session.connectUrl);
