@@ -41,6 +41,7 @@ async function testChapter19() {
     { key: 'BROWSERBASE_API_KEY', critical: false },
     { key: 'BROWSERBASE_PROJECT_ID', critical: false },
     { key: 'INNGEST_EVENT_KEY', critical: false },
+    { key: 'INNGEST_SIGNING_KEY', critical: false },
   ];
 
   for (const { key, critical } of requiredKeys) {
