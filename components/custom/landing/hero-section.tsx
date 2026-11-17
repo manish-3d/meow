@@ -40,10 +40,10 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-center font-sans tracking-tight text-neutral-900 font-normal text-5xl sm:text-7xl lg:text-[96px] leading-[0.98] flex items-center justify-center flex-wrap gap-x-3 sm:gap-x-6 select-none"
+          className="text-center font-sans tracking-tight text-neutral-900 font-normal text-5xl sm:text-7xl lg:text-[96px] leading-[0.98] flex items-center justify-center flex-wrap gap-x-2.5 sm:gap-x-4 select-none"
         >
           <span className="tracking-tighter">meet</span>
-          <CharacterFaceFollow className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 mx-1" />
+          <CharacterFaceFollow className="w-16 h-[95px] sm:w-20 sm:h-[120px] lg:w-24 lg:h-[144px] shrink-0" />
           <span className="tracking-tighter font-medium">meow bot</span>
         </motion.h1>
 
