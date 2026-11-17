@@ -1,52 +1,52 @@
 import React from "react";
 import { LandingNavbar } from "@/components/custom/landing/landing-navbar";
 import { HeroSection } from "@/components/custom/landing/hero-section";
-import { InteractiveSimulator } from "@/components/custom/landing/interactive-simulator";
-import { IntegrationsGrid } from "@/components/custom/landing/integrations-grid";
-import { BentoFeatures } from "@/components/custom/landing/bento-features";
-import { TeamGovernance } from "@/components/custom/landing/team-governance";
-import { SecurityMatrix } from "@/components/custom/landing/security-matrix";
-import { FrameworksSection } from "@/components/custom/landing/frameworks-section";
-import { FaqSection } from "@/components/custom/landing/faq-section";
-import { FinalCtaBanner } from "@/components/custom/landing/final-cta";
+import { BotCrewGrid } from "@/components/custom/landing/bot-crew-grid";
+import { ComputerShowcase } from "@/components/custom/landing/computer-showcase";
+import { MultiKeySection } from "@/components/custom/landing/multi-key-section";
+import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
+import { HostingSection } from "@/components/custom/landing/hosting-section";
+import { PricingSection } from "@/components/custom/landing/pricing-section";
+import { OnboardingSteps } from "@/components/custom/landing/onboarding-steps";
+import { LandingFaq } from "@/components/custom/landing/landing-faq";
 import { LandingFooter } from "@/components/custom/landing/landing-footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#F6F6F6] text-[#0F0F0F] selection:bg-[#00D26A] selection:text-black">
-      {/* Floating Pill Capsule Navigation */}
+    <div className="min-h-screen bg-white text-[#131316] selection:bg-[#7C5CFC] selection:text-white">
+      {/* 1. Header Navigation */}
       <LandingNavbar />
 
       <main>
-        {/* Dark Hero Section with Rotating Slot Keyword & Logo Marquee */}
+        {/* 2. Hero with Cursor-Following Pixel Cat Mascot in Title & Live Desktop App Simulator */}
         <HeroSection />
 
-        {/* #use-cases: Make your AI finish what you ask (3-column Interactive Simulator) */}
-        <InteractiveSimulator />
+        {/* 3. Give each bot a job (6 Specialized Roles Grid) */}
+        <BotCrewGrid />
 
-        {/* #agents: Works with any AI (8-card Grid with one-click copy & install) */}
-        <IntegrationsGrid />
+        {/* 4. Each bot gets its own computer (Live Cloud VM & Interactive Takeover) */}
+        <ComputerShowcase />
 
-        {/* #harder-jobs: Don’t settle for AI that stops halfway (3 Bento Cards) */}
-        <BentoFeatures />
+        {/* 5. Bring your own keys (BYOK Multi-Model: Gemini, Claude, OpenAI, DeepSeek, Ollama) */}
+        <MultiKeySection />
 
-        {/* #teams: One setup for your whole team (Shared Accounts, Skills, Budget) */}
-        <TeamGovernance />
+        {/* 6. Plugs into 60+ existing apps (Gmail, Slack, Calendar, Spotify, WhatsApp, GitHub) */}
+        <IntegrationsStrip />
 
-        {/* #trust: Secure access, always in your control (OAuth scopes & Policy Guardrails) */}
-        <SecurityMatrix />
+        {/* 7. Where your bots live (Your computer vs. Meow Cloud 24/7) */}
+        <HostingSection />
 
-        {/* #build & #frameworks: Build it into your agent (Framework Tabs & Quickstart Code) */}
-        <FrameworksSection />
+        {/* 8. Pricing with the Sleeping Pixel Cat Mascot ($0 Free, Plus, Pro) */}
+        <PricingSection />
 
-        {/* #faq: Frequently Asked Questions (Expandable Accordion) */}
-        <FaqSection />
+        {/* 9. Ready in under two minutes (4-Step Frictionless Onboarding) */}
+        <OnboardingSteps />
 
-        {/* #start: Give your AI what it needs to finish the job (Final CTA Banner) */}
-        <FinalCtaBanner />
+        {/* 10. Plainspoken FAQ */}
+        <LandingFaq />
       </main>
 
-      {/* Footer with Newsletter Subscription & Directory Links */}
+      {/* 11. Minimal Lovable Footer */}
       <LandingFooter />
     </div>
   );
