@@ -5,5 +5,8 @@ export type AgentConfigType = {
   description?: string | null;
   agentImage?: string | null;
   userEmail: string;
+  e2bSandboxId?: string | null;
+  vmStatus?: "active" | "paused" | "inactive";
+  vmLastActive?: string | Date | null;
   createdAt?: string | Date;
 };

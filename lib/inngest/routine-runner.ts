@@ -1,9 +1,11 @@
 import { db } from "@/db";
 import { routines, executionLogs, agentConfig, agentChatHistory } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { generateText, isStepCount } from "ai";
+import { generateText, isStepCount, tool } from "ai";
+import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
+import { runAgentBrowserTask, isE2BConfigured } from "@/lib/e2b/client";
 
 export async function runAgentRoutineLogic({
   routineId,
@@ -92,10 +94,39 @@ export async function runAgentRoutineLogic({
     console.warn("Could not load dynamic tools in routine runner:", err?.message);
   }
 
+    // Register Cloud VM Desktop Browser tool
+    try {
+      dynamicTools["cloud_browser"] = tool({
+        description:
+          "Autonomous Cloud VM Desktop Browser tool. Use this tool to browse the live web, navigate to a URL, read online documentation, articles, or scrape dynamic web content.",
+        inputSchema: z.object({
+          url: z.string().describe("The full web URL to navigate to"),
+          objective: z
+            .string()
+            .optional()
+            .describe("What information to extract or analyze from the webpage"),
+        }),
+        execute: async ({ url, objective }: { url: string; objective?: string }) => {
+          if (!isE2BConfigured()) {
+            return {
+              status: "simulated",
+              message:
+                "Cloud VM Desktop is ready. E2B_API_KEY is not configured in .env, so live VM execution is simulated.",
+              url,
+              objective,
+            };
+          }
+          return await runAgentBrowserTask(agentId, userEmail, url, objective);
+        },
+      });
+    } catch (e2bErr) {
+      console.warn("Could not register Cloud VM browser tool in routine runner:", e2bErr);
+    }
+
   const toolSummary =
     connectedToolsList.length > 0
-      ? `Active authenticated tools available: ${connectedToolsList.join(", ")}.`
-      : "No active external tools connected.";
+      ? `Active authenticated tools available: ${connectedToolsList.join(", ")}. In addition, you have the Cloud VM Desktop browser tool ("cloud_browser").`
+      : "No active external OAuth tools connected, but Cloud VM Desktop browser tool ('cloud_browser') is available.";
 
   const systemPrompt = `You are "${agent.name}", an autonomous AI agent executing a scheduled background routine on the Meow Bot SaaS platform.
 

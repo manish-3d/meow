@@ -4,9 +4,11 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/db";
 import { agentConfig, tools, agentChatHistory } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
-import { streamText, isStepCount } from "ai";
+import { streamText, isStepCount, tool } from "ai";
+import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
+import { runAgentBrowserTask, isE2BConfigured } from "@/lib/e2b/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -126,11 +128,46 @@ export async function POST(req: NextRequest) {
       console.warn("Could not load dynamic Composio tools for chat:", toolErr);
     }
 
+    // 4b. Register Cloud VM Desktop Browser tool
+    try {
+      dynamicTools["cloud_browser"] = tool({
+        description:
+          "Autonomous Cloud VM Desktop Browser tool. Use this tool when the user asks to browse the web, open a website, check live web pages (e.g. Google News, GitHub trending, blogs, documentation), or scrape/inspect external websites.",
+        inputSchema: z.object({
+          url: z
+            .string()
+            .describe(
+              "The full HTTP or HTTPS URL to navigate to (e.g. 'https://news.google.com')"
+            ),
+          objective: z
+            .string()
+            .optional()
+            .describe(
+              "The specific goal or information to extract from the webpage"
+            ),
+        }),
+        execute: async ({ url, objective }: { url: string; objective?: string }) => {
+          if (!isE2BConfigured()) {
+            return {
+              status: "simulated",
+              message:
+                "Cloud VM Desktop is ready. E2B_API_KEY is not yet configured in .env, so live remote desktop execution is simulated. Add E2B_API_KEY to enable live VM browsing.",
+              url,
+              objective,
+            };
+          }
+          return await runAgentBrowserTask(agentId, userEmail, url, objective);
+        },
+      });
+    } catch (e2bErr) {
+      console.warn("Could not register Cloud VM browser tool:", e2bErr);
+    }
+
     // 5. Formulate system persona and protocol
     const toolSummary =
       connectedToolkitNames.length > 0
-        ? `You have ACTIVE live authenticated tools connected for: ${connectedToolkitNames.join(", ")}. Use them autonomously to fulfill user requests!`
-        : "You have no connected external tools yet. If the user asks you to interact with Gmail, Slack, or GitHub, advise them to connect that tool in the Tools tab on the right.";
+        ? `You have ACTIVE live authenticated tools connected for: ${connectedToolkitNames.join(", ")}. In addition, you have an integrated Cloud VM Desktop browser tool ("cloud_browser"). Use them autonomously to fulfill user requests!`
+        : "You have no external OAuth tools connected yet, but you DO have the Cloud VM Desktop browser tool ('cloud_browser') to browse live websites. If the user asks you to interact with Gmail, Slack, or GitHub, advise them to connect that tool in the Tools tab on the right.";
 
     const availableToolsDescription = availableToolsList
       .map((t) => `- ${t.name} (slug: "${t.slug}"): ${t.description || ""}`)
