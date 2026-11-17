@@ -88,6 +88,7 @@ export function AgentConfigProvider({
         name: targetAgent.name,
         description: targetAgent.description || "",
         agentImage: targetAgent.agentImage || "",
+        isActive: targetAgent.isActive,
       });
 
       if (res.data?.agent) {

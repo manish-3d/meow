@@ -47,7 +47,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           </div>
 
           <div className="flex flex-col min-w-0">
-            <span className="text-sm font-bold truncate text-foreground">{name}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm font-bold truncate text-foreground">{name}</span>
+              {currentAgent?.isActive === false && (
+                <span className="text-[9px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 px-1.5 py-0.2 rounded shrink-0">
+                  Paused
+                </span>
+              )}
+            </div>
             <span className="text-[11px] text-muted-foreground truncate">Configuration Hub</span>
           </div>
         </div>

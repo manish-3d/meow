@@ -44,6 +44,17 @@ export async function POST(req: NextRequest) {
 
     const currentAgent = foundAgents[0];
 
+    // Check if agent is paused (Chapter 18)
+    if (currentAgent.isActive === false) {
+      return NextResponse.json(
+        {
+          error:
+            "This agent is currently paused. Please activate the agent in the Settings tab to resume conversations.",
+        },
+        { status: 403 }
+      );
+    }
+
     // 2. Fetch available tools catalog from DB
     let availableToolsList: Array<{ name: string; slug: string; description: string | null }> = [];
     try {

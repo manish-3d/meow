@@ -29,6 +29,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     name: "Meow Agent",
     agentImage: "https://api.dicebear.com/7.x/bottts/svg?seed=fallback",
     description: "",
+    isActive: true,
   };
 
   const [input, setInput] = useState("");
@@ -310,13 +311,23 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
 
       {/* Bottom Area: Prompt Chips + Input Area */}
       <div className="p-4 border-t border-border/50 bg-background/80 backdrop-blur space-y-3 shrink-0">
+        {/* Paused Agent Notice */}
+        {agent.isActive === false && (
+          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
+            <span className="font-semibold">Agent Paused:</span>
+            <span className="text-muted-foreground text-[11px]">
+              This agent is paused. Automated routines and conversations are suspended. Activate it in the Settings tab to resume.
+            </span>
+          </div>
+        )}
+
         {/* Suggestion Chips */}
         <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
           {quickPromptChips.map((chip, idx) => (
             <button
               key={idx}
               type="button"
-              disabled={isStreaming}
+              disabled={isStreaming || agent.isActive === false}
               onClick={() => handleChipClick(chip)}
               className="text-[11px] bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-full border border-border/50 whitespace-nowrap transition-colors shrink-0 disabled:opacity-50 disabled:pointer-events-none"
             >
@@ -331,17 +342,21 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={isStreaming}
-            placeholder={`Message ${agent.name}... (Press Enter to send, Shift+Enter for new line)`}
+            disabled={isStreaming || agent.isActive === false}
+            placeholder={
+              agent.isActive === false
+                ? "Agent is paused. Activate in Settings to message..."
+                : `Message ${agent.name}... (Press Enter to send, Shift+Enter for new line)`
+            }
             rows={2}
-            className="w-full resize-none bg-transparent border-0 focus-visible:ring-0 text-xs p-3 pr-12 leading-relaxed"
+            className="w-full resize-none bg-transparent border-0 focus-visible:ring-0 text-xs p-3 pr-12 leading-relaxed disabled:opacity-60"
           />
 
           <Button
             type="button"
             size="icon"
             onClick={() => handleSend()}
-            disabled={!input.trim() || isStreaming || propLoading}
+            disabled={!input.trim() || isStreaming || propLoading || agent.isActive === false}
             className="absolute bottom-2 right-2 size-7 rounded-lg"
           >
             {isStreaming ? (

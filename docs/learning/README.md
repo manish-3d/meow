@@ -76,5 +76,5 @@ flowchart TD
 | **Ch. 15** | [Durable Background Execution](chapters/chapter-15/README.md) | Inngest Cron, Step Execution, Payload Trimming, Execution Logs | Documented |
 | **Ch. 16** | [Chat Persistence & History](chapters/chapter-16/README.md) | PostgreSQL Chat Threads, Message Restoration, Routine Inbox | Documented |
 | **Ch. 17** | [VM Desktop Sandbox](chapters/chapter-17/README.md) | E2B Cloud Desktop, Live Browser Automation, VNC Viewport | Documented |
-| **Ch. 18** | [Marketplace & Settings](chapters/chapter-18/README.md) | Tool Marketplace Dialog, Pause Agent, Danger Zone Deletion | Current |
-| **Ch. 19** | [Production Deployment](chapters/chapter-19/README.md) | Vercel Deployment, Inngest Cloud Sync, Domain Configuration | Upcoming |
+| **Ch. 18** | [Marketplace & Settings](chapters/chapter-18/README.md) | Tool Marketplace Dialog, Pause Agent, Danger Zone Deletion | Documented |
+| **Ch. 19** | [Production Deployment](chapters/chapter-19/README.md) | Vercel Deployment, Inngest Cloud Sync, Domain Configuration | Current |

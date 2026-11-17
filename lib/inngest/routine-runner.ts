@@ -38,7 +38,22 @@ export async function runAgentRoutineLogic({
   const agent = foundAgents[0] || {
     name: "Meow Agent",
     description: "Autonomous assistant",
+    isActive: true,
   };
+
+  // Skip execution if agent is paused (Chapter 18)
+  if (agent.isActive === false) {
+    console.log(`[Inngest] Routine ${routineId} skipped: Agent ${agentId} is currently paused.`);
+    await db
+      .update(executionLogs)
+      .set({
+        status: "completed",
+        resultSummary: `Execution skipped because agent "${agent.name}" is currently paused. Resume agent in Settings to re-enable automated execution.`,
+        completedAt: new Date(),
+      })
+      .where(eq(executionLogs.executionId, executionId));
+    return;
+  }
 
   // 3. Load active tools
   let dynamicTools: Record<string, any> = {};

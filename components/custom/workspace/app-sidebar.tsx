@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 import { AgentConfigType } from "@/types/agent";
+import { MarketplaceDialog } from "./marketplace-dialog";
 
 export function AppSidebar() {
   const { data: session } = useSession();
@@ -29,6 +30,7 @@ export function AppSidebar() {
   // Live agents state from Neon Database (Tutorial timestamp 1:43:54)
   const [agents, setAgents] = useState<AgentConfigType[]>([]);
   const [loadingAgents, setLoadingAgents] = useState(true);
+  const [marketplaceOpen, setMarketplaceOpen] = useState(false);
 
   // Fetch agents owned by authenticated user (Tutorial timestamp 1:44:13)
   const getUserAgents = async () => {
@@ -142,14 +144,19 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
-              render={<Link href="/workspace" />}
-              className="h-9 px-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground"
+              onClick={() => setMarketplaceOpen(true)}
+              className="h-9 px-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground cursor-pointer"
             >
               <Store className="size-4" />
               <span className="text-sm font-medium">Marketplace</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
+
+        <MarketplaceDialog
+          open={marketplaceOpen}
+          onOpenChange={setMarketplaceOpen}
+        />
 
         {/* User Profile Card */}
         <div className="flex items-center justify-between p-2 rounded-lg bg-muted/40 border border-border/50">

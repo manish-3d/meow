@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth/[...nextauth]/route";
 import { db } from "@/db";
-import { agentConfig } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { agentConfig, routines, executionLogs, agentChatHistory } from "@/db/schema";
+import { eq, and, desc, inArray } from "drizzle-orm";
+import { pauseAgentSandbox } from "@/lib/e2b/client";
 
 // POST /api/agent — Create a new agent configuration
 export async function POST(req: NextRequest) {
@@ -100,7 +101,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-// PUT /api/agent — Update existing agent configuration (name, description, agentImage)
+// PUT /api/agent — Update existing agent configuration (name, description, agentImage, isActive)
 export async function PUT(req: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -109,7 +110,7 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    const { agentId, name, description, agentImage } = await req.json();
+    const { agentId, name, description, agentImage, isActive } = await req.json();
 
     if (!agentId) {
       return NextResponse.json(
@@ -124,6 +125,7 @@ export async function PUT(req: NextRequest) {
         ...(name !== undefined && { name }),
         ...(description !== undefined && { description }),
         ...(agentImage !== undefined && { agentImage }),
+        ...(isActive !== undefined && { isActive }),
       })
       .where(
         and(
@@ -148,6 +150,96 @@ export async function PUT(req: NextRequest) {
     console.error("Error updating agent:", error);
     return NextResponse.json(
       { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// DELETE /api/agent — Danger Zone: Cascading deletion of an agent and all associated records
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const agentId = searchParams.get("agentId");
+
+  if (!agentId) {
+    return NextResponse.json(
+      { error: "agentId query parameter is required" },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // 1. Verify agent ownership
+    const existing = await db
+      .select()
+      .from(agentConfig)
+      .where(
+        and(
+          eq(agentConfig.agentId, agentId),
+          eq(agentConfig.userEmail, session.user.email)
+        )
+      );
+
+    if (!existing.length) {
+      return NextResponse.json(
+        { error: "Agent not found or unauthorized to delete" },
+        { status: 404 }
+      );
+    }
+
+    // 2. Pause/cleanup active E2B microVM sandbox if running
+    try {
+      await pauseAgentSandbox(agentId, session.user.email);
+    } catch (vmErr) {
+      console.warn("Could not pause sandbox during agent deletion:", vmErr);
+    }
+
+    // 3. Find all routines belonging to this agent
+    const agentRoutines = await db
+      .select({ routineId: routines.routineId })
+      .from(routines)
+      .where(eq(routines.agentId, agentId));
+
+    const routineIds = agentRoutines.map((r) => r.routineId);
+
+    // 4. Cascade delete execution logs for this agent
+    await db
+      .delete(executionLogs)
+      .where(eq(executionLogs.agentId, agentId));
+
+    // 5. Cascade delete routines
+    await db.delete(routines).where(eq(routines.agentId, agentId));
+
+    // 6. Cascade delete conversational chat history
+    await db
+      .delete(agentChatHistory)
+      .where(eq(agentChatHistory.agentId, agentId));
+
+    // 7. Finally, delete the agent configuration record
+    const deleted = await db
+      .delete(agentConfig)
+      .where(
+        and(
+          eq(agentConfig.agentId, agentId),
+          eq(agentConfig.userEmail, session.user.email)
+        )
+      )
+      .returning();
+
+    return NextResponse.json({
+      success: true,
+      message: `Agent "${deleted[0]?.name || agentId}" and all associated data permanently deleted`,
+      deletedAgent: deleted[0],
+    });
+  } catch (error: any) {
+    console.error("Error deleting agent in danger zone:", error);
+    return NextResponse.json(
+      { error: error?.message || "Failed to delete agent" },
       { status: 500 }
     );
   }

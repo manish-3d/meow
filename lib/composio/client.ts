@@ -73,3 +73,33 @@ export async function getActiveUserConnections(userId: string): Promise<Set<stri
     return new Set<string>();
   }
 }
+
+/**
+ * Disconnects and revokes an active tool connection for a user
+ */
+export async function disconnectUserConnection(userId: string, toolkitSlug: string): Promise<boolean> {
+  try {
+    const list = await composio.connectedAccounts.list({
+      userIds: [userId],
+    });
+
+    const targetSlug = toolkitSlug.toLowerCase();
+    let disconnectedAny = false;
+
+    for (const item of list.items) {
+      if (item.toolkit?.slug?.toLowerCase() === targetSlug && item.id) {
+        try {
+          await composio.connectedAccounts.delete(item.id);
+          disconnectedAny = true;
+        } catch (delErr) {
+          console.warn(`Could not delete account ${item.id}:`, delErr);
+        }
+      }
+    }
+
+    return disconnectedAny;
+  } catch (error) {
+    console.error("Error disconnecting Composio connection:", error);
+    throw error;
+  }
+}
