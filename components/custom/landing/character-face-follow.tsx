@@ -10,33 +10,67 @@ interface CharacterFaceFollowProps {
 
 type Pose = "left" | "center" | "right";
 
-export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFaceFollowProps) {
+export function CharacterFaceFollow({ size, className = "" }: CharacterFaceFollowProps) {
   const containerRef = useRef<HTMLSpanElement>(null);
+  const headMeshRef = useRef<HTMLSpanElement>(null);
+  const pupilsSvgRef = useRef<SVGSVGElement>(null);
+
   const [pose, setPose] = useState<Pose>("center");
   const [isBlinking, setIsBlinking] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
 
-  // Smooth lerp state for 3D head tilt
-  const targetTransform = useRef({ rotX: 0, rotY: 0, transX: 0, transY: 0 });
-  const currentTransform = useRef({ rotX: 0, rotY: 0, transX: 0, transY: 0 });
-  const headMeshRef = useRef<HTMLSpanElement>(null);
+  // Smooth lerp state for 3D head articulation
+  const targetTransform = useRef({ rotX: 0, rotY: 0, rotZ: 0, transX: 0, transY: 0 });
+  const currentTransform = useRef({ rotX: 0, rotY: 0, rotZ: 0, transX: 0, transY: 0 });
+
+  // Smooth lerp state for high-accuracy pupil tracking
+  const targetPupil = useRef({ x: 0, y: 0 });
+  const currentPupil = useRef({ x: 0, y: 0 });
+
   const animFrameRef = useRef<number | null>(null);
 
-  // Smooth RAF loop for 60fps organic physics
+  // 60 FPS RAF loop for organic physics
   useEffect(() => {
     const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
     const tick = () => {
-      const cur = currentTransform.current;
-      const tar = targetTransform.current;
+      const curT = currentTransform.current;
+      const tarT = targetTransform.current;
 
-      cur.rotX = lerp(cur.rotX, tar.rotX, 0.12);
-      cur.rotY = lerp(cur.rotY, tar.rotY, 0.12);
-      cur.transX = lerp(cur.transX, tar.transX, 0.12);
-      cur.transY = lerp(cur.transY, tar.transY, 0.12);
+      curT.rotX = lerp(curT.rotX, tarT.rotX, 0.14);
+      curT.rotY = lerp(curT.rotY, tarT.rotY, 0.14);
+      curT.rotZ = lerp(curT.rotZ, tarT.rotZ, 0.14);
+      curT.transX = lerp(curT.transX, tarT.transX, 0.14);
+      curT.transY = lerp(curT.transY, tarT.transY, 0.14);
 
       if (headMeshRef.current) {
-        headMeshRef.current.style.transform = `rotateX(${cur.rotX.toFixed(2)}deg) rotateY(${cur.rotY.toFixed(2)}deg) translate3d(${cur.transX.toFixed(1)}px, ${cur.transY.toFixed(1)}px, 0)`;
+        headMeshRef.current.style.transform = `rotateX(${curT.rotX.toFixed(2)}deg) rotateY(${curT.rotY.toFixed(2)}deg) rotateZ(${curT.rotZ.toFixed(2)}deg) translate3d(${curT.transX.toFixed(1)}px, ${curT.transY.toFixed(1)}px, 0)`;
+      }
+
+      // Smooth pupil lerp
+      const curP = currentPupil.current;
+      const tarP = targetPupil.current;
+      curP.x = lerp(curP.x, tarP.x, 0.22);
+      curP.y = lerp(curP.y, tarP.y, 0.22);
+
+      // Directly update pupil circles in SVG for maximum 60fps performance
+      if (pupilsSvgRef.current) {
+        const leftPupil = pupilsSvgRef.current.querySelector("#left-pupil") as SVGCircleElement | null;
+        const rightPupil = pupilsSvgRef.current.querySelector("#right-pupil") as SVGCircleElement | null;
+
+        if (leftPupil) {
+          const baseCx = parseFloat(leftPupil.getAttribute("data-base-cx") || "424");
+          const baseCy = parseFloat(leftPupil.getAttribute("data-base-cy") || "445");
+          leftPupil.setAttribute("cx", (baseCx + curP.x).toFixed(1));
+          leftPupil.setAttribute("cy", (baseCy + curP.y).toFixed(1));
+        }
+
+        if (rightPupil) {
+          const baseCx = parseFloat(rightPupil.getAttribute("data-base-cx") || "567");
+          const baseCy = parseFloat(rightPupil.getAttribute("data-base-cy") || "445");
+          rightPupil.setAttribute("cx", (baseCx + curP.x).toFixed(1));
+          rightPupil.setAttribute("cy", (baseCy + curP.y).toFixed(1));
+        }
       }
 
       animFrameRef.current = requestAnimationFrame(tick);
@@ -49,53 +83,60 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
     };
   }, []);
 
-  // Mouse / Touch movement tracking
+  // Long-range high-accuracy viewport tracking
   useEffect(() => {
-    let inactivityTimer: NodeJS.Timeout;
-
     const handlePointerMove = (clientX: number, clientY: number) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
+      const dx = clientX - centerX;
+      const dy = clientY - centerY;
+
+      // Distance and angle to cursor everywhere in the window
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+
+      // Long range: full viewport range of contact
+      const maxViewportDist = Math.hypot(window.innerWidth, window.innerHeight) * 0.55;
+      const distanceFactor = Math.min(1, dist / Math.max(250, maxViewportDist));
+
       // Normalized coordinates from -1 to 1
-      const rawDx = (clientX - centerX) / (window.innerWidth / 2);
-      const rawDy = (clientY - centerY) / (window.innerHeight / 2);
+      const normX = Math.max(-1, Math.min(1, dx / (window.innerWidth / 2)));
+      const normY = Math.max(-1, Math.min(1, dy / (window.innerHeight / 2)));
 
-      const clampedDx = Math.max(-1, Math.min(1, rawDx));
-      const clampedDy = Math.max(-1, Math.min(1, rawDy));
-
-      // 3D rotation limits: up/down (-16 to +16 deg), left/right (-20 to +20 deg)
+      // 3D Head rotation (high range: ±26° vertical, ±30° horizontal, ±7° organic roll)
       targetTransform.current = {
-        rotX: clampedDy * -16,
-        rotY: clampedDx * 20,
-        transX: clampedDx * 5,
-        transY: clampedDy * 4,
+        rotX: normY * -24,
+        rotY: normX * 28,
+        rotZ: normX * normY * 7,
+        transX: normX * 10,
+        transY: normY * 8,
       };
 
-      // Determine face pose angle with hysteresis to avoid boundary flickering
+      // High-accuracy pupil tracking: moves in exact 360° direction towards cursor
+      const maxTravelX = 22;
+      const maxTravelY = 24;
+      targetPupil.current = {
+        x: Math.cos(angle) * maxTravelX * distanceFactor,
+        y: Math.sin(angle) * maxTravelY * distanceFactor,
+      };
+
+      // Hysteresis angle switching
       setPose((prevPose) => {
         if (prevPose === "center") {
-          if (clampedDx > 0.18) return "right";
-          if (clampedDx < -0.18) return "left";
+          if (normX > 0.22) return "right";
+          if (normX < -0.22) return "left";
           return "center";
         } else if (prevPose === "right") {
-          if (clampedDx < 0.08) return "center";
+          if (normX < 0.10) return "center";
           return "right";
         } else {
-          // prevPose === "left"
-          if (clampedDx > -0.08) return "center";
+          if (normX > -0.10) return "center";
           return "left";
         }
       });
-
-      // Clear inactivity timer and reset smoothly after 3 seconds of stillness
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(() => {
-        targetTransform.current = { rotX: 0, rotY: 0, transX: 0, transY: 0 };
-        setPose("center");
-      }, 3500);
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -114,7 +155,6 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("touchmove", onTouchMove);
-      clearTimeout(inactivityTimer);
     };
   }, []);
 
@@ -123,13 +163,13 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
     let blinkTimeout: NodeJS.Timeout;
 
     const scheduleBlink = () => {
-      const delay = 3000 + Math.random() * 2500; // between 3.0s and 5.5s
+      const delay = 3200 + Math.random() * 2600;
       blinkTimeout = setTimeout(() => {
         setIsBlinking(true);
         setTimeout(() => {
           setIsBlinking(false);
           scheduleBlink();
-        }, 160);
+        }, 150);
       }, delay);
     };
 
@@ -138,12 +178,11 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
     return () => clearTimeout(blinkTimeout);
   }, []);
 
-  // Cheerful click interaction
+  // Playful click interaction
   const handleClick = useCallback(() => {
     setIsClicked(true);
     setIsBlinking(true);
 
-    // Double-blink animation
     setTimeout(() => {
       setIsBlinking(false);
       setTimeout(() => {
@@ -156,19 +195,20 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
     }, 140);
   }, []);
 
+  // Responsive default dimensions
+  const containerStyle = size
+    ? { width: size, height: size, perspective: 900 }
+    : { perspective: 900 };
+
   return (
     <span
       ref={containerRef}
       onClick={handleClick}
-      style={{
-        width: size,
-        height: size,
-        perspective: 800,
-      }}
-      className={`relative inline-flex items-center justify-center shrink-0 align-middle select-none cursor-pointer group ${className}`}
+      style={containerStyle}
+      className={`relative inline-flex items-center justify-center shrink-0 align-middle select-none cursor-pointer group w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44 ${className}`}
       title="Man face tracks your cursor everywhere • Click to wink!"
     >
-      {/* 3D Transform Head Container */}
+      {/* 3D Transform Head Mesh */}
       <span
         ref={headMeshRef}
         style={{
@@ -182,7 +222,7 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
         {/* Center Pose Image */}
         <Image
           src="/character-center.png"
-          alt="Man face looking straight"
+          alt="Man face center"
           width={1000}
           height={1000}
           priority
@@ -194,7 +234,7 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
         {/* Left Pose Image */}
         <Image
           src="/character-left.png"
-          alt="Man face looking left"
+          alt="Man face left"
           width={1000}
           height={1000}
           priority
@@ -206,7 +246,7 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
         {/* Right Pose Image */}
         <Image
           src="/character-right.png"
-          alt="Man face looking right"
+          alt="Man face right"
           width={1000}
           height={1000}
           priority
@@ -215,76 +255,160 @@ export function CharacterFaceFollow({ size = 92, className = "" }: CharacterFace
           }`}
         />
 
-        {/* Eyelid Blink Overlay (Curved closed eyes over glasses when blinking) */}
-        {isBlinking && (
-          <svg
-            viewBox="0 0 1000 1000"
-            className="absolute inset-0 size-full pointer-events-none z-10"
-          >
-            {pose === "center" && (
-              <>
-                {/* Left eye closed curve */}
-                <path
-                  d="M 405 448 Q 435 466 465 448"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-                {/* Right eye closed curve */}
-                <path
-                  d="M 525 444 Q 555 462 585 444"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
+        {/* Dynamic 360° Cursor-Tracking Eyes & Eyelids Layer */}
+        <svg
+          ref={pupilsSvgRef}
+          viewBox="0 0 1000 1000"
+          className="absolute inset-0 size-full pointer-events-none z-10"
+        >
+          {pose === "center" && (
+            <>
+              {/* White lens fills to clear static pupils */}
+              <ellipse cx="424" cy="445" rx="36" ry="44" fill="#ffffff" />
+              <ellipse cx="567" cy="445" rx="38" ry="44" fill="#ffffff" />
 
-            {pose === "left" && (
-              <>
-                {/* Left-turned eye closed curve */}
-                <path
-                  d="M 370 458 Q 395 474 420 458"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-                {/* Right-turned eye closed curve */}
-                <path
-                  d="M 480 454 Q 508 470 534 454"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
+              {!isBlinking ? (
+                <>
+                  {/* Left Pupil (tracks 360°) */}
+                  <circle
+                    id="left-pupil"
+                    data-base-cx="424"
+                    data-base-cy="445"
+                    cx="424"
+                    cy="445"
+                    r="13"
+                    fill="#000000"
+                  />
+                  {/* Right Pupil (tracks 360°) */}
+                  <circle
+                    id="right-pupil"
+                    data-base-cx="567"
+                    data-base-cy="445"
+                    cx="567"
+                    cy="445"
+                    r="13"
+                    fill="#000000"
+                  />
+                </>
+              ) : (
+                <>
+                  {/* Left eye closed curve */}
+                  <path
+                    d="M 405 448 Q 435 466 465 448"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                  {/* Right eye closed curve */}
+                  <path
+                    d="M 525 444 Q 555 462 585 444"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                </>
+              )}
+            </>
+          )}
 
-            {pose === "right" && (
-              <>
-                {/* Right-turned eye closed curve */}
-                <path
-                  d="M 466 454 Q 494 470 522 454"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-                {/* Far-right turned eye closed curve */}
-                <path
-                  d="M 578 458 Q 604 474 630 458"
-                  fill="none"
-                  stroke="#000000"
-                  strokeWidth="16"
-                  strokeLinecap="round"
-                />
-              </>
-            )}
-          </svg>
-        )}
+          {pose === "left" && (
+            <>
+              {/* White lens fills */}
+              <ellipse cx="441" cy="450" rx="36" ry="44" fill="#ffffff" />
+              <ellipse cx="562" cy="450" rx="50" ry="44" fill="#ffffff" />
+
+              {!isBlinking ? (
+                <>
+                  <circle
+                    id="left-pupil"
+                    data-base-cx="441"
+                    data-base-cy="450"
+                    cx="441"
+                    cy="450"
+                    r="13"
+                    fill="#000000"
+                  />
+                  <circle
+                    id="right-pupil"
+                    data-base-cx="562"
+                    data-base-cy="450"
+                    cx="562"
+                    cy="450"
+                    r="13"
+                    fill="#000000"
+                  />
+                </>
+              ) : (
+                <>
+                  <path
+                    d="M 370 458 Q 395 474 420 458"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 480 454 Q 508 470 534 454"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                </>
+              )}
+            </>
+          )}
+
+          {pose === "right" && (
+            <>
+              {/* White lens fills */}
+              <ellipse cx="426" cy="450" rx="42" ry="44" fill="#ffffff" />
+              <ellipse cx="548" cy="450" rx="36" ry="44" fill="#ffffff" />
+
+              {!isBlinking ? (
+                <>
+                  <circle
+                    id="left-pupil"
+                    data-base-cx="426"
+                    data-base-cy="450"
+                    cx="426"
+                    cy="450"
+                    r="13"
+                    fill="#000000"
+                  />
+                  <circle
+                    id="right-pupil"
+                    data-base-cx="548"
+                    data-base-cy="450"
+                    cx="548"
+                    cy="450"
+                    r="13"
+                    fill="#000000"
+                  />
+                </>
+              ) : (
+                <>
+                  <path
+                    d="M 466 454 Q 494 470 522 454"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                  <path
+                    d="M 578 458 Q 604 474 630 458"
+                    fill="none"
+                    stroke="#000000"
+                    strokeWidth="16"
+                    strokeLinecap="round"
+                  />
+                </>
+              )}
+            </>
+          )}
+        </svg>
       </span>
     </span>
   );
