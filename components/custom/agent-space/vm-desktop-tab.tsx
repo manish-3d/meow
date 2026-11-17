@@ -6,7 +6,6 @@ import {
   Globe,
   Power,
   Play,
-  Pause,
   RefreshCw,
   ExternalLink,
   Maximize2,
@@ -17,6 +16,10 @@ import {
   Sparkles,
   ShieldCheck,
   Terminal,
+  Hand,
+  CheckCircle2,
+  Laptop,
+  Cloud,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -30,24 +33,31 @@ export function VmDesktopTab() {
 
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
-  const [vmStatus, setVmStatus] = useState<"active" | "paused" | "inactive">("inactive");
+  const [sessionStatus, setSessionStatus] = useState<"idle" | "running" | "interrupted" | "closed" | "active" | "paused">("idle");
   const [streamUrl, setStreamUrl] = useState<string | null>(null);
-  const [isConfigured, setIsConfigured] = useState(true);
+  const [lastScreenshot, setLastScreenshot] = useState<string | null>(null);
+  const [mode, setMode] = useState<"browserbase" | "local">("local");
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("https://news.google.com");
-  const [autoPauseSeconds, setAutoPauseSeconds] = useState(120);
+  const [autoPauseSeconds, setAutoPauseSeconds] = useState(180);
 
-  // 1. Fetch live VM status
+  // 1. Fetch live browser session status
   const fetchStatus = useCallback(async (silent = false) => {
     if (!agentId || agentId === "default") return;
     try {
       if (!silent) setLoading(true);
-      const res = await axios.get(`/api/agent/vm/status?agentId=${agentId}`);
-      setVmStatus(res.data.status);
+      const res = await axios.get(`/api/agent/browser/status?agentId=${agentId}`);
+      setSessionStatus(res.data.status);
       setStreamUrl(res.data.streamUrl);
-      setIsConfigured(res.data.isConfigured);
+      if (res.data.lastScreenshot) {
+        setLastScreenshot(res.data.lastScreenshot);
+      }
+      if (res.data.currentUrl) {
+        setCurrentUrl(res.data.currentUrl);
+      }
+      setMode(res.data.mode || "local");
     } catch (err: any) {
-      console.warn("Could not fetch VM status:", err);
+      console.warn("Could not fetch browser status:", err);
     } finally {
       if (!silent) setLoading(false);
     }
@@ -57,45 +67,46 @@ export function VmDesktopTab() {
     fetchStatus();
   }, [fetchStatus]);
 
-  // 2. Countdown timer for 2-minute auto-pause
+  // 2. Countdown timer for inactivity pause
   useEffect(() => {
-    if (vmStatus !== "active") return;
+    if (sessionStatus !== "running" && sessionStatus !== "active") return;
     const interval = setInterval(() => {
       setAutoPauseSeconds((prev) => {
         if (prev <= 1) {
-          setVmStatus("paused");
-          return 120;
+          setSessionStatus("idle");
+          return 180;
         }
         return prev - 1;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [vmStatus]);
+  }, [sessionStatus]);
 
-  // 3. Start / Resume Sandbox
-  const handleStartVM = async () => {
+  // 3. Start / Launch Browser Session
+  const handleStartBrowser = async (headless = false) => {
     if (!agentId || actionLoading) return;
     setActionLoading(true);
 
     try {
-      const res = await axios.post("/api/agent/vm/start", { agentId });
-      setVmStatus("active");
+      const res = await axios.post("/api/agent/browser/start", { agentId, headless });
+      setSessionStatus("active");
       setStreamUrl(res.data.streamUrl);
-      setAutoPauseSeconds(120);
+      setMode(res.data.mode || "local");
+      setAutoPauseSeconds(180);
+
       toast.add({
-        title: res.data?.isSimulated
-          ? "Daytona Sandbox (Preview Active)"
-          : "Daytona Sandbox Activated",
+        title: res.data.mode === "browserbase" ? "Browserbase Cloud Active" : "Local Playwright Active",
         description:
-          res.data?.notice ||
-          "Your agent's Daytona Cloud Sandbox environment is now active.",
-        type: res.data?.isSimulated ? "info" : "success",
+          res.data.mode === "browserbase"
+            ? "Cloud CDP browser connected with live debugger stream."
+            : "Running on host Google Chrome/Edge with $0 cost.",
+        type: "success",
       });
     } catch (err: any) {
-      const errMsg = err?.response?.data?.error || err?.message || "Failed to start VM";
+      const errMsg = err?.response?.data?.error || err?.message || "Failed to start browser";
       toast.add({
-        title: "VM Activation Failed",
+        title: "Browser Activation Failed",
         description: errMsg,
         type: "error",
       });
@@ -104,24 +115,24 @@ export function VmDesktopTab() {
     }
   };
 
-  // 4. Pause Sandbox
-  const handlePauseVM = async () => {
+  // 4. Close Browser Session
+  const handleCloseBrowser = async () => {
     if (!agentId || actionLoading) return;
     setActionLoading(true);
 
     try {
-      await axios.post("/api/agent/vm/pause", { agentId });
-      setVmStatus("paused");
+      await axios.post("/api/agent/browser/pause", { agentId });
+      setSessionStatus("closed");
       setStreamUrl(null);
       toast.add({
-        title: "Cloud Desktop Paused",
-        description: "Sandbox paused to preserve compute credits.",
+        title: "Browser Session Closed",
+        description: "Browser closed and system memory reclaimed.",
         type: "info",
       });
     } catch (err: any) {
       toast.add({
-        title: "Error Pausing VM",
-        description: err?.message || "Failed to pause sandbox",
+        title: "Error Closing Browser",
+        description: err?.message || "Failed to close browser",
         type: "error",
       });
     } finally {
@@ -129,69 +140,121 @@ export function VmDesktopTab() {
     }
   };
 
-  // 5. Quick browser launch
+  // 5. Human-in-the-Loop: Take Control / Interrupt or Resume
+  const handleToggleInterrupt = async () => {
+    if (!agentId || actionLoading) return;
+    setActionLoading(true);
+
+    const isInterrupted = sessionStatus === "interrupted";
+    const nextAction = isInterrupted ? "resume" : "interrupt";
+
+    try {
+      const res = await axios.post("/api/agent/browser/interrupt", {
+        agentId,
+        action: nextAction,
+      });
+
+      setSessionStatus(res.data.status);
+      toast.add({
+        title: isInterrupted ? "Agent Resumed" : "User Takeover Active",
+        description: isInterrupted
+          ? "Autonomous agent is back in control."
+          : "Agent paused! You can now interact with the window and resolve CAPTCHAs or logins.",
+        type: isInterrupted ? "info" : "success",
+      });
+    } catch (err: any) {
+      toast.add({
+        title: "Interruption Failed",
+        description: err?.message || "Could not toggle control",
+        type: "error",
+      });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // 6. Quick URL Navigation
   const handleLaunchUrl = async (urlToOpen: string) => {
     if (!agentId) return;
     setCurrentUrl(urlToOpen);
-    if (vmStatus !== "active") {
-      await handleStartVM();
-    }
+    setActionLoading(true);
+
     try {
       toast.add({
-        title: "Launching Browser",
-        description: `Opening ${urlToOpen} on cloud desktop...`,
+        title: "Navigating Browser",
+        description: `Navigating to ${urlToOpen}...`,
         type: "info",
       });
-      await axios.post("/api/agent/vm/execute", {
+
+      const res = await axios.post("/api/agent/browser/execute", {
         agentId,
         targetUrl: urlToOpen,
       });
-      setAutoPauseSeconds(120); // Reset timer on activity
+
+      if (res.data.screenshotUrl) {
+        setLastScreenshot(res.data.screenshotUrl);
+      }
+      if (res.data.currentUrl) {
+        setCurrentUrl(res.data.currentUrl);
+      }
+      setSessionStatus("active");
+      setAutoPauseSeconds(180);
+
+      toast.add({
+        title: "Navigation Complete",
+        description: `Page successfully loaded and analyzed.`,
+        type: "success",
+      });
     } catch (e: any) {
-      console.warn("Launch error:", e);
+      console.warn("Navigation error:", e);
+      toast.add({
+        title: "Navigation Failed",
+        description: e?.response?.data?.error || e?.message || "Could not load target page",
+        type: "error",
+      });
+    } finally {
+      setActionLoading(false);
     }
   };
 
   return (
     <div className="space-y-4 pt-2">
-      {/* Configuration Advisory if Daytona Key Missing */}
-      {!isConfigured && (
-        <div className="p-3.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-card-foreground space-y-2">
-          <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-semibold text-xs">
-            <AlertCircle className="size-4 shrink-0" />
-            <span>Daytona Cloud Sandbox API Key Not Configured</span>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            To connect a live Daytona cloud sandbox for autonomous code execution and web tasks, configure your key in <code className="bg-muted px-1.5 py-0.5 rounded text-[10px]">.env</code>:
-            <br />
-            <code className="text-foreground font-mono text-[10px] block mt-1">DAYTONA_API_KEY=dtn_...</code>
-            Manage your workspace and keys at <a href="https://app.daytona.io" target="_blank" rel="noreferrer" className="underline font-medium text-primary inline-flex items-center gap-0.5">app.daytona.io <ExternalLink className="size-2.5" /></a>.
-          </p>
-        </div>
-      )}
-
-      {/* VM Status & Control Header */}
+      {/* Engine Status & Mode Header Card */}
       <div className="p-3.5 rounded-xl border border-border/70 bg-card text-card-foreground shadow-xs space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div
               className={`size-2.5 rounded-full transition-colors ${
-                vmStatus === "active"
+                sessionStatus === "running" || sessionStatus === "active"
                   ? "bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50"
-                  : vmStatus === "paused"
-                  ? "bg-amber-500"
+                  : sessionStatus === "interrupted"
+                  ? "bg-purple-500 shadow-sm shadow-purple-500/50"
                   : "bg-muted-foreground/40"
               }`}
             />
             <div className="flex flex-col">
-              <span className="text-xs font-bold leading-none text-foreground capitalize">
-                Daytona Sandbox: {vmStatus}
-              </span>
-              {vmStatus === "active" && (
-                <span className="text-[10px] text-muted-foreground mt-0.5">
-                  Auto-pauses in {Math.floor(autoPauseSeconds / 60)}:{(autoPauseSeconds % 60).toString().padStart(2, "0")}
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold leading-none text-foreground capitalize">
+                  Browser: {sessionStatus}
                 </span>
-              )}
+                <Badge
+                  variant="outline"
+                  className={`text-[9px] font-mono py-0 px-1.5 ${
+                    mode === "browserbase"
+                      ? "bg-primary/10 text-primary border-primary/20"
+                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
+                  }`}
+                >
+                  {mode === "browserbase" ? "Browserbase CDP" : "Local Playwright ($0 Free)"}
+                </Badge>
+              </div>
+              <span className="text-[10px] text-muted-foreground mt-0.5">
+                {sessionStatus === "interrupted"
+                  ? "User is in manual control. Click Resume to return control to agent."
+                  : sessionStatus === "active" || sessionStatus === "running"
+                  ? `Active session • Auto-pauses in ${Math.floor(autoPauseSeconds / 60)}:${(autoPauseSeconds % 60).toString().padStart(2, "0")}`
+                  : "Ready to launch local Chrome or Browserbase cloud session."}
+              </span>
             </div>
           </div>
 
@@ -202,27 +265,46 @@ export function VmDesktopTab() {
               className="size-7 p-0 text-muted-foreground hover:text-foreground"
               onClick={() => fetchStatus()}
               disabled={loading}
-              title="Refresh Sandbox Status"
+              title="Refresh status"
             >
               <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
             </Button>
 
-            {vmStatus === "active" ? (
+            {/* Human Interruption Button */}
+            {(sessionStatus === "active" || sessionStatus === "running" || sessionStatus === "interrupted") && (
+              <Button
+                size="sm"
+                variant={sessionStatus === "interrupted" ? "default" : "outline"}
+                className={`h-7 text-xs gap-1.5 font-medium ${
+                  sessionStatus === "interrupted"
+                    ? "bg-purple-600 hover:bg-purple-700 text-white"
+                    : "border-purple-500/40 text-purple-600 hover:bg-purple-500/10"
+                }`}
+                onClick={handleToggleInterrupt}
+                disabled={actionLoading}
+                title="Pause agent and take over control manually"
+              >
+                <Hand className="size-3" />
+                {sessionStatus === "interrupted" ? "Resume Agent" : "Take Control"}
+              </Button>
+            )}
+
+            {sessionStatus === "active" || sessionStatus === "running" || sessionStatus === "interrupted" ? (
               <Button
                 size="sm"
                 variant="outline"
                 className="h-7 text-xs gap-1.5 border-border hover:bg-muted font-medium text-destructive hover:text-destructive"
-                onClick={handlePauseVM}
+                onClick={handleCloseBrowser}
                 disabled={actionLoading}
               >
                 <Power className="size-3" />
-                Pause Sandbox
+                Close
               </Button>
             ) : (
               <Button
                 size="sm"
                 className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
-                onClick={handleStartVM}
+                onClick={() => handleStartBrowser(false)}
                 disabled={actionLoading}
               >
                 {actionLoading ? (
@@ -230,14 +312,14 @@ export function VmDesktopTab() {
                 ) : (
                   <Play className="size-3" />
                 )}
-                Activate Sandbox
+                Launch Browser
               </Button>
             )}
           </div>
         </div>
 
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          Provides your AI agent with an isolated Daytona Cloud Sandbox environment for autonomous browsing, code execution, and web scraping. Auto-pauses after 2 minutes of inactivity to conserve resources.
+          Autonomous browser execution powered by <strong>Playwright</strong>. Connects locally to your host Google Chrome with $0 API costs, or cloud sessions via Browserbase. You can take over control anytime to solve logins or inspect actions.
         </p>
 
         {/* Quick Launch Shortcuts */}
@@ -284,7 +366,7 @@ export function VmDesktopTab() {
             <span className="truncate">{currentUrl}</span>
           </div>
 
-          {vmStatus === "active" && streamUrl && (
+          {(streamUrl || lastScreenshot) && (
             <Button
               size="sm"
               variant="ghost"
@@ -300,138 +382,124 @@ export function VmDesktopTab() {
 
         {/* Viewport Content Area */}
         <div className="h-[280px] w-full bg-muted/20 relative flex items-center justify-center overflow-hidden">
-          {vmStatus === "active" && streamUrl && streamUrl.includes("daytonaproxy") ? (
+          {streamUrl ? (
+            /* Mode 1: Browserbase Live Debugger Stream (Full Interactive Iframe) */
             <iframe
               src={streamUrl}
               className="size-full border-0"
-              title="Cloud VM Desktop Stream"
+              title="Browserbase Live Stream"
               allow="clipboard-read; clipboard-write"
             />
-          ) : vmStatus === "active" ? (
-            /* Active Sandbox View */
-            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/70 backdrop-blur-xs">
-              <div className="size-11 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-600 animate-pulse">
-                <Monitor className="size-5" />
+          ) : lastScreenshot ? (
+            /* Mode 2: Local Playwright Live Captured Screenshot */
+            <div className="relative size-full flex items-center justify-center bg-black/5 overflow-auto p-2">
+              <img
+                src={lastScreenshot}
+                alt="Live Browser Page"
+                className="max-h-full max-w-full rounded border border-border shadow-md object-contain"
+              />
+              <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
+                <Badge variant="outline" className="text-[9px] bg-background/90 backdrop-blur font-mono">
+                  Live Snapshot • {new Date().toLocaleTimeString()}
+                </Badge>
               </div>
-              <div className="space-y-1.5 max-w-sm">
-                <div className="flex items-center justify-center gap-2">
-                  <span className="relative flex size-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full size-2 bg-emerald-500" />
-                  </span>
-                  <h5 className="text-xs font-semibold text-foreground">Daytona Sandbox Active</h5>
-                </div>
+            </div>
+          ) : sessionStatus === "active" || sessionStatus === "running" ? (
+            /* Active but waiting for navigation */
+            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/60 backdrop-blur-xs">
+              <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                <Laptop className="size-5" />
+              </div>
+              <div className="space-y-1 max-w-xs">
+                <h5 className="text-xs font-semibold text-foreground">Playwright Browser Ready</h5>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Autonomous sandbox is running for <code className="text-primary font-mono bg-primary/5 px-1 py-0.5 rounded">{currentUrl}</code>. Auto-pauses in {autoPauseSeconds}s.
+                  Browser session is live. Click a shortcut or ask your agent in chat to navigate any webpage.
                 </p>
               </div>
-              <div className="flex items-center gap-2 pt-1">
-                <a
-                  href="https://app.daytona.io/dashboard"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 font-medium transition-colors"
-                >
-                  <ExternalLink className="size-3" />
-                  Daytona Console
-                </a>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={handlePauseVM}
-                  disabled={actionLoading}
-                  className="h-7 text-[11px] px-2.5"
-                >
-                  <Pause className="size-3 mr-1" />
-                  Pause Sandbox
-                </Button>
-              </div>
-              <Badge variant="outline" className="text-[10px] font-mono bg-background text-muted-foreground">
-                Daytona Cloud Sandbox • Isolated Container
+              <Badge variant="outline" className="text-[10px] font-mono bg-background">
+                Host Chrome / Edge • 100% Free
               </Badge>
             </div>
           ) : (
-            /* Inactive / Paused Overlay */
+            /* Inactive / Closed */
             <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-muted/30">
               <div className="size-10 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground">
                 <Monitor className="size-5" />
               </div>
               <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">
-                  {vmStatus === "paused" ? "Daytona Sandbox Inactive (Paused)" : "Daytona Cloud Sandbox Off"}
-                </h5>
+                <h5 className="text-xs font-semibold text-foreground">Browser Automation Inactive</h5>
                 <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Click activate to provision or resume the Daytona cloud environment for autonomous execution.
+                  Launch the browser to enable autonomous website navigation, research, and live screenshots.
                 </p>
               </div>
               <Button
                 size="sm"
-                onClick={handleStartVM}
+                onClick={() => handleStartBrowser(false)}
                 disabled={actionLoading}
                 className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground font-medium"
               >
                 {actionLoading ? <Loader2 className="size-3 animate-spin" /> : <Play className="size-3" />}
-                Activate Daytona Sandbox
+                Launch Browser
               </Button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Full-Screen Interactive Desktop Modal Overlay */}
+      {/* Full-Screen Interactive Modal Overlay */}
       {isFullScreen && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-150">
-          {/* Top Overlay Bar */}
           <div className="h-12 border-b border-border bg-card px-4 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <Monitor className="size-4 text-primary" />
                 <span className="text-xs font-bold text-foreground">
-                  Meow Daytona Sandbox — {agentConfig?.name || "Agent"}
+                  Meow Browser Automation — {agentConfig?.name || "Agent"}
                 </span>
               </div>
               <Badge variant="outline" className="text-[10px] font-mono bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                Daytona Cloud Workspace
+                {mode === "browserbase" ? "Browserbase Cloud Stream" : "Local Playwright Stream"}
               </Badge>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-[11px] text-muted-foreground mr-2">
-                Auto-pause in {Math.floor(autoPauseSeconds / 60)}:{(autoPauseSeconds % 60).toString().padStart(2, "0")}
-              </span>
               <Button
                 size="sm"
-                variant="ghost"
-                className="h-8 text-xs gap-1.5"
-                onClick={() => setIsFullScreen(false)}
+                variant={sessionStatus === "interrupted" ? "default" : "outline"}
+                className="h-7 text-xs gap-1.5 font-medium"
+                onClick={handleToggleInterrupt}
               >
-                <Minimize2 className="size-3.5" />
-                Exit Fullscreen
+                <Hand className="size-3" />
+                {sessionStatus === "interrupted" ? "Resume Agent" : "Take Control"}
               </Button>
               <Button
                 size="sm"
-                variant="destructive"
-                className="h-8 size-8 p-0"
+                variant="ghost"
+                className="size-7 p-0 text-muted-foreground hover:text-foreground"
                 onClick={() => setIsFullScreen(false)}
+                title="Exit Fullscreen"
               >
                 <X className="size-4" />
               </Button>
             </div>
           </div>
 
-          {/* Full Screen Iframe Canvas */}
-          <div className="flex-1 w-full bg-black relative">
+          <div className="flex-1 bg-black/20 p-4 flex items-center justify-center overflow-auto">
             {streamUrl ? (
               <iframe
                 src={streamUrl}
-                className="size-full border-0"
-                title="Fullscreen Cloud VM Desktop"
-                allow="clipboard-read; clipboard-write; fullscreen"
+                className="size-full rounded-lg border border-border shadow-2xl bg-white"
+                title="Browser Fullscreen Stream"
+                allow="clipboard-read; clipboard-write"
+              />
+            ) : lastScreenshot ? (
+              <img
+                src={lastScreenshot}
+                alt="Live Browser Page Fullscreen"
+                className="max-h-full max-w-full rounded-lg border border-border shadow-2xl object-contain"
               />
             ) : (
-              <div className="size-full flex items-center justify-center text-white text-xs">
-                Stream unavailable. Please restart VM.
-              </div>
+              <div className="text-muted-foreground text-xs">No active visual stream.</div>
             )}
           </div>
         </div>

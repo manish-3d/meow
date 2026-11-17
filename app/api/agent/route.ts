@@ -4,7 +4,7 @@ import { authOptions } from "../auth/[...nextauth]/route";
 import { db } from "@/db";
 import { agentConfig, routines, executionLogs, agentChatHistory } from "@/db/schema";
 import { eq, and, desc, inArray } from "drizzle-orm";
-import { pauseAgentSandbox } from "@/lib/daytona/client";
+import { closeBrowserSession } from "@/lib/browser/client";
 
 // POST /api/agent — Create a new agent configuration
 export async function POST(req: NextRequest) {
@@ -192,11 +192,11 @@ export async function DELETE(req: NextRequest) {
       );
     }
 
-    // 2. Pause/cleanup active E2B microVM sandbox if running
+    // 2. Pause/cleanup active browser session if running
     try {
-      await pauseAgentSandbox(agentId, session.user.email);
+      await closeBrowserSession(agentId, session.user.email);
     } catch (vmErr) {
-      console.warn("Could not pause sandbox during agent deletion:", vmErr);
+      console.warn("Could not close browser session during agent deletion:", vmErr);
     }
 
     // 3. Find all routines belonging to this agent

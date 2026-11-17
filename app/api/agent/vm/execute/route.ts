@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { runAgentBrowserTask } from "@/lib/daytona/client";
+import { runPlaywrightBrowserTask } from "@/lib/browser/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const result = await runAgentBrowserTask(
+    const result = await runPlaywrightBrowserTask(
       agentId,
       session.user.email,
       targetUrl,

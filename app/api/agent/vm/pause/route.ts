@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { pauseAgentSandbox } from "@/lib/daytona/client";
+import { closeBrowserSession } from "@/lib/browser/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "agentId is required" }, { status: 400 });
     }
 
-    await pauseAgentSandbox(agentId, session.user.email);
+    await closeBrowserSession(agentId, session.user.email);
 
     return NextResponse.json({
       success: true,

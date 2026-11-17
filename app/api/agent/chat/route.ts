@@ -8,7 +8,7 @@ import { streamText, isStepCount, tool } from "ai";
 import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
-import { runAgentBrowserTask, isDaytonaConfigured } from "@/lib/daytona/client";
+import { runPlaywrightBrowserTask } from "@/lib/browser/client";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -158,16 +158,7 @@ export async function POST(req: NextRequest) {
             ),
         }),
         execute: async ({ url, objective }: { url: string; objective?: string }) => {
-          if (!isDaytonaConfigured()) {
-            return {
-              status: "simulated",
-              message:
-                "Daytona Cloud Sandbox is ready. Set DAYTONA_API_KEY in .env to activate live execution.",
-              url,
-              objective,
-            };
-          }
-          return await runAgentBrowserTask(agentId, userEmail, url, objective);
+          return await runPlaywrightBrowserTask(agentId, userEmail, url, objective);
         },
       });
     } catch (e2bErr) {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { getAgentVMStatus } from "@/lib/daytona/client";
+import { getBrowserSessionStatus, isBrowserbaseConfigured } from "@/lib/browser/client";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -18,8 +18,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const status = await getAgentVMStatus(agentId, session.user.email);
-    return NextResponse.json(status);
+    const status = await getBrowserSessionStatus(agentId, session.user.email);
+    return NextResponse.json({
+      ...status,
+      isConfigured: true, // Always configured because local Playwright runs out-of-the-box!
+      isBrowserbase: isBrowserbaseConfigured(),
+    });
   } catch (error: any) {
     console.error("Error checking VM status:", error);
     return NextResponse.json(

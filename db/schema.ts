@@ -17,7 +17,7 @@ export const agentConfig = pgTable("agent_config", {
   userEmail: text("user_email")
     .notNull()
     .references(() => users.email),
-  // Cloud VM & Sandbox state (Daytona & E2B)
+  // Cloud Browser & Sandbox state
   daytonaSandboxId: varchar("daytona_sandbox_id", { length: 255 }),
   e2bSandboxId: varchar("e2b_sandbox_id", { length: 255 }),
   vmStatus: varchar("vm_status", { length: 50 }).default("inactive").notNull(),
