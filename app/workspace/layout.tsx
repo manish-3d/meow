@@ -53,7 +53,7 @@ function WorkspaceHeader() {
           <span className="text-muted-foreground/60 text-[11px]">›</span>
           <div className="flex items-center gap-1.5 font-semibold text-foreground">
             <span>{activeAgentName}</span>
-            <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span className="size-1.5 rounded-full bg-[#8dcb16] shrink-0" />
           </div>
         </div>
       </div>

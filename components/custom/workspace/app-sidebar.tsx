@@ -160,7 +160,7 @@ export function AppSidebar() {
                       render={<Link href={item.href} />}
                       className={`h-9 rounded-xl px-2.5 transition-all group ${
                         isActive
-                          ? "bg-[#eefbf0] text-emerald-900 font-semibold shadow-2xs"
+                          ? "bg-[#f4fbe8] text-[#3f6212] font-semibold shadow-2xs"
                           : "hover:bg-black/[0.04] text-foreground/80 hover:text-foreground"
                       }`}
                       isActive={isActive}
@@ -168,7 +168,7 @@ export function AppSidebar() {
                       <Icon
                         className={`size-4 transition-colors ${
                           isActive
-                            ? "text-emerald-700"
+                            ? "text-[#4d7c0f]"
                             : "text-muted-foreground group-hover:text-foreground"
                         }`}
                       />
@@ -176,7 +176,7 @@ export function AppSidebar() {
                         {item.label}
                       </span>
                       {isAgents && agents.length > 0 && (
-                        <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-100/70 border border-emerald-200/50 px-1.5 py-0.2 rounded-full">
+                        <span className="text-[10px] font-mono font-semibold text-[#4d7c0f] bg-[#f4fbe8] border border-[#8dcb16]/40 px-1.5 py-0.2 rounded-full">
                           {agents.length}
                         </span>
                       )}
@@ -230,7 +230,7 @@ export function AppSidebar() {
                           render={<Link href={`/workspace/${agent.agentId}`} />}
                           className={`h-10 rounded-xl px-2.5 transition-all group flex items-center gap-2.5 ${
                             isActive
-                              ? "bg-[#eefbf0] text-emerald-950 font-semibold shadow-2xs"
+                              ? "bg-[#f4fbe8] text-foreground font-semibold shadow-2xs"
                               : "hover:bg-black/[0.03] text-foreground/80 hover:text-foreground"
                           }`}
                           isActive={isActive}
@@ -251,7 +251,7 @@ export function AppSidebar() {
 
                           {/* Active green dot indicator */}
                           {isActive && (
-                            <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
+                            <span className="size-2 rounded-full bg-[#8dcb16] shrink-0" />
                           )}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -271,11 +271,11 @@ export function AppSidebar() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               {/* Minecraft Voxel Dirt/Grass Block Icon */}
-              <div className="size-5 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-emerald-700 shadow-2xs">
+              <div className="size-5 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-[#5b8731] shadow-2xs">
                 <svg viewBox="0 0 24 24" className="size-4.5 fill-current">
                   {/* Grass top */}
-                  <rect x="2" y="2" width="20" height="7" fill="#5b8731" />
-                  <path d="M2 9h4v3h4V9h4v3h4V9h4v2H2z" fill="#5b8731" />
+                  <rect x="2" y="2" width="20" height="7" fill="#8dcb16" />
+                  <path d="M2 9h4v3h4V9h4v3h4V9h4v2H2z" fill="#8dcb16" />
                   {/* Dirt bottom */}
                   <rect x="2" y="9" width="20" height="13" fill="#866043" />
                   <rect x="5" y="13" width="3" height="3" fill="#6d4e36" />
@@ -287,8 +287,8 @@ export function AppSidebar() {
               </span>
             </div>
 
-            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/50">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#4d7c0f] bg-[#f4fbe8] px-1.5 py-0.5 rounded-full border border-[#8dcb16]/40">
+              <span className="size-1.5 rounded-full bg-[#8dcb16] animate-pulse" />
               Online
             </span>
           </div>
@@ -297,10 +297,10 @@ export function AppSidebar() {
             Workspace environment active
           </p>
 
-          {/* Green Environment Status Indicator */}
-          <div className="h-1 w-full bg-emerald-500/20 rounded-full overflow-hidden">
+          {/* Minecraft Grass Green Environment Status Indicator */}
+          <div className="h-1 w-full bg-[#8dcb16]/20 rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-emerald-500 rounded-full"
+              className="h-full bg-[#8dcb16] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: "100%" }}
               transition={{ duration: 0.8, ease: "easeOut" }}
@@ -312,11 +312,11 @@ export function AppSidebar() {
         <div className="p-3 rounded-2xl border border-black/[0.08] bg-white space-y-2 shadow-2xs">
           <div className="flex items-center gap-2.5">
             {/* Minecraft Voxel Dirt/Grass Block Icon */}
-            <div className="size-6 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-emerald-700 shadow-2xs">
+            <div className="size-6 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-[#5b8731] shadow-2xs">
               <svg viewBox="0 0 24 24" className="size-5 fill-current">
                 {/* Grass top */}
-                <rect x="2" y="2" width="20" height="7" fill="#5b8731" />
-                <path d="M2 9h4v3h4V9h4v3h4V9h4v2H2z" fill="#5b8731" />
+                <rect x="2" y="2" width="20" height="7" fill="#8dcb16" />
+                <path d="M2 9h4v3h4V9h4v3h4V9h4v2H2z" fill="#8dcb16" />
                 {/* Dirt bottom */}
                 <rect x="2" y="9" width="20" height="13" fill="#866043" />
                 <rect x="5" y="13" width="3" height="3" fill="#6d4e36" />
@@ -333,10 +333,10 @@ export function AppSidebar() {
             </div>
           </div>
 
-          {/* Green Progress Bar */}
+          {/* Minecraft Grass Green Progress Bar */}
           <div className="h-1.5 w-full bg-black/[0.06] rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-emerald-500 rounded-full"
+              className="h-full bg-[#8dcb16] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${usagePct}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}

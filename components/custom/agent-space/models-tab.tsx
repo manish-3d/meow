@@ -105,7 +105,7 @@ export function ModelsTab() {
                     {selectedModel.name}
                   </span>
                   {selectedModel.isFree && (
-                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-semibold text-[#4d7c0f] bg-[#f4fbe8] border border-[#8dcb16]/40 px-2 py-0.5 rounded-full">
                       Recommended
                     </span>
                   )}
@@ -226,7 +226,7 @@ export function ModelsTab() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Workload & Effort</span>
-                  <span className="text-xs font-semibold font-mono text-emerald-800 capitalize">
+                  <span className="text-xs font-semibold font-mono text-[#4d7c0f] capitalize">
                     {reasoningEffort}
                   </span>
                 </div>
@@ -239,9 +239,9 @@ export function ModelsTab() {
                     value={effortIndex}
                     onChange={(e) => handleEffortSliderChange(parseInt(e.target.value, 10))}
                     style={{
-                      background: `linear-gradient(to right, #10b981 ${((effortIndex - 1) / 2) * 100}%, rgba(0,0,0,0.08) ${((effortIndex - 1) / 2) * 100}%)`,
+                      background: `linear-gradient(to right, #8dcb16 ${((effortIndex - 1) / 2) * 100}%, rgba(0,0,0,0.08) ${((effortIndex - 1) / 2) * 100}%)`,
                     }}
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#8dcb16]"
                   />
                 </div>
                 <div className="flex justify-between text-[9px] font-mono text-muted-foreground px-0.5">
@@ -268,9 +268,9 @@ export function ModelsTab() {
                     value={temperature}
                     onChange={(e) => setTemperature(parseFloat(e.target.value))}
                     style={{
-                      background: `linear-gradient(to right, #10b981 ${(temperature / 2) * 100}%, rgba(0,0,0,0.08) ${(temperature / 2) * 100}%)`,
+                      background: `linear-gradient(to right, #8dcb16 ${(temperature / 2) * 100}%, rgba(0,0,0,0.08) ${(temperature / 2) * 100}%)`,
                     }}
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#8dcb16]"
                   />
                 </div>
               </div>
@@ -292,9 +292,9 @@ export function ModelsTab() {
                     value={topP}
                     onChange={(e) => setTopP(parseFloat(e.target.value))}
                     style={{
-                      background: `linear-gradient(to right, #10b981 ${topP * 100}%, rgba(0,0,0,0.08) ${topP * 100}%)`,
+                      background: `linear-gradient(to right, #8dcb16 ${topP * 100}%, rgba(0,0,0,0.08) ${topP * 100}%)`,
                     }}
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#8dcb16]"
                   />
                 </div>
               </div>
@@ -316,9 +316,9 @@ export function ModelsTab() {
                     value={maxTokens}
                     onChange={(e) => setMaxTokens(parseInt(e.target.value, 10))}
                     style={{
-                      background: `linear-gradient(to right, #10b981 ${((maxTokens - 512) / (16384 - 512)) * 100}%, rgba(0,0,0,0.08) ${((maxTokens - 512) / (16384 - 512)) * 100}%)`,
+                      background: `linear-gradient(to right, #8dcb16 ${((maxTokens - 512) / (16384 - 512)) * 100}%, rgba(0,0,0,0.08) ${((maxTokens - 512) / (16384 - 512)) * 100}%)`,
                     }}
-                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-[#8dcb16]"
                   />
                 </div>
               </div>
@@ -355,7 +355,7 @@ export function ModelsTab() {
 
           <div className="h-1.5 w-full bg-black/[0.06] rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-emerald-500 rounded-full"
+              className="h-full bg-[#8dcb16] rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${usagePercent}%` }}
               transition={{ duration: 0.6, ease: "easeOut" }}
