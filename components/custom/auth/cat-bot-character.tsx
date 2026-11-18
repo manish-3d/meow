@@ -98,9 +98,11 @@ export function CatBotCharacter({ isHappy = false }: CatBotCharacterProps) {
           y: isHappy
             ? { type: "spring", stiffness: 320, damping: 16 }
             : isHovered
-            ? { duration: 0.2 }
+            ? { duration: 0.2, ease: "easeOut" }
             : { repeat: Infinity, duration: 3.8, ease: "easeInOut" },
-          rotate: { type: "spring", stiffness: 220, damping: 22 },
+          rotate: isHappy
+            ? { duration: 0.6, ease: "easeInOut" }
+            : { type: "spring", stiffness: 220, damping: 22 },
         }}
         className="relative w-full h-full flex items-center justify-center"
       >
