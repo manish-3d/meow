@@ -8,34 +8,22 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
 import {
   Search,
   Store,
-  CheckCircle2,
+  Check,
   Plus,
   Loader2,
   RefreshCw,
-  ExternalLink,
+  X,
+  ShieldCheck,
+  CheckCircle2,
   Unlink,
-  Mail,
-  MessageSquare,
-  Github,
-  FileText,
-  Calendar,
-  Globe,
-  Newspaper,
-  HardDrive,
-  Hash,
-  KanbanSquare,
-  Layers,
-  Monitor,
-  Sparkles,
 } from "lucide-react";
 import axios from "axios";
+import { BrandLogo } from "@/components/custom/brands/brand-logo";
+import { motion, AnimatePresence } from "motion/react";
 
 export interface ToolRecord {
   id: number;
@@ -46,44 +34,6 @@ export interface ToolRecord {
   isActive: boolean;
   connected?: boolean;
 }
-
-const TwitterIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className || "size-4"}>
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-  </svg>
-);
-
-const LinkedinIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className || "size-4"}>
-    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m1.37 9.74v-8.37H5.1v8.37h2.73z" />
-  </svg>
-);
-
-const InstagramIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className || "size-4"}>
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
-
-const TOOL_ICON_MAP: Record<string, React.ElementType> = {
-  GMAIL: Mail,
-  OUTLOOK: Mail,
-  SLACK: MessageSquare,
-  DISCORD: Hash,
-  GITHUB: Github,
-  NOTION: FileText,
-  GOOGLECALENDAR: Calendar,
-  GOOGLEDRIVE: HardDrive,
-  HACKERNEWS: Newspaper,
-  JIRA: KanbanSquare,
-  LINEAR: Layers,
-  TWITTER: TwitterIcon,
-  LINKEDIN: LinkedinIcon,
-  INSTAGRAM: InstagramIcon,
-  E2B: Monitor,
-};
 
 const CATEGORIES = [
   "All",
@@ -99,9 +49,9 @@ type Category = typeof CATEGORIES[number];
 function getToolCategory(slug: string): Category {
   const s = slug.toUpperCase();
   if (["GMAIL", "OUTLOOK", "SLACK", "DISCORD"].includes(s)) return "Communication";
-  if (["GOOGLECALENDAR", "NOTION", "GOOGLEDRIVE"].includes(s)) return "Productivity";
+  if (["GOOGLECALENDAR", "NOTION", "GOOGLEDRIVE", "GOOGLEDOCS"].includes(s)) return "Productivity";
   if (["TWITTER", "LINKEDIN", "INSTAGRAM", "REDDIT"].includes(s)) return "Social Media";
-  if (["GITHUB", "JIRA", "LINEAR", "HACKERNEWS", "E2B"].includes(s)) return "Developer";
+  if (["GITHUB", "JIRA", "LINEAR", "HACKERNEWS", "TRELLO", "E2B"].includes(s)) return "Developer";
   return "Productivity";
 }
 
@@ -116,6 +66,7 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
   const [actionLoadingSlug, setActionLoadingSlug] = useState<string | null>(null);
+  const [hoveredDisconnectSlug, setHoveredDisconnectSlug] = useState<string | null>(null);
 
   // 1. Fetch live tools catalog with connection status
   const fetchTools = useCallback(async (silent = false) => {
@@ -153,32 +104,44 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
       if (res.data?.redirectUrl) {
         toast.add({
           title: `Connecting ${tool.name}`,
-          description: "Opening authorization window in a new tab...",
+          description: "Complete authentication in the opened window.",
           type: "info",
         });
 
-        // Open OAuth authorization in a new window/tab
-        window.open(res.data.redirectUrl, "_blank", "noopener,noreferrer");
+        const popup = window.open(
+          res.data.redirectUrl,
+          `oauth_${tool.slug}`,
+          "width=600,height=720,top=120,left=240"
+        );
 
-        // Periodically poll for completion over the next 15 seconds
-        let attempts = 0;
-        const pollInterval = setInterval(async () => {
-          attempts++;
-          await fetchTools(true);
-          if (attempts >= 5) clearInterval(pollInterval);
-        }, 3000);
+        const checkInterval = setInterval(async () => {
+          if (!popup || popup.closed) {
+            clearInterval(checkInterval);
+            setActionLoadingSlug(null);
+            await fetchTools(true);
+            toast.add({
+              title: `${tool.name} Connected`,
+              description: `Tool successfully linked to your agent workspace.`,
+              type: "success",
+            });
+          }
+        }, 1500);
+      } else {
+        toast.add({
+          title: "Connection Ready",
+          description: res.data?.message || "Tool configured.",
+          type: "success",
+        });
+        await fetchTools(true);
+        setActionLoadingSlug(null);
       }
     } catch (err: any) {
-      const errorMsg =
-        err?.response?.data?.error ||
-        err?.message ||
-        `Failed to initiate connection to ${tool.name}`;
+      console.error("Connection error:", err);
       toast.add({
         title: "Connection Failed",
-        description: errorMsg,
+        description: err.response?.data?.error || err.message || "Failed to start OAuth flow",
         type: "error",
       });
-    } finally {
       setActionLoadingSlug(null);
     }
   };
@@ -188,20 +151,20 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
     setActionLoadingSlug(tool.slug);
     try {
       await axios.post("/api/tools/disconnect", {
-        toolSlug: tool.slug,
+        toolkitSlug: tool.slug,
       });
 
       toast.add({
         title: `${tool.name} Disconnected`,
-        description: "Integration authorization was revoked.",
-        type: "success",
+        description: "Account access revoked successfully.",
+        type: "info",
       });
 
       await fetchTools(true);
     } catch (err: any) {
       toast.add({
         title: "Disconnection Failed",
-        description: err?.response?.data?.error || "Could not revoke tool access.",
+        description: err.response?.data?.error || err.message || "Could not disconnect tool",
         type: "error",
       });
     } finally {
@@ -209,7 +172,9 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
     }
   };
 
-  // 4. Filtered & searched tools
+  // 4. Counts & Filter logic
+  const connectedCount = useMemo(() => tools.filter((t) => t.connected).length, [tools]);
+
   const filteredTools = useMemo(() => {
     return tools.filter((tool) => {
       const matchesSearch =
@@ -220,176 +185,189 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
       if (!matchesSearch) return false;
 
       if (selectedCategory === "All") return true;
-      if (selectedCategory === "Connected") return !!tool.connected;
+      if (selectedCategory === "Connected") return Boolean(tool.connected);
 
       return getToolCategory(tool.slug) === selectedCategory;
     });
   }, [tools, search, selectedCategory]);
 
-  const connectedCount = tools.filter((t) => t.connected).length;
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-3xl max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-card text-card-foreground border-border shadow-2xl">
-        {/* Header */}
-        <div className="p-5 border-b border-border/70 bg-muted/20 shrink-0">
-          <div className="flex items-start justify-between gap-4">
-            <div className="space-y-1">
+      <DialogContent className="max-w-3xl p-0 overflow-hidden bg-white rounded-3xl border border-black/[0.08] shadow-2xl flex flex-col max-h-[85vh]">
+        {/* ── HEADER ── */}
+        <div className="px-6 pt-6 pb-4 border-b border-black/[0.06] shrink-0 bg-white">
+          <div className="flex items-center justify-between gap-3 mb-1">
+            <div className="flex items-center gap-2.5">
+              <div className="size-8 rounded-xl bg-neutral-100 border border-black/[0.08] flex items-center justify-center text-foreground shadow-2xs">
+                <Store className="size-4" />
+              </div>
               <div className="flex items-center gap-2">
-                <div className="size-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
-                  <Store className="size-4" />
-                </div>
-                <DialogTitle className="text-base font-bold tracking-tight">
+                <DialogTitle className="text-base font-bold text-foreground tracking-tight">
                   Tool & Integration Marketplace
                 </DialogTitle>
-                <Badge variant="outline" className="text-[10px] font-mono ml-1">
+                <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/60">
                   {connectedCount} Connected
-                </Badge>
+                </span>
               </div>
-              <DialogDescription className="text-xs text-muted-foreground">
-                Connect your SaaS accounts and cloud services. Connected tools are instantly accessible to all your autonomous agents.
-              </DialogDescription>
             </div>
 
-            <Button
-              size="sm"
-              variant="outline"
-              className="size-8 p-0 shrink-0"
+            <button
+              type="button"
               onClick={() => fetchTools()}
               disabled={loading}
+              className="size-8 rounded-xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-neutral-100 transition-colors"
               title="Refresh integrations"
             >
               <RefreshCw className={`size-3.5 ${loading ? "animate-spin" : ""}`} />
-            </Button>
+            </button>
           </div>
 
-          {/* Search & Categories Bar */}
-          <div className="mt-4 space-y-2.5">
-            <div className="relative">
-              <Search className="size-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search tools by name, service, or keyword (e.g. Gmail, GitHub, Calendar)..."
-                className="pl-8 text-xs h-8 bg-background border-border"
-              />
-            </div>
+          <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+            Connect your SaaS accounts and cloud services. Connected tools are immediately accessible to all your autonomous agents.
+          </DialogDescription>
 
-            {/* Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pt-0.5">
-              {CATEGORIES.map((cat) => (
+          {/* Search Bar */}
+          <div className="relative mt-4">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search tools by name, service, or keyword (e.g. Gmail, GitHub, Calendar)..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full h-9 pl-9 pr-3 text-xs rounded-xl border border-black/[0.08] bg-neutral-50/80 outline-none focus:border-black/30 focus:bg-white transition-all placeholder:text-muted-foreground/60 shadow-2xs"
+            />
+          </div>
+
+          {/* Category Filter Pills */}
+          <div className="flex items-center gap-1.5 mt-3 overflow-x-auto no-scrollbar">
+            {CATEGORIES.map((cat) => {
+              const isSelected = selectedCategory === cat;
+              return (
                 <button
                   key={cat}
                   type="button"
                   onClick={() => setSelectedCategory(cat)}
-                  className={`text-[11px] px-2.5 py-1 rounded-md font-medium transition-colors shrink-0 ${
-                    selectedCategory === cat
-                      ? "bg-primary text-primary-foreground shadow-xs"
-                      : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+                  className={`px-3 py-1 rounded-xl text-xs font-medium whitespace-nowrap transition-all cursor-pointer ${
+                    isSelected
+                      ? "bg-black text-white shadow-2xs font-semibold"
+                      : "bg-neutral-100 text-muted-foreground hover:text-foreground hover:bg-neutral-200/70"
                   }`}
                 >
-                  {cat}
-                  {cat === "Connected" && connectedCount > 0 && ` (${connectedCount})`}
+                  {cat} {cat === "Connected" && `(${connectedCount})`}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Tools Grid Body */}
-        <div className="flex-1 overflow-y-auto p-5">
+        {/* ── TOOL CARDS GRID (PRO STAGESHOW SPEC) ── */}
+        <div className="flex-1 overflow-y-auto p-6 bg-neutral-50/40">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-16 space-y-2 text-muted-foreground">
-              <Loader2 className="size-6 animate-spin text-primary" />
-              <span className="text-xs">Loading integration catalog...</span>
+            <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
+              <Loader2 className="size-6 animate-spin text-black" />
+              <span className="text-xs font-mono">Loading integrations catalog...</span>
             </div>
           ) : filteredTools.length === 0 ? (
-            <div className="text-center py-14 space-y-2">
-              <Store className="size-8 mx-auto text-muted-foreground/60" />
-              <p className="text-xs font-semibold text-foreground">No integrations found</p>
-              <p className="text-[11px] text-muted-foreground max-w-xs mx-auto">
-                No tools match &ldquo;{search}&rdquo; in category {selectedCategory}.
-              </p>
+            <div className="text-center py-16 space-y-2">
+              <span className="text-xs text-muted-foreground">No integrations match your search.</span>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {filteredTools.map((tool) => {
-                const IconComponent =
-                  TOOL_ICON_MAP[tool.slug.toUpperCase()] || Globe;
-                const isActionLoading = actionLoadingSlug === tool.slug;
+                const isConnecting = actionLoadingSlug === tool.slug;
                 const category = getToolCategory(tool.slug);
+                const isHovered = hoveredDisconnectSlug === tool.slug;
 
                 return (
                   <div
                     key={tool.id}
-                    className="p-3.5 rounded-xl border border-border/70 bg-card hover:border-border transition-all flex flex-col justify-between space-y-3"
+                    className="p-4 rounded-2xl border border-black/[0.08] bg-white shadow-2xs hover:border-black/20 hover:shadow-xs transition-all flex flex-col justify-between gap-3 group"
                   >
+                    {/* Top Row: Real Brand Logo + Name + Category Tag */}
                     <div className="flex items-start justify-between gap-2.5">
-                      <div className="flex items-start gap-2.5 min-w-0">
-                        <div className="size-8 rounded-lg bg-muted border border-border flex items-center justify-center text-foreground shrink-0 mt-0.5">
-                          <IconComponent className="size-4" />
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Real Official Brand Mark */}
+                        <div className="size-10 rounded-xl border border-black/[0.08] bg-white flex items-center justify-center p-1.5 shadow-2xs shrink-0 group-hover:scale-105 transition-transform duration-200">
+                          <BrandLogo slug={tool.slug} name={tool.name} size={22} />
                         </div>
+
                         <div className="min-w-0">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <h4 className="text-xs font-bold text-foreground truncate">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-semibold text-xs text-foreground tracking-tight truncate">
                               {tool.name}
-                            </h4>
-                            <span className="text-[9px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted px-1.5 py-0.2 rounded">
+                            </span>
+                            <span className="text-[9px] font-mono text-muted-foreground uppercase tracking-wider bg-neutral-100 px-1.5 py-0.2 rounded">
                               {category}
                             </span>
                           </div>
-                          <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1 leading-relaxed">
-                            {tool.description || `Autonomous integration for ${tool.name}.`}
-                          </p>
+                          <span className="text-[10px] text-muted-foreground font-mono block">
+                            OAuth 2.0
+                          </span>
                         </div>
                       </div>
 
+                      {/* Connection Status Indicator */}
                       {tool.connected && (
-                        <Badge
-                          variant="outline"
-                          className="text-[9px] font-medium bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 shrink-0 gap-1"
-                        >
-                          <CheckCircle2 className="size-2.5" />
-                          Connected
-                        </Badge>
+                        <span className="flex items-center gap-1 text-[10px] font-medium font-mono text-emerald-600 bg-emerald-50 border border-emerald-200/50 px-2 py-0.5 rounded-full shrink-0">
+                          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span>Connected</span>
+                        </span>
                       )}
                     </div>
 
-                    {/* Bottom Action Footer */}
-                    <div className="pt-2 border-t border-border/40 flex items-center justify-between">
-                      <span className="text-[10px] text-muted-foreground font-mono">
-                        slug: {tool.slug}
-                      </span>
+                    {/* Description */}
+                    <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                      {tool.description || `Integrate ${tool.name} tools and automated workflows.`}
+                    </p>
 
+                    {/* Bottom Action Row (NO developer-slop slug tag) */}
+                    <div className="pt-2 border-t border-black/[0.04] flex items-center justify-end">
                       {tool.connected ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
+                        <button
+                          type="button"
+                          onMouseEnter={() => setHoveredDisconnectSlug(tool.slug)}
+                          onMouseLeave={() => setHoveredDisconnectSlug(null)}
                           onClick={() => handleDisconnect(tool)}
-                          disabled={isActionLoading}
-                          className="h-7 text-[11px] gap-1.5 text-destructive hover:text-destructive hover:bg-destructive/10 border-border"
+                          disabled={isConnecting}
+                          className={`h-7 px-3 rounded-xl text-xs font-medium transition-all flex items-center gap-1.5 cursor-pointer border ${
+                            isHovered
+                              ? "bg-rose-50 border-rose-200 text-rose-600 shadow-2xs"
+                              : "bg-neutral-50 border-black/[0.06] text-muted-foreground"
+                          }`}
                         >
-                          {isActionLoading ? (
+                          {isConnecting ? (
                             <Loader2 className="size-3 animate-spin" />
+                          ) : isHovered ? (
+                            <>
+                              <Unlink className="size-3" />
+                              <span>Disconnect</span>
+                            </>
                           ) : (
-                            <Unlink className="size-3" />
+                            <>
+                              <Check className="size-3 text-emerald-600 stroke-[2.5]" />
+                              <span>Active</span>
+                            </>
                           )}
-                          Disconnect
-                        </Button>
+                        </button>
                       ) : (
-                        <Button
-                          size="sm"
+                        <button
+                          type="button"
                           onClick={() => handleConnect(tool)}
-                          disabled={isActionLoading}
-                          className="h-7 text-[11px] gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
+                          disabled={isConnecting}
+                          className="h-7 px-3.5 rounded-xl text-xs font-semibold bg-black text-white hover:bg-neutral-800 transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                         >
-                          {isActionLoading ? (
-                            <Loader2 className="size-3 animate-spin" />
+                          {isConnecting ? (
+                            <>
+                              <Loader2 className="size-3 animate-spin" />
+                              <span>Connecting...</span>
+                            </>
                           ) : (
-                            <Plus className="size-3" />
+                            <>
+                              <Plus className="size-3 stroke-[2.5]" />
+                              <span>Connect</span>
+                            </>
                           )}
-                          Connect
-                        </Button>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -399,20 +377,20 @@ export function MarketplaceDialog({ open, onOpenChange }: MarketplaceDialogProps
           )}
         </div>
 
-        {/* Modal Footer Advisory */}
-        <div className="p-3 border-t border-border/70 bg-muted/20 px-5 flex items-center justify-between text-[11px] text-muted-foreground shrink-0">
-          <div className="flex items-center gap-1.5">
-            <Sparkles className="size-3 text-primary shrink-0" />
-            <span>Secure OAuth tokens are managed and encrypted via Composio proxy vaults.</span>
+        {/* ── FOOTER ── */}
+        <div className="px-6 py-3.5 border-t border-black/[0.06] bg-white flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-1.5 text-muted-foreground text-[11px]">
+            <ShieldCheck className="size-3.5 text-emerald-600" />
+            <span>Encrypted OAuth credentials managed via Composio vaults.</span>
           </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-xs h-7"
+
+          <button
+            type="button"
             onClick={() => onOpenChange(false)}
+            className="text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1 rounded-xl hover:bg-neutral-100"
           >
             Close
-          </Button>
+          </button>
         </div>
       </DialogContent>
     </Dialog>

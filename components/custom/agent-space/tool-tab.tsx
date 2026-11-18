@@ -2,27 +2,18 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import {
-  Mail,
-  MessageSquare,
-  Github,
-  FileText,
-  Calendar,
-  Globe,
-  Newspaper,
-  HardDrive,
-  Hash,
-  KanbanSquare,
-  Layers,
+  Wrench,
   CheckCircle2,
   Plus,
   Loader2,
-  Wrench,
-  ExternalLink,
   RefreshCw,
+  Unlink,
+  Check,
 } from "lucide-react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
+import { BrandLogo } from "@/components/custom/brands/brand-logo";
 
 interface ToolRecord {
   id: number;
@@ -34,48 +25,11 @@ interface ToolRecord {
   connected?: boolean;
 }
 
-const TwitterIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className || "size-4"}>
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-  </svg>
-);
-
-const LinkedinIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className={className || "size-4"}>
-    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3m1.37 9.74v-8.37H5.1v8.37h2.73z" />
-  </svg>
-);
-
-const InstagramIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className || "size-4"}>
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
-
-const TOOL_ICON_MAP: Record<string, React.ElementType> = {
-  GMAIL: Mail,
-  OUTLOOK: Mail,
-  SLACK: MessageSquare,
-  GITHUB: Github,
-  NOTION: FileText,
-  GOOGLECALENDAR: Calendar,
-  GOOGLEDOCS: FileText,
-  GOOGLEDRIVE: HardDrive,
-  REDDIT: Newspaper,
-  DISCORD: Hash,
-  TRELLO: KanbanSquare,
-  LINEAR: Layers,
-  TWITTER: TwitterIcon,
-  LINKEDIN: LinkedinIcon,
-  INSTAGRAM: InstagramIcon,
-};
-
 export function ToolTab() {
   const [tools, setTools] = useState<ToolRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [connectingSlug, setConnectingSlug] = useState<string | null>(null);
+  const [hoveredDisconnectSlug, setHoveredDisconnectSlug] = useState<string | null>(null);
 
   const fetchTools = useCallback(async (silent = false) => {
     try {
@@ -100,7 +54,6 @@ export function ToolTab() {
     fetchTools();
   }, [fetchTools]);
 
-  // When window regains focus (e.g. user finishes OAuth popup and returns), refresh list
   useEffect(() => {
     const handleFocus = () => {
       fetchTools(true);
@@ -124,21 +77,19 @@ export function ToolTab() {
           type: "success",
         });
 
-        // Open Composio's real OAuth window
         const popup = window.open(
           res.data.redirectUrl,
           `composio_${tool.slug}`,
-          "width=650,height=750,top=100,left=200"
+          "width=600,height=720,top=120,left=240"
         );
 
-        // Poll every 3 seconds while popup is open to detect completion
         const timer = setInterval(() => {
           if (!popup || popup.closed) {
             clearInterval(timer);
             setConnectingSlug(null);
             fetchTools(true);
           }
-        }, 2000);
+        }, 1500);
       } else {
         throw new Error("No redirect URL returned by Composio");
       }
@@ -153,20 +104,45 @@ export function ToolTab() {
     }
   };
 
+  const handleDisconnect = async (tool: ToolRecord) => {
+    try {
+      setConnectingSlug(tool.slug);
+      await axios.post("/api/tools/disconnect", {
+        toolkitSlug: tool.slug,
+      });
+
+      toast.add({
+        title: `${tool.name} Disconnected`,
+        description: "Integration disconnected.",
+        type: "info",
+      });
+
+      await fetchTools(true);
+    } catch (err: any) {
+      toast.add({
+        title: "Disconnection Failed",
+        description: err.response?.data?.error || err.message || "Could not disconnect tool",
+        type: "error",
+      });
+    } finally {
+      setConnectingSlug(null);
+    }
+  };
+
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-2 text-center">
-        <Loader2 className="size-4 animate-spin text-primary" />
-        <span className="text-xs text-muted-foreground">Checking live Composio connections...</span>
+      <div className="flex flex-col items-center justify-center py-16 gap-2 text-center text-muted-foreground">
+        <Loader2 className="size-4 animate-spin text-black" />
+        <span className="text-xs font-mono">Syncing integrations...</span>
       </div>
     );
   }
 
   if (!tools.length) {
     return (
-      <div className="text-center py-10 space-y-2">
-        <Wrench className="size-6 mx-auto text-muted-foreground/60" />
-        <p className="text-xs text-muted-foreground">No tools available.</p>
+      <div className="text-center py-12 space-y-2">
+        <Wrench className="size-6 mx-auto text-muted-foreground/40" />
+        <p className="text-xs text-muted-foreground">No integrations available.</p>
       </div>
     );
   }
@@ -174,82 +150,103 @@ export function ToolTab() {
   const connectedCount = tools.filter((t) => t.connected).length;
 
   return (
-    <div className="space-y-3 pt-2">
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-muted-foreground">
-          Live toolkits powered by <strong>Composio v3</strong>.
-          <span className="text-[10px] ml-1.5 font-medium text-emerald-500">
-            ({connectedCount}/{tools.length} active)
+    <div className="space-y-4 pt-1 pb-6 text-xs select-none">
+      {/* ── HEADER TELEMETRY ── */}
+      <div className="flex items-center justify-between pb-1 border-b border-black/[0.04]">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-xs text-foreground">Active Toolkits</span>
+          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/50">
+            {connectedCount}/{tools.length} Ready
           </span>
-        </p>
+        </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-foreground gap-1"
+        <button
+          type="button"
           onClick={() => fetchTools(false)}
-          title="Refresh connections"
+          className="size-6 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-neutral-100 transition-colors"
+          title="Refresh integrations"
         >
-          <RefreshCw className="size-2.5" />
-          <span>Refresh</span>
-        </Button>
+          <RefreshCw className="size-3" />
+        </button>
       </div>
 
+      {/* ── TOOL LIST ── */}
       <div className="space-y-2">
         {tools.map((tool) => {
-          const IconComponent = TOOL_ICON_MAP[tool.slug] || Globe;
           const isConnecting = connectingSlug === tool.slug;
+          const isHovered = hoveredDisconnectSlug === tool.slug;
 
           return (
             <div
               key={tool.id}
-              className="flex items-center justify-between p-2.5 rounded-lg border border-border/60 bg-muted/30 hover:bg-muted/50 transition-colors"
+              className="p-3 rounded-2xl border border-black/[0.08] bg-white shadow-2xs hover:border-black/20 hover:shadow-xs transition-all flex items-center justify-between gap-3 group"
             >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="size-8 rounded-lg bg-background border border-border flex items-center justify-center shrink-0">
-                  <IconComponent className="size-4 text-foreground" />
+              {/* Left: Real Official Logo + Name + Description */}
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="size-9 rounded-xl border border-black/[0.08] bg-white flex items-center justify-center p-1.5 shadow-2xs shrink-0 group-hover:scale-105 transition-transform duration-200">
+                  <BrandLogo slug={tool.slug} name={tool.name} size={20} />
                 </div>
+
                 <div className="flex flex-col min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-semibold truncate text-foreground">{tool.name}</span>
-                    {tool.authType && (
-                      <span className="text-[9px] font-medium text-muted-foreground bg-muted/80 px-1.5 py-0 rounded">
-                        {tool.authType}
-                      </span>
+                    <span className="text-xs font-semibold text-foreground truncate tracking-tight">
+                      {tool.name}
+                    </span>
+                    {tool.connected && (
+                      <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
                     )}
                   </div>
-                  <span className="text-[11px] text-muted-foreground truncate">
-                    {tool.description || "No description available"}
+                  <span className="text-[11px] text-muted-foreground truncate leading-tight">
+                    {tool.description || "Cloud integration"}
                   </span>
                 </div>
               </div>
 
-              <div className="shrink-0 pl-2">
+              {/* Right: Connect or Disconnect Button */}
+              <div className="shrink-0">
                 {tool.connected ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-full">
-                    <CheckCircle2 className="size-3" />
-                    Connected
-                  </span>
-                ) : (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-7 text-[11px] gap-1 px-2.5"
+                  <button
+                    type="button"
+                    onMouseEnter={() => setHoveredDisconnectSlug(tool.slug)}
+                    onMouseLeave={() => setHoveredDisconnectSlug(null)}
+                    onClick={() => handleDisconnect(tool)}
                     disabled={isConnecting}
-                    onClick={() => handleConnect(tool)}
+                    className={`h-7 px-2.5 rounded-xl text-[11px] font-medium transition-all flex items-center gap-1 cursor-pointer border ${
+                      isHovered
+                        ? "bg-rose-50 border-rose-200 text-rose-600 shadow-2xs"
+                        : "bg-neutral-50 border-black/[0.06] text-muted-foreground"
+                    }`}
                   >
                     {isConnecting ? (
+                      <Loader2 className="size-3 animate-spin" />
+                    ) : isHovered ? (
                       <>
-                        <Loader2 className="size-3 animate-spin" />
-                        <span>Connecting...</span>
+                        <Unlink className="size-3" />
+                        <span>Disconnect</span>
                       </>
                     ) : (
                       <>
-                        <Plus className="size-3" />
+                        <Check className="size-3 text-emerald-600 stroke-[2.5]" />
+                        <span>Connected</span>
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => handleConnect(tool)}
+                    disabled={isConnecting}
+                    className="h-7 px-3 rounded-xl text-[11px] font-semibold bg-black text-white hover:bg-neutral-800 transition-all shadow-2xs flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  >
+                    {isConnecting ? (
+                      <Loader2 className="size-3 animate-spin" />
+                    ) : (
+                      <>
+                        <Plus className="size-3 stroke-[2.5]" />
                         <span>Connect</span>
                       </>
                     )}
-                  </Button>
+                  </button>
                 )}
               </div>
             </div>

@@ -22,6 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RoutineSchemaType } from "@/lib/ai/agent_response_schema";
 import { TimezoneContinentSelect } from "./timezone-select";
+import { BrandLogo } from "@/components/custom/brands/brand-logo";
 import axios from "axios";
 
 interface RoutineCardProps {
@@ -465,16 +466,12 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
             {toolStatuses.map((t) => (
               <div
                 key={t.slug}
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[10px] font-mono border transition-colors ${t.isConnected
-                  ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/25"
-                  : "bg-amber-500/10 text-amber-500 border-amber-500/25"
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-mono border transition-colors ${t.isConnected
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200/60"
+                  : "bg-amber-50 text-amber-700 border-amber-200/60"
                   }`}
               >
-                {t.isConnected ? (
-                  <CheckCircle2 className="size-3 shrink-0 text-emerald-500" />
-                ) : (
-                  <AlertCircle className="size-3 shrink-0 text-amber-500" />
-                )}
+                <BrandLogo slug={t.slug} name={t.name} size={14} />
                 <span className="font-semibold">{t.name}</span>
                 <span className="text-[9px] opacity-80">
                   {t.isConnected ? "Ready" : "Auth Required"}
@@ -483,7 +480,7 @@ export function RoutineCard({ routine, agentId, onRoutineCreated }: RoutineCardP
                   <button
                     type="button"
                     onClick={() => handleConnectTool(t.slug)}
-                    className="ml-1 text-[9px] underline font-semibold text-amber-500 hover:text-foreground inline-flex items-center gap-0.5"
+                    className="ml-1 text-[9px] underline font-semibold text-amber-600 hover:text-foreground inline-flex items-center gap-0.5"
                   >
                     + Connect
                   </button>
