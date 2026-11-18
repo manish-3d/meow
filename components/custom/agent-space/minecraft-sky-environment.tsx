@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
@@ -819,6 +819,100 @@ function ElevatedMinecraftGround() {
 }
 
 // =========================================================================
+// 8.5 VOXEL MINECRAFT CLOUDS DRIFTING HORIZONTALLY
+// =========================================================================
+
+interface CloudItem {
+  id: number;
+  initialX: number;
+  yRatio: number;
+  z: number;
+  width: number;
+  height: number;
+  depth: number;
+  speed: number;
+}
+
+function VoxelCloud({ cloud }: { cloud: CloudItem }) {
+  const meshRef = useRef<THREE.Group>(null);
+  const currentX = useRef(cloud.initialX);
+  const { viewport } = useThree();
+
+  const wrapBoundary = viewport.width / 2 + 5;
+  const cloudY = viewport.height * cloud.yRatio;
+
+  useFrame((_, delta) => {
+    if (meshRef.current) {
+      currentX.current += cloud.speed * delta;
+      if (currentX.current > wrapBoundary) {
+        currentX.current = -wrapBoundary;
+      }
+      meshRef.current.position.x = currentX.current;
+      meshRef.current.position.y = cloudY;
+    }
+  });
+
+  return (
+    <group
+      ref={meshRef}
+      position={[cloud.initialX, cloudY, cloud.z]}
+      scale={0.7}
+    >
+      {/* Main Base Cloud Slab (Minecraft flat voxel shape) */}
+      <mesh castShadow={false}>
+        <boxGeometry args={[cloud.width, 0.38, cloud.depth]} />
+        <meshStandardMaterial
+          color="#FFFFFF"
+          transparent
+          opacity={0.88}
+          roughness={0.9}
+        />
+      </mesh>
+      {/* Stepped top block */}
+      <mesh position={[0.3, 0.26, 0]}>
+        <boxGeometry args={[cloud.width * 0.6, 0.28, cloud.depth * 0.75]} />
+        <meshStandardMaterial
+          color="#FFFFFF"
+          transparent
+          opacity={0.9}
+          roughness={0.9}
+        />
+      </mesh>
+      {/* Side extension block */}
+      <mesh position={[-cloud.width * 0.28, -0.06, 0.1]}>
+        <boxGeometry args={[cloud.width * 0.45, 0.26, cloud.depth * 0.65]} />
+        <meshStandardMaterial
+          color="#F8FAFC"
+          transparent
+          opacity={0.85}
+          roughness={0.9}
+        />
+      </mesh>
+    </group>
+  );
+}
+
+function VoxelCloudsSky() {
+  const clouds: CloudItem[] = useMemo(
+    () => [
+      { id: 1, initialX: -3.5, yRatio: 0.36, z: -3.5, width: 3.8, height: 0.38, depth: 1.8, speed: 0.12 },
+      { id: 2, initialX: 3.2, yRatio: 0.42, z: -4.5, width: 4.8, height: 0.38, depth: 2.2, speed: 0.09 },
+      { id: 3, initialX: 7.5, yRatio: 0.32, z: -2.8, width: 3.2, height: 0.38, depth: 1.6, speed: 0.14 },
+      { id: 4, initialX: -8.0, yRatio: 0.40, z: -5.0, width: 5.0, height: 0.38, depth: 2.4, speed: 0.08 },
+    ],
+    []
+  );
+
+  return (
+    <>
+      {clouds.map((cloud) => (
+        <VoxelCloud key={cloud.id} cloud={cloud} />
+      ))}
+    </>
+  );
+}
+
+// =========================================================================
 // 9. MAIN MINECRAFT LIVING WORLD EXPORT
 // =========================================================================
 
@@ -854,6 +948,9 @@ export function MinecraftSkyEnvironment() {
           intensity={0.65}
         />
 
+        {/* 0. Drifting Minecraft voxel clouds in upper sky */}
+        <VoxelCloudsSky />
+
         {/* 1. Upper-left: Headphone Cat sitting on wooden platform with green leaves & hanging vines */}
         <UpperLeftCatIsland />
 
@@ -863,7 +960,7 @@ export function MinecraftSkyEnvironment() {
         {/* 3. Drifting Island 2: Floating wooden cabin / cottage with chimney, window, foliage & vines (Right to Left) */}
         <DriftingCottageIsland />
 
-        {/* 4. Bottom Area: Elevated lush Minecraft grass terrain, oak tree, flowers, timber beam & glowing lantern */}
+        {/* 4. Bottom Area: Elevated lush Minecraft grass terrain, flowers, timber beam & tall symmetrical lamp posts */}
         <ElevatedMinecraftGround />
       </Canvas>
     </div>

@@ -429,14 +429,14 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             <Mic className="size-4" />
           </button>
 
-          {/* Solid Black Send Button */}
+          {/* Green Send Button */}
           <motion.button
             type="button"
             onClick={() => handleSend()}
             disabled={!input.trim() || isStreaming || propLoading || agent.isActive === false}
             whileTap={{ scale: 0.94 }}
             aria-label="Send message"
-            className="shrink-0 size-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-neutral-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
+            className="shrink-0 size-8 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:bg-emerald-600 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
           >
             {isStreaming ? (
               <Loader2 className="size-3.5 animate-spin" />

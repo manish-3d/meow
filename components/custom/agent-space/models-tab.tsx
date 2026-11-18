@@ -56,8 +56,8 @@ export function ModelsTab() {
   const usagePercent = Math.min(100, Math.round((currentTokens / monthlyLimit) * 100));
 
   // Input & Output token breakdown
-  const inputTokens = allTimeUsage.promptTokens > 0 ? allTimeUsage.promptTokens : 8340;
-  const outputTokens = allTimeUsage.completionTokens > 0 ? allTimeUsage.completionTokens : 4090;
+  const inputTokens = allTimeUsage.promptTokens > 0 ? allTimeUsage.promptTokens : 4165;
+  const outputTokens = allTimeUsage.completionTokens > 0 ? allTimeUsage.completionTokens : 89;
   const totalTokens = inputTokens + outputTokens;
   const estimatedCost = allTimeUsage.estimatedCost > 0 ? allTimeUsage.estimatedCost : 0.042;
 
@@ -105,7 +105,7 @@ export function ModelsTab() {
                     {selectedModel.name}
                   </span>
                   {selectedModel.isFree && (
-                    <span className="text-[10px] font-medium bg-black/[0.04] text-muted-foreground px-2 py-0.5 rounded-full">
+                    <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/50 px-2 py-0.5 rounded-full">
                       Recommended
                     </span>
                   )}
@@ -226,7 +226,7 @@ export function ModelsTab() {
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
                   <span className="text-xs text-muted-foreground">Workload & Effort</span>
-                  <span className="text-xs font-semibold font-mono text-foreground capitalize">
+                  <span className="text-xs font-semibold font-mono text-emerald-800 capitalize">
                     {reasoningEffort}
                   </span>
                 </div>
@@ -238,7 +238,10 @@ export function ModelsTab() {
                     step="1"
                     value={effortIndex}
                     onChange={(e) => handleEffortSliderChange(parseInt(e.target.value, 10))}
-                    className="w-full h-1 bg-black/[0.1] rounded-full appearance-none cursor-pointer accent-black"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 ${((effortIndex - 1) / 2) * 100}%, rgba(0,0,0,0.08) ${((effortIndex - 1) / 2) * 100}%)`,
+                    }}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
                   />
                 </div>
                 <div className="flex justify-between text-[9px] font-mono text-muted-foreground px-0.5">
@@ -264,7 +267,10 @@ export function ModelsTab() {
                     step="0.05"
                     value={temperature}
                     onChange={(e) => setTemperature(parseFloat(e.target.value))}
-                    className="w-full h-1 bg-black/[0.1] rounded-full appearance-none cursor-pointer accent-black"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 ${(temperature / 2) * 100}%, rgba(0,0,0,0.08) ${(temperature / 2) * 100}%)`,
+                    }}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
                   />
                 </div>
               </div>
@@ -285,7 +291,10 @@ export function ModelsTab() {
                     step="0.05"
                     value={topP}
                     onChange={(e) => setTopP(parseFloat(e.target.value))}
-                    className="w-full h-1 bg-black/[0.1] rounded-full appearance-none cursor-pointer accent-black"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 ${topP * 100}%, rgba(0,0,0,0.08) ${topP * 100}%)`,
+                    }}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
                   />
                 </div>
               </div>
@@ -306,7 +315,10 @@ export function ModelsTab() {
                     step="512"
                     value={maxTokens}
                     onChange={(e) => setMaxTokens(parseInt(e.target.value, 10))}
-                    className="w-full h-1 bg-black/[0.1] rounded-full appearance-none cursor-pointer accent-black"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 ${((maxTokens - 512) / (16384 - 512)) * 100}%, rgba(0,0,0,0.08) ${((maxTokens - 512) / (16384 - 512)) * 100}%)`,
+                    }}
+                    className="w-full h-1.5 rounded-full appearance-none cursor-pointer accent-emerald-600"
                   />
                 </div>
               </div>
@@ -343,7 +355,7 @@ export function ModelsTab() {
 
           <div className="h-1.5 w-full bg-black/[0.06] rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-black rounded-full"
+              className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${usagePercent}%` }}
               transition={{ duration: 0.6, ease: "easeOut" }}

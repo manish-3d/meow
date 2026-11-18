@@ -160,17 +160,23 @@ export function AppSidebar() {
                       render={<Link href={item.href} />}
                       className={`h-9 rounded-xl px-2.5 transition-all group ${
                         isActive
-                          ? "bg-neutral-100 text-foreground font-semibold"
+                          ? "bg-[#eefbf0] text-emerald-900 font-semibold shadow-2xs"
                           : "hover:bg-black/[0.04] text-foreground/80 hover:text-foreground"
                       }`}
                       isActive={isActive}
                     >
-                      <Icon className="size-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                      <Icon
+                        className={`size-4 transition-colors ${
+                          isActive
+                            ? "text-emerald-700"
+                            : "text-muted-foreground group-hover:text-foreground"
+                        }`}
+                      />
                       <span className="text-xs font-medium flex-1">
                         {item.label}
                       </span>
                       {isAgents && agents.length > 0 && (
-                        <span className="text-[10px] font-mono font-medium text-muted-foreground">
+                        <span className="text-[10px] font-mono font-semibold text-emerald-700 bg-emerald-100/70 border border-emerald-200/50 px-1.5 py-0.2 rounded-full">
                           {agents.length}
                         </span>
                       )}
@@ -224,7 +230,7 @@ export function AppSidebar() {
                           render={<Link href={`/workspace/${agent.agentId}`} />}
                           className={`h-10 rounded-xl px-2.5 transition-all group flex items-center gap-2.5 ${
                             isActive
-                              ? "bg-neutral-100 text-foreground font-semibold"
+                              ? "bg-[#eefbf0] text-emerald-950 font-semibold shadow-2xs"
                               : "hover:bg-black/[0.03] text-foreground/80 hover:text-foreground"
                           }`}
                           isActive={isActive}
@@ -243,9 +249,9 @@ export function AppSidebar() {
                             {agent.name}
                           </span>
 
-                          {/* Active dot indicator */}
+                          {/* Active green dot indicator */}
                           {isActive && (
-                            <span className="size-1.5 rounded-full bg-neutral-400 shrink-0" />
+                            <span className="size-2 rounded-full bg-emerald-500 shrink-0" />
                           )}
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -258,8 +264,50 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
 
-      {/* ── FOOTER: PRO PLAN & USER PROFILE ── */}
+      {/* ── FOOTER: WORLD STATUS, PRO PLAN & USER PROFILE ── */}
       <SidebarFooter className="p-3 border-t border-black/[0.06] space-y-2.5">
+        {/* World Status Card */}
+        <div className="p-3 rounded-2xl border border-black/[0.08] bg-white space-y-1.5 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {/* Minecraft Voxel Dirt/Grass Block Icon */}
+              <div className="size-5 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-emerald-700 shadow-2xs">
+                <svg viewBox="0 0 24 24" className="size-4.5 fill-current">
+                  {/* Grass top */}
+                  <rect x="2" y="2" width="20" height="7" fill="#5b8731" />
+                  <path d="M2 9h4v3h4V9h4v3h4V9h4v2H2z" fill="#5b8731" />
+                  {/* Dirt bottom */}
+                  <rect x="2" y="9" width="20" height="13" fill="#866043" />
+                  <rect x="5" y="13" width="3" height="3" fill="#6d4e36" />
+                  <rect x="14" y="15" width="3" height="3" fill="#6d4e36" />
+                </svg>
+              </div>
+              <span className="text-xs font-semibold text-foreground leading-tight">
+                World Status
+              </span>
+            </div>
+
+            <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full border border-emerald-200/50">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Online
+            </span>
+          </div>
+
+          <p className="text-[10px] text-muted-foreground leading-tight">
+            Workspace environment active
+          </p>
+
+          {/* Green Environment Status Indicator */}
+          <div className="h-1 w-full bg-emerald-500/20 rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-emerald-500 rounded-full"
+              initial={{ width: 0 }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+
         {/* Pro Plan Card */}
         <div className="p-3 rounded-2xl border border-black/[0.08] bg-white space-y-2 shadow-2xs">
           <div className="flex items-center gap-2.5">
@@ -285,10 +333,10 @@ export function AppSidebar() {
             </div>
           </div>
 
-          {/* Solid Black Progress Bar */}
+          {/* Green Progress Bar */}
           <div className="h-1.5 w-full bg-black/[0.06] rounded-full overflow-hidden">
             <motion.div
-              className="h-full bg-black rounded-full"
+              className="h-full bg-emerald-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${usagePct}%` }}
               transition={{ duration: 0.8, ease: "easeOut" }}

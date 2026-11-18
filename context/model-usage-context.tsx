@@ -69,7 +69,7 @@ const STORAGE_KEYS = {
 
 export function ModelUsageProvider({ children }: { children: React.ReactNode }) {
   const [selectedModelId, setSelectedModelIdState] = useState<string>("gemini-3-flash");
-  const [reasoningEffort, setReasoningEffortState] = useState<ReasoningEffort>("medium");
+  const [reasoningEffort, setReasoningEffortState] = useState<ReasoningEffort>("high");
   const [temperature, setTemperatureState] = useState<number>(0.7);
   const [topP, setTopPState] = useState<number>(0.9);
   const [maxTokens, setMaxTokensState] = useState<number>(8192);

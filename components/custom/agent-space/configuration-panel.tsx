@@ -112,14 +112,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           onClick={() => setActiveTab("model")}
           className={`flex items-center gap-1.5 py-3 text-xs transition-colors relative cursor-pointer ${
             activeTab === "model"
-              ? "font-semibold text-foreground"
+              ? "font-semibold text-emerald-950"
               : "font-medium text-muted-foreground hover:text-foreground"
           }`}
         >
           <Box className="size-3.5" />
           <span>Model</span>
           {activeTab === "model" && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
           )}
         </button>
 
@@ -128,14 +128,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           onClick={() => setActiveTab("tools")}
           className={`flex items-center gap-1.5 py-3 text-xs transition-colors relative cursor-pointer ${
             activeTab === "tools"
-              ? "font-semibold text-foreground"
+              ? "font-semibold text-emerald-950"
               : "font-medium text-muted-foreground hover:text-foreground"
           }`}
         >
           <Wrench className="size-3.5" />
           <span>Tools</span>
           {activeTab === "tools" && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
           )}
         </button>
 
@@ -144,14 +144,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           onClick={() => setActiveTab("schedule")}
           className={`flex items-center gap-1.5 py-3 text-xs transition-colors relative cursor-pointer ${
             activeTab === "schedule"
-              ? "font-semibold text-foreground"
+              ? "font-semibold text-emerald-950"
               : "font-medium text-muted-foreground hover:text-foreground"
           }`}
         >
           <Calendar className="size-3.5" />
           <span>Schedule</span>
           {activeTab === "schedule" && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
           )}
         </button>
 
@@ -160,14 +160,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           onClick={() => setActiveTab("vm")}
           className={`flex items-center gap-1.5 py-3 text-xs transition-colors relative cursor-pointer ${
             activeTab === "vm"
-              ? "font-semibold text-foreground"
+              ? "font-semibold text-emerald-950"
               : "font-medium text-muted-foreground hover:text-foreground"
           }`}
         >
           <Monitor className="size-3.5" />
           <span>VM</span>
           {activeTab === "vm" && (
-            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+            <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 rounded-full" />
           )}
         </button>
       </div>
