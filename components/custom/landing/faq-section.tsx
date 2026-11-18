@@ -28,7 +28,7 @@ const FAQS: FaqItem[] = [
   {
     question: "Which AI models power Meow Bot?",
     answer:
-      "Meow Bot comes out-of-the-box with Google Gemini 2.5 Flash, Anthropic Claude 3.7 Sonnet, OpenAI GPT-4o, and supports custom models via the universal Model Context Protocol (MCP) gateway.",
+      "Meow Bot comes out-of-the-box with Google Gemini 3 Flash, Anthropic Claude 3.7 Sonnet, OpenAI GPT-4o, and supports custom models via the universal Model Context Protocol (MCP) gateway.",
   },
   {
     question: "How do tool connections work?",

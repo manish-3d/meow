@@ -255,7 +255,7 @@ export function ModelUsageModal({ open, onOpenChange }: ModelUsageModalProps) {
             <Sparkles className="size-4 text-primary shrink-0 mt-0.5" />
             <div>
               <span className="font-semibold text-foreground block">Zero Markup Guarantee</span>
-              Meow Bot provides Gemini 2.5 Flash at zero cost. When using your own API keys for Claude, OpenAI, or DeepSeek, tokens are billed directly to your provider account with no platform fee.
+              Meow Bot provides Gemini 3 Flash at zero cost. When using your own API keys for Claude, OpenAI, or DeepSeek, tokens are billed directly to your provider account with no platform fee.
             </div>
           </div>
         </div>

@@ -64,7 +64,7 @@ const BOTS: BotItem[] = [
     avatarColor: "#3B82F6",
     avatarChar: "🔍",
     previewText: "Compared 3 CRMs. Here's how they compare on seats and API limits.",
-    model: "Gemini 2.5 Flash",
+    model: "Gemini 3 Flash",
     routines: [
       { name: "Competitor scrape", schedule: "Every Monday at 9:00 AM", active: true },
       { name: "HN digest", schedule: "Daily at 10:00 PM", active: true },
@@ -95,7 +95,7 @@ const BOTS: BotItem[] = [
     avatarColor: "#2563EB",
     avatarChar: "✉️",
     previewText: "Sent. I'll let you know as soon as Sarah answers.",
-    model: "Gemini 2.5 Flash",
+    model: "Gemini 3 Flash",
     routines: [
       { name: "Inbox triage", schedule: "Runs every 2 hours", active: true },
       { name: "VIP alert", schedule: "Instant trigger on client email", active: true },
@@ -144,7 +144,7 @@ const BOTS: BotItem[] = [
     avatarColor: "#EAB308",
     avatarChar: "🏀",
     previewText: "Evaluated 12 games tonight. Key injury report updated.",
-    model: "Gemini 2.5 Flash",
+    model: "Gemini 3 Flash",
     routines: [
       { name: "Pre-game rollup", schedule: "Daily at 5:00 PM", active: true },
     ],

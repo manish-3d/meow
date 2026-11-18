@@ -47,8 +47,8 @@ export const EFFORT_CONFIG: Record<
 export const AVAILABLE_MODELS: ModelDefinition[] = [
   // 1. Google Gemini (Meow Default Free Tier)
   {
-    id: "gemini-2.5-flash",
-    name: "Gemini 2.5 Flash",
+    id: "gemini-3-flash",
+    name: "Gemini 3 Flash",
     provider: "google",
     providerName: "Google",
     isFree: true,
@@ -63,8 +63,8 @@ export const AVAILABLE_MODELS: ModelDefinition[] = [
     supportsEffort: true,
   },
   {
-    id: "gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
+    id: "gemini-3-pro",
+    name: "Gemini 3 Pro",
     provider: "google",
     providerName: "Google",
     isFree: false,
@@ -215,5 +215,11 @@ export const AVAILABLE_MODELS: ModelDefinition[] = [
 ];
 
 export function getModelById(id: string): ModelDefinition {
-  return AVAILABLE_MODELS.find((m) => m.id === id) || AVAILABLE_MODELS[0];
+  const normalizedId =
+    id === "gemini-2.5-flash"
+      ? "gemini-3-flash"
+      : id === "gemini-2.5-pro"
+      ? "gemini-3-pro"
+      : id;
+  return AVAILABLE_MODELS.find((m) => m.id === normalizedId || m.id === id) || AVAILABLE_MODELS[0];
 }

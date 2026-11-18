@@ -62,7 +62,7 @@ export function TeamGovernance() {
                   <span className="text-neutral-800 font-semibold">social media bot</span>
                 </div>
                 <span className="text-[10px] text-emerald-600 font-semibold bg-emerald-50 px-2 py-0.5 rounded">
-                  Gemini 2.5
+                  Gemini 3 Flash
                 </span>
               </div>
 

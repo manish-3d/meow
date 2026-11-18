@@ -70,7 +70,7 @@ export function ModelsTab() {
     {
       id: "google",
       name: "Google Gemini (Custom Key)",
-      models: "Gemini 2.5 Pro (Note: Gemini 2.5 Flash is already free)",
+      models: "Gemini 3 Pro (Note: Gemini 3 Flash is already free)",
       placeholder: "AIzaSy...",
       docsUrl: "https://aistudio.google.com/app/apikey",
     },
@@ -218,7 +218,7 @@ export function ModelsTab() {
         </div>
 
         <p className="text-[11px] text-muted-foreground leading-relaxed">
-          Meow Bot covers Gemini 2.5 Flash for free. To use Anthropic Claude, OpenAI, or DeepSeek, enter your API keys below and test connection.
+          Meow Bot covers Gemini 3 Flash for free. To use Anthropic Claude, OpenAI, or DeepSeek, enter your API keys below and test connection.
         </p>
 
         <div className="space-y-3">

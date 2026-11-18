@@ -60,7 +60,7 @@ export function MissingKeyDialog({
   };
 
   const handleSwitchToFree = () => {
-    setSelectedModelId("gemini-2.5-flash");
+    setSelectedModelId("gemini-3-flash");
     onOpenChange(false);
   };
 
@@ -97,7 +97,7 @@ export function MissingKeyDialog({
               </>
             ) : (
               <>
-                <span className="font-semibold text-foreground">{targetModel.name}</span> requires your own {providerNames[provider] || provider} API key (BYOK). Meow Bot provides <span className="font-semibold text-emerald-600 dark:text-emerald-400">Gemini 2.5 Flash</span> for free out-of-the-box.
+                <span className="font-semibold text-foreground">{targetModel.name}</span> requires your own {providerNames[provider] || provider} API key (BYOK). Meow Bot provides <span className="font-semibold text-emerald-600 dark:text-emerald-400">Gemini 3 Flash</span> for free out-of-the-box.
               </>
             )}
           </DialogDescription>
@@ -156,7 +156,7 @@ export function MissingKeyDialog({
             className="text-xs gap-1.5 border-emerald-500/30 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10 w-full sm:w-auto"
           >
             <Sparkles className="size-3.5" />
-            <span>Use Gemini 2.5 Flash (Free)</span>
+            <span>Use Gemini 3 Flash (Free)</span>
           </Button>
 
           <Button

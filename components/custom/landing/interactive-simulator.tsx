@@ -34,7 +34,7 @@ const SIMULATOR_STEPS: Step[] = [
   {
     id: "step-1",
     category: "INTENT PARSER",
-    label: "Gemini 2.5 Multi-Turn Reasoning",
+    label: "Gemini 3 Multi-Turn Reasoning",
     detail: "Parses prompt: 'say hi to manishsinghjio135@gmail.com in 9 pm today' -> extracts recipient, message, and target hour.",
     badge: "Prompt Analyzed",
   },
@@ -116,7 +116,7 @@ export function InteractiveSimulator() {
             <div className="flex items-center gap-2.5">
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
               <span className="font-mono text-xs uppercase font-semibold text-neutral-800">
-                ACTIVE AGENT: social media bot • Gemini 2.5 Flash • Autonomous Mode
+                ACTIVE AGENT: social media bot • Gemini 3 Flash • Autonomous Mode
               </span>
             </div>
 
@@ -155,7 +155,7 @@ export function InteractiveSimulator() {
                       social media bot
                     </span>
                     <span className="text-[10px] text-neutral-400 font-mono">
-                      Gemini 2.5 Flash • Composio Native Tools
+                      Gemini 3 Flash • Composio Native Tools
                     </span>
                   </div>
                 </div>

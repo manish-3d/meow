@@ -22,7 +22,7 @@ export function getLanguageModel({
 
   // 1. Google Gemini Models
   if (modelDef.provider === "google") {
-    // If it's free Gemini 2.5 Flash, use server key unless user supplied their own
+    // If it's free Gemini 3 Flash, use server key unless user supplied their own
     const effectiveKey = apiKey?.trim() || (modelDef.isFree ? serverGoogleKey : "");
     if (!effectiveKey) {
       throw new Error(`API key required for ${modelDef.name}. Please configure your Google Gemini API key in Settings.`);
@@ -34,7 +34,7 @@ export function getLanguageModel({
 
     // Map internal ID to Google model name supported by Google API
     const googleModelName =
-      modelId === "gemini-2.5-pro"
+      modelId.includes("pro")
         ? "gemini-3.1-pro-preview"
         : "gemini-3-flash-preview";
 
@@ -101,6 +101,6 @@ export function getLanguageModel({
     return deepseek(targetModel);
   }
 
-  // Fallback to default Gemini Flash
-  return defaultGoogle("gemini-2.5-flash");
+  // Fallback to default Gemini 3 Flash
+  return defaultGoogle("gemini-3-flash-preview");
 }

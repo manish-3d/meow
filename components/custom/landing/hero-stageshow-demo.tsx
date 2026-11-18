@@ -46,7 +46,7 @@ export function HeroStageshowDemo() {
         {/* Status Pill */}
         <div className="hidden sm:flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground shrink-0">
           <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Gemini 2.5 Flash • Composio Native</span>
+          <span>Gemini 3 Flash • Composio Native</span>
         </div>
       </div>
 

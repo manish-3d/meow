@@ -18,7 +18,7 @@ const MODELS: ModelKeyOption[] = [
   {
     id: "gemini",
     provider: "Google AI",
-    model: "Gemini 2.5 Flash",
+    model: "Gemini 3 Flash",
     latency: "120ms",
     bestFor: "Fast background routines, email sorting, and multi-modal web scraping.",
     keyStatus: "Connected (Key active)",

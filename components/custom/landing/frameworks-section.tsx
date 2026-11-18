@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   const tools = await getMeowTools(["gmail", "slack"]);
 
   const { text } = await generateText({
-    model: google("gemini-2.5-flash"),
+    model: google("gemini-3-flash-preview"),
     prompt: "Schedule executive sync and post agenda to #general",
     tools,
     maxSteps: 5,

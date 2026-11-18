@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     const { agentId, messages, message, timezone, modelId, customApiKey, effort } = await req.json();
     const userTimezone = timezone || "UTC";
-    const activeModelId = modelId || "gemini-2.5-flash";
+    const activeModelId = modelId || "gemini-3-flash";
     const reasoningEffort: ReasoningEffort = effort || "medium";
 
     if (!agentId) {

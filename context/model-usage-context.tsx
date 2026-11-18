@@ -59,7 +59,7 @@ const STORAGE_KEYS = {
 };
 
 export function ModelUsageProvider({ children }: { children: React.ReactNode }) {
-  const [selectedModelId, setSelectedModelIdState] = useState<string>("gemini-2.5-flash");
+  const [selectedModelId, setSelectedModelIdState] = useState<string>("gemini-3-flash");
   const [reasoningEffort, setReasoningEffortState] = useState<ReasoningEffort>("medium");
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({
     google: "",
@@ -94,8 +94,15 @@ export function ModelUsageProvider({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     try {
       const savedModel = localStorage.getItem(STORAGE_KEYS.MODEL);
-      if (savedModel && AVAILABLE_MODELS.some((m) => m.id === savedModel)) {
-        setSelectedModelIdState(savedModel);
+      const normalizedModel =
+        savedModel === "gemini-2.5-flash"
+          ? "gemini-3-flash"
+          : savedModel === "gemini-2.5-pro"
+          ? "gemini-3-pro"
+          : savedModel;
+
+      if (normalizedModel && AVAILABLE_MODELS.some((m) => m.id === normalizedModel)) {
+        setSelectedModelIdState(normalizedModel);
       }
 
       const savedEffort = localStorage.getItem(STORAGE_KEYS.EFFORT) as ReasoningEffort;
@@ -287,7 +294,7 @@ export function ModelUsageProvider({ children }: { children: React.ReactNode }) 
   const isKeyConfiguredForModel = useCallback(
     (modelId: string) => {
       const model = getModelById(modelId);
-      if (model.isFree) return true; // Gemini 2.5 Flash is always available for free
+      if (model.isFree) return true; // Gemini 3 Flash is always available for free
       const key = apiKeys[model.provider]?.trim();
       return Boolean(key && key.length > 5);
     },
