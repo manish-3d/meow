@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -119,123 +120,40 @@ export function ModelSelectorBar({ className = "", compact = false }: ModelSelec
 
         <DropdownMenuContent align="start" className="w-72 max-h-[75vh] overflow-y-auto p-1.5">
           {/* Default Free Tier */}
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            Meow Built-In (Free)
-          </DropdownMenuLabel>
-          {googleModels
-            .filter((m) => m.isFree)
-            .map((model) => (
-              <DropdownMenuItem
-                key={model.id}
-                onClick={() => handleSelectModel(model)}
-                className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
-              >
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-foreground">{model.name}</span>
-                    <Badge variant="outline" className="text-[9px] px-1 py-0 text-emerald-600 bg-emerald-500/10 border-emerald-500/20">
-                      Free Default
-                    </Badge>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              Meow Built-In (Free)
+            </DropdownMenuLabel>
+            {googleModels
+              .filter((m) => m.isFree)
+              .map((model) => (
+                <DropdownMenuItem
+                  key={model.id}
+                  onClick={() => handleSelectModel(model)}
+                  className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                >
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground">{model.name}</span>
+                      <Badge variant="outline" className="text-[9px] px-1 py-0 text-emerald-600 bg-emerald-500/10 border-emerald-500/20">
+                        Free Default
+                      </Badge>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground truncate">{model.recommendedFor}</span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground truncate">{model.recommendedFor}</span>
-                </div>
-                {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
-              </DropdownMenuItem>
-            ))}
+                  {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
+                </DropdownMenuItem>
+              ))}
+          </DropdownMenuGroup>
 
           <DropdownMenuSeparator className="my-1" />
 
           {/* Anthropic Section */}
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            Anthropic (BYOK)
-          </DropdownMenuLabel>
-          {anthropicModels.map((model) => {
-            const hasKey = isKeyConfiguredForModel(model.id);
-            return (
-              <DropdownMenuItem
-                key={model.id}
-                onClick={() => handleSelectModel(model)}
-                className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
-              >
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-foreground">{model.name}</span>
-                    <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground truncate">
-                    {hasKey ? "Key Connected" : "Requires API Key"}
-                  </span>
-                </div>
-                {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
-              </DropdownMenuItem>
-            );
-          })}
-
-          <DropdownMenuSeparator className="my-1" />
-
-          {/* OpenAI Section */}
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            OpenAI (BYOK)
-          </DropdownMenuLabel>
-          {openaiModels.map((model) => {
-            const hasKey = isKeyConfiguredForModel(model.id);
-            return (
-              <DropdownMenuItem
-                key={model.id}
-                onClick={() => handleSelectModel(model)}
-                className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
-              >
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-foreground">{model.name}</span>
-                    <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground truncate">
-                    {hasKey ? "Key Connected" : "Requires API Key"}
-                  </span>
-                </div>
-                {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
-              </DropdownMenuItem>
-            );
-          })}
-
-          <DropdownMenuSeparator className="my-1" />
-
-          {/* DeepSeek Section */}
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            DeepSeek (BYOK)
-          </DropdownMenuLabel>
-          {deepseekModels.map((model) => {
-            const hasKey = isKeyConfiguredForModel(model.id);
-            return (
-              <DropdownMenuItem
-                key={model.id}
-                onClick={() => handleSelectModel(model)}
-                className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
-              >
-                <div className="flex flex-col min-w-0">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-foreground">{model.name}</span>
-                    <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
-                  </div>
-                  <span className="text-[10px] text-muted-foreground truncate">
-                    {hasKey ? "Key Connected" : "Requires API Key"}
-                  </span>
-                </div>
-                {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
-              </DropdownMenuItem>
-            );
-          })}
-
-          <DropdownMenuSeparator className="my-1" />
-
-          {/* Google Frontier Section */}
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            Google Frontier (BYOK)
-          </DropdownMenuLabel>
-          {googleModels
-            .filter((m) => !m.isFree)
-            .map((model) => {
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              Anthropic (BYOK)
+            </DropdownMenuLabel>
+            {anthropicModels.map((model) => {
               const hasKey = isKeyConfiguredForModel(model.id);
               return (
                 <DropdownMenuItem
@@ -256,6 +174,99 @@ export function ModelSelectorBar({ className = "", compact = false }: ModelSelec
                 </DropdownMenuItem>
               );
             })}
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="my-1" />
+
+          {/* OpenAI Section */}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              OpenAI (BYOK)
+            </DropdownMenuLabel>
+            {openaiModels.map((model) => {
+              const hasKey = isKeyConfiguredForModel(model.id);
+              return (
+                <DropdownMenuItem
+                  key={model.id}
+                  onClick={() => handleSelectModel(model)}
+                  className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                >
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground">{model.name}</span>
+                      <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {hasKey ? "Key Connected" : "Requires API Key"}
+                    </span>
+                  </div>
+                  {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="my-1" />
+
+          {/* DeepSeek Section */}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              DeepSeek (BYOK)
+            </DropdownMenuLabel>
+            {deepseekModels.map((model) => {
+              const hasKey = isKeyConfiguredForModel(model.id);
+              return (
+                <DropdownMenuItem
+                  key={model.id}
+                  onClick={() => handleSelectModel(model)}
+                  className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                >
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground">{model.name}</span>
+                      <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground truncate">
+                      {hasKey ? "Key Connected" : "Requires API Key"}
+                    </span>
+                  </div>
+                  {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuGroup>
+
+          <DropdownMenuSeparator className="my-1" />
+
+          {/* Google Frontier Section */}
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              Google Frontier (BYOK)
+            </DropdownMenuLabel>
+            {googleModels
+              .filter((m) => !m.isFree)
+              .map((model) => {
+                const hasKey = isKeyConfiguredForModel(model.id);
+                return (
+                  <DropdownMenuItem
+                    key={model.id}
+                    onClick={() => handleSelectModel(model)}
+                    className="flex items-center justify-between text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                  >
+                    <div className="flex flex-col min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-semibold text-foreground">{model.name}</span>
+                        <span className="text-[9px] font-mono text-muted-foreground">${model.pricing.inputPerMillion}/1M</span>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground truncate">
+                        {hasKey ? "Key Connected" : "Requires API Key"}
+                      </span>
+                    </div>
+                    {selectedModel.id === model.id && <Check className="size-3.5 text-primary shrink-0" />}
+                  </DropdownMenuItem>
+                );
+              })}
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -272,35 +283,37 @@ export function ModelSelectorBar({ className = "", compact = false }: ModelSelec
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="center" className="w-60 p-1.5">
-          <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
-            Reasoning & Workload Effort
-          </DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <DropdownMenuLabel className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider px-2 py-1">
+              Reasoning & Workload Effort
+            </DropdownMenuLabel>
 
-          {(["low", "medium", "high"] as ReasoningEffort[]).map((level) => {
-            const conf = EFFORT_CONFIG[level];
-            const isSelected = reasoningEffort === level;
+            {(["low", "medium", "high"] as ReasoningEffort[]).map((level) => {
+              const conf = EFFORT_CONFIG[level];
+              const isSelected = reasoningEffort === level;
 
-            return (
-              <DropdownMenuItem
-                key={level}
-                onClick={() => setReasoningEffort(level)}
-                className={`flex items-start justify-between text-xs p-2 cursor-pointer rounded-md ${
-                  isSelected ? "bg-surface-2" : ""
-                }`}
-              >
-                <div className="space-y-0.5 min-w-0 pr-2">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-semibold text-foreground">{conf.label}</span>
-                    <span className="font-mono text-[10px] text-primary">{conf.bars}</span>
+              return (
+                <DropdownMenuItem
+                  key={level}
+                  onClick={() => setReasoningEffort(level)}
+                  className={`flex items-start justify-between text-xs p-2 cursor-pointer rounded-md ${
+                    isSelected ? "bg-surface-2" : ""
+                  }`}
+                >
+                  <div className="space-y-0.5 min-w-0 pr-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-foreground">{conf.label}</span>
+                      <span className="font-mono text-[10px] text-primary">{conf.bars}</span>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground block leading-tight">
+                      {conf.description}
+                    </span>
                   </div>
-                  <span className="text-[10px] text-muted-foreground block leading-tight">
-                    {conf.description}
-                  </span>
-                </div>
-                {isSelected && <Check className="size-3.5 text-primary shrink-0 mt-0.5" />}
-              </DropdownMenuItem>
-            );
-          })}
+                  {isSelected && <Check className="size-3.5 text-primary shrink-0 mt-0.5" />}
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 

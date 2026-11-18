@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
-import { signIn } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
+import { signIn, useSession } from "next-auth/react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CatBotCharacter } from "@/components/custom/auth/cat-bot-character";
@@ -14,22 +14,65 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/workspace";
   const urlError = searchParams.get("error");
+  const router = useRouter();
+  const { status } = useSession();
+
+  // If already authenticated, redirect straight to callbackUrl
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(callbackUrl);
+    }
+  }, [status, callbackUrl, router]);
 
   const [oauthLoading, setOauthLoading] = useState<string | null>(null);
   const [isHappy, setIsHappy] = useState(false);
-  const [error, setError] = useState<string | null>(
-    urlError === "OAuthSignin" || urlError === "OAuthCallback"
-      ? "Error connecting with OAuth provider. Please check your credentials."
-      : null
-  );
 
-  const handleOAuthSignIn = (provider: "google" | "github") => {
+  // Parse all NextAuth error scenarios with user-friendly explanations
+  const getErrorMessage = (err: string | null) => {
+    if (!err) return null;
+    switch (err) {
+      case "OAuthSignin":
+      case "OAuthCallback":
+        return "OAuth authentication could not be completed. Please check your provider credentials and redirect URI.";
+      case "OAuthCreateAccount":
+        return "Could not create user account with this provider.";
+      case "Callback":
+        return "Authentication callback failed. Please try again.";
+      case "Configuration":
+        return "Server OAuth configuration error. Check Client ID and Secret in .env.";
+      case "AccessDenied":
+        return "Access was denied by the provider. Please try again with an authorized account.";
+      case "Verification":
+        return "The login token has expired or is invalid. Please try again.";
+      case "OAuthAccountNotLinked":
+        return "An account with this email already exists with a different provider.";
+      default:
+        return `Sign-in notice: ${err}. Please try again.`;
+    }
+  };
+
+  const [error, setError] = useState<string | null>(getErrorMessage(urlError));
+
+  useEffect(() => {
+    if (urlError) {
+      setError(getErrorMessage(urlError));
+      setOauthLoading(null);
+    }
+  }, [urlError]);
+
+  const handleOAuthSignIn = async (provider: "google" | "github") => {
     setOauthLoading(provider);
     setError(null);
     setIsHappy(true);
 
-    // Trigger OAuth sign in with preserved callbackUrl
-    signIn(provider, { callbackUrl });
+    try {
+      await signIn(provider, { callbackUrl });
+    } catch (err: any) {
+      console.error("Sign-in trigger error:", err);
+      setError(err?.message || "Failed to start sign in. Please try again.");
+      setOauthLoading(null);
+      setIsHappy(false);
+    }
   };
 
   return (
