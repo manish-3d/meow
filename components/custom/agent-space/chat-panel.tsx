@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "motion/react";
 import {
   Bot,
@@ -9,6 +10,7 @@ import {
   Loader2,
   Paperclip,
   Mic,
+  Sparkles,
 } from "lucide-react";
 import { AgentConfigType } from "@/types/agent";
 import { useAgentConfig } from "@/context/agent-config-context";
@@ -17,6 +19,12 @@ import { useModelUsage } from "@/context/model-usage-context";
 import { MissingKeyDialog } from "@/components/custom/models/missing-key-dialog";
 import { ModelDefinition } from "@/lib/ai/models";
 import { DEFAULT_AVATAR } from "@/lib/avatars";
+
+// Dynamically load 3D Minecraft Sky Environment with no SSR to ensure fast, glitch-free WebGL rendering
+const MinecraftSkyEnvironment = dynamic(
+  () => import("./minecraft-sky-environment").then((mod) => mod.MinecraftSkyEnvironment),
+  { ssr: false }
+);
 
 export interface ChatMessage {
   id: string;
@@ -265,70 +273,66 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
   const agentAvatarSrc = agent.agentImage || DEFAULT_AVATAR.path;
 
   return (
-    <div className="flex flex-col h-full bg-white overflow-hidden relative">
-      {/* ── MESSAGES / WELCOME STAGE ── */}
-      <div className="flex-1 overflow-y-auto">
+    <div className="flex flex-col h-full bg-transparent overflow-hidden relative">
+      {/* ── 3D MINECRAFT SKY WORLD (UPPER-LEFT CAT ON PLATFORM + VOXEL CLOUDS) ── */}
+      <MinecraftSkyEnvironment />
+
+      {/* ── MESSAGES / CONVERSATION CONTAINER ── */}
+      <div className="relative z-10 flex-1 min-h-0 overflow-y-auto">
         <AnimatePresence mode="wait">
           {!hasMessages ? (
-            /* Stageshow: Centered Isometric Mascot & Persona Intro */
+            /* Stageshow: Clean Welcome Screen with Quick Starter Prompts */
             <motion.div
               key="welcome-stage"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.25 }}
-              className="flex flex-col items-center justify-center min-h-full px-6 py-16 text-center select-none"
+              className="flex flex-col items-center justify-center min-h-full px-6 py-12 text-center select-none max-w-xl mx-auto"
             >
-              {/* Isometric Character Base with Floating Cubes */}
-              <div className="relative mb-6 flex items-center justify-center">
-                {/* Floating Voxel Pixel Elements */}
-                <motion.div
-                  animate={{ y: [-2, 3, -2], opacity: [0.6, 0.9, 0.6] }}
-                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -left-6 top-4 size-2.5 bg-neutral-300 rounded-[2px]"
-                />
-                <motion.div
-                  animate={{ y: [3, -3, 3], opacity: [0.5, 0.8, 0.5] }}
-                  transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -right-5 top-7 size-2 bg-neutral-300 rounded-[2px]"
-                />
-                <motion.div
-                  animate={{ y: [-3, 2, -3], opacity: [0.4, 0.7, 0.4] }}
-                  transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute right-7 -top-2 size-1.5 bg-neutral-400 rounded-[2px]"
-                />
+              {/* Frosted Glass Welcome Card */}
+              <div className="bg-white/75 backdrop-blur-md border border-white/70 shadow-xs rounded-3xl p-8 w-full flex flex-col items-center">
+                {/* Agent Avatar Badge */}
+                <div className="size-16 rounded-2xl bg-white/90 border border-black/[0.08] shadow-xs flex items-center justify-center p-2 mb-4">
+                  <img
+                    src={agentAvatarSrc}
+                    alt={agent.name}
+                    className="size-full object-contain filter drop-shadow-2xs"
+                  />
+                </div>
 
-                {/* Pedestal / Island Base */}
-                <div className="relative">
-                  {/* Subtle isometric tile base under cat */}
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/[0.04] rounded-full blur-[2px]" />
+                {/* Title & Description */}
+                <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2">
+                  {agent.name}
+                </h1>
+                <p className="text-xs text-muted-foreground max-w-md leading-relaxed font-normal mb-6">
+                  {agent.description || "Manage, create and grow your social media presence across platforms."}
+                </p>
 
-                  {/* Character with gentle idle float */}
-                  <motion.div
-                    animate={{ y: [0, -5, 0] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                    className="relative size-24 flex items-center justify-center"
-                  >
-                    <img
-                      src={agentAvatarSrc}
-                      alt={agent.name}
-                      className="size-full object-contain filter drop-shadow-sm"
-                    />
-                  </motion.div>
+                {/* Suggested Quick Starter Prompts */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 w-full text-left">
+                  {[
+                    "Summarize my recent unread notifications",
+                    "Analyze the latest trends and write an outline",
+                    "Draft an update for team review",
+                    "Search for real-time web updates",
+                  ].map((prompt, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => handleSend(prompt)}
+                      className="px-3.5 py-2.5 rounded-xl bg-white/80 hover:bg-white border border-black/[0.06] hover:border-black/15 shadow-2xs text-[11px] text-foreground font-medium transition-all text-left flex items-center justify-between group cursor-pointer"
+                    >
+                      <span className="line-clamp-1">{prompt}</span>
+                      <ArrowUp className="size-3 text-muted-foreground group-hover:text-foreground shrink-0 ml-1.5 transition-colors" />
+                    </button>
+                  ))}
                 </div>
               </div>
-
-              {/* Title & Description */}
-              <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2">
-                {agent.name}
-              </h1>
-              <p className="text-xs text-muted-foreground max-w-md leading-relaxed font-normal">
-                {agent.description || "Manage, create and grow your social media presence across platforms."}
-              </p>
             </motion.div>
           ) : (
-            /* Active Message Thread */
-            <div className="p-6 space-y-5 max-w-3xl mx-auto w-full">
+            /* Active Message Thread with Frosted Translucent Cards */
+            <div className="pt-28 md:pt-32 px-4 md:px-6 pb-6 space-y-6 max-w-3xl mx-auto w-full">
               {messages.map((msg, idx) => (
                 <motion.div
                   key={msg.id}
@@ -338,17 +342,17 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
                   className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                 >
                   {msg.role === "agent" && (
-                    <div className="size-7 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-white border border-black/[0.08] shadow-2xs">
+                    <div className="size-8 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-white/90 backdrop-blur-sm border border-white/80 shadow-2xs mt-0.5">
                       <img src={agentAvatarSrc} alt={agent.name} className="size-full object-contain p-0.5" />
                     </div>
                   )}
 
-                  <div className={`space-y-1 max-w-[82%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col`}>
+                  <div className={`space-y-1.5 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col`}>
                     <div
-                      className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap break-words ${
+                      className={`text-xs leading-relaxed whitespace-pre-wrap break-words ${
                         msg.role === "user"
-                          ? "bg-black text-white rounded-tr-xs shadow-xs"
-                          : "bg-neutral-50 text-foreground border border-black/[0.06] rounded-tl-xs shadow-2xs"
+                          ? "px-4 py-2.5 bg-black text-white rounded-2xl rounded-tr-xs shadow-xs"
+                          : "px-5 py-4 bg-white/85 backdrop-blur-md text-foreground border border-white/70 rounded-2xl rounded-tl-xs shadow-xs"
                       }`}
                     >
                       {msg.role === "agent" && msg.isStreaming && !msg.content ? (
@@ -372,7 +376,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
                     </div>
 
                     <span
-                      className={`text-[10px] font-mono tabular-nums text-muted-foreground px-1 ${
+                      className={`text-[10px] font-mono tabular-nums text-muted-foreground/80 px-1 ${
                         msg.role === "user" ? "text-right" : "text-left"
                       }`}
                     >
@@ -381,8 +385,8 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
                   </div>
 
                   {msg.role === "user" && (
-                    <div className="size-7 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-neutral-100 border border-black/[0.08] shadow-2xs">
-                      <User className="size-3.5 text-foreground" />
+                    <div className="size-8 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-black text-white shadow-2xs mt-0.5">
+                      <User className="size-4" />
                     </div>
                   )}
                 </motion.div>
@@ -393,9 +397,9 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
         </AnimatePresence>
       </div>
 
-      {/* ── FLOATING BOTTOM INPUT CAPSULE (MATCHING REFERENCE EXACTLY) ── */}
-      <div className="p-5 pt-2 bg-transparent shrink-0 max-w-3xl mx-auto w-full">
-        <div className="relative flex items-center gap-2 rounded-full border border-black/[0.1] bg-white shadow-xs px-4 py-2 hover:border-black/20 focus-within:border-black/30 transition-all">
+      {/* ── FLOATING BOTTOM INPUT CAPSULE (FIXED OVER 3D SKY) ── */}
+      <div className="relative z-10 p-4 md:p-6 pt-2 bg-transparent shrink-0 max-w-3xl mx-auto w-full">
+        <div className="relative flex items-center gap-2 rounded-full border border-black/[0.1] bg-white/90 backdrop-blur-md shadow-sm px-4 py-2 hover:border-black/20 focus-within:border-black/30 transition-all">
           {/* Paperclip */}
           <button
             type="button"
