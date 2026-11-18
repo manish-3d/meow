@@ -6,14 +6,17 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { VoxelIsland } from "./voxel-island";
 import { VoxelCat } from "./voxel-cat";
 import {
-  BrowserProps,
+  CodingBotProps,
+  CodingBotVisor,
   ResearcherProps,
   ResearcherGlasses,
   BuilderProps,
   BuilderHeadphones,
   WriterProps,
-  AutomatorProps,
+  SocialMediaBotHeadGear,
+  SocialMediaBotProps,
 } from "./bot-props";
+import { BrandOrbitCubes } from "./brand-orbit-cubes";
 
 interface VoxelBotsCanvasProps {
   activeIndex: number;
@@ -28,28 +31,28 @@ function useSignTexture(label: string, icon: string, isBuilder: boolean, isHighl
     if (typeof document === "undefined") return null;
 
     const canvas = document.createElement("canvas");
-    canvas.width = 512;
-    canvas.height = 128;
+    canvas.width = 1024;
+    canvas.height = 256;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
-    ctx.clearRect(0, 0, 512, 128);
+    ctx.clearRect(0, 0, 1024, 256);
 
     // Pill block rounded rectangle
-    const r = 36;
+    const r = 72;
     ctx.beginPath();
-    ctx.roundRect(10, 10, 492, 108, r);
+    ctx.roundRect(20, 20, 984, 216, r);
 
     if (isBuilder) {
       ctx.fillStyle = "#bef264";
       ctx.fill();
-      ctx.lineWidth = 9;
+      ctx.lineWidth = 16;
       ctx.strokeStyle = "#84cc16";
       ctx.stroke();
     } else {
       ctx.fillStyle = isHighlighted ? "#ffffff" : "#fbfbfb";
       ctx.fill();
-      ctx.lineWidth = 6;
+      ctx.lineWidth = 12;
       ctx.strokeStyle = isHighlighted ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)";
       ctx.stroke();
     }
@@ -57,9 +60,10 @@ function useSignTexture(label: string, icon: string, isBuilder: boolean, isHighl
     // Text & Icon in Minecraft Monospace style
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `bold ${isBuilder ? "56px" : "52px"} monospace, system-ui, sans-serif`;
+    const fontSize = label.length > 13 ? 76 : (isBuilder ? 96 : 88);
+    ctx.font = `bold ${fontSize}px monospace, system-ui, sans-serif`;
     ctx.fillStyle = isBuilder ? "#09090b" : "#18181b";
-    ctx.fillText(`${icon}  ${label}`, 256, 65);
+    ctx.fillText(`${icon}  ${label}`, 512, 130);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
@@ -267,29 +271,35 @@ export function VoxelBotsCanvas({
           />
         </group>
 
-        {/* --- 1. BROWSER ISLAND (Far Left: x = -10.8, enlarged scale = 0.92) --- */}
+        {/* --- FLOATING 3D BRAND LOGO ORBIT CUBES (GitHub, Instagram, X, YouTube, Slack) --- */}
+        <BrandOrbitCubes />
+
+        {/* --- 1. CODING BOT ISLAND (Far Left: x = -10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={0}
           basePosition={[-10.8, 0.6, -0.4]}
           scale={0.92}
-          label="Browser"
-          icon="🌐"
+          label="Coding Bot"
+          icon="</>"
           isSelected={activeIndex === 0}
           isHovered={hoveredIndex === 0}
           onSelect={() => onSelectBot(0)}
           onHover={(h) => onHoverBot(h ? 0 : null)}
         >
-          <VoxelCat isHovered={hoveredIndex === 0 || activeIndex === 0}>
-            <BrowserProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
+          <VoxelCat
+            isHovered={hoveredIndex === 0 || activeIndex === 0}
+            customHeadGear={<CodingBotVisor />}
+          >
+            <CodingBotProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 2. RESEARCHER ISLAND (Mid Left: x = -5.4, enlarged scale = 0.92) --- */}
+        {/* --- 2. RESEARCH BOT ISLAND (Mid Left: x = -5.4, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={1}
           basePosition={[-5.4, 0.85, 0.0]}
           scale={0.92}
-          label="Researcher"
+          label="Research Bot"
           icon="🔍"
           isSelected={activeIndex === 1}
           isHovered={hoveredIndex === 1}
@@ -304,13 +314,13 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 3. BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 1.35, enlarged scale = 1.15) --- */}
+        {/* --- 3. AGENT BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 1.35, enlarged scale = 1.15) --- */}
         <BotIslandAnchor
           index={2}
           basePosition={[0, 1.35, 0.6]}
           scale={1.15}
-          label="Builder"
-          icon="</>"
+          label="Agent Builder"
+          icon="📦"
           isBuilder
           isSelected={activeIndex === 2}
           isHovered={hoveredIndex === 2}
@@ -325,12 +335,12 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 4. WRITER ISLAND (Mid Right: x = 5.4, enlarged scale = 0.92) --- */}
+        {/* --- 4. NOTES BOT ISLAND (Mid Right: x = 5.4, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={3}
           basePosition={[5.4, 0.85, 0.0]}
           scale={0.92}
-          label="Writer"
+          label="Notes Bot"
           icon="📄"
           isSelected={activeIndex === 3}
           isHovered={hoveredIndex === 3}
@@ -342,20 +352,23 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 5. AUTOMATOR ISLAND (Far Right: x = 10.8, enlarged scale = 0.92) --- */}
+        {/* --- 5. SOCIAL MEDIA BOT ISLAND (Far Right: x = 10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={4}
           basePosition={[10.8, 0.6, -0.4]}
           scale={0.92}
-          label="Automator"
-          icon="⚡"
+          label="Social Media Bot"
+          icon="📢"
           isSelected={activeIndex === 4}
           isHovered={hoveredIndex === 4}
           onSelect={() => onSelectBot(4)}
           onHover={(h) => onHoverBot(h ? 4 : null)}
         >
-          <VoxelCat isHovered={hoveredIndex === 4 || activeIndex === 4}>
-            <AutomatorProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
+          <VoxelCat
+            isHovered={hoveredIndex === 4 || activeIndex === 4}
+            customHeadGear={<SocialMediaBotHeadGear />}
+          >
+            <SocialMediaBotProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
           </VoxelCat>
         </BotIslandAnchor>
       </Canvas>

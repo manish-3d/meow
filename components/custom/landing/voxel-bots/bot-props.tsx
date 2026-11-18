@@ -845,3 +845,190 @@ export function AutomatorProps({ isHovered = false }: { isHovered?: boolean }) {
     </>
   );
 }
+
+// ==========================================
+// 8. CODING BOT PROPS & VISOR
+// ==========================================
+export function CodingBotVisor() {
+  return (
+    <group position={[0, 0.95, 0.42]}>
+      {/* Cyan/Blue Developer Cap & Visor */}
+      <mesh position={[0, 0.22, 0]} castShadow>
+        <boxGeometry args={[1.05, 0.16, 1.05]} />
+        <meshStandardMaterial color="#0284c7" roughness={0.6} />
+      </mesh>
+      {/* Visor Brim sticking forward */}
+      <mesh position={[0, 0.14, 0.38]} rotation={[0.15, 0, 0]} castShadow>
+        <boxGeometry args={[0.95, 0.06, 0.42]} />
+        <meshStandardMaterial color="#0369a1" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+export function CodingBotProps({ isHovered = false }: { isHovered?: boolean }) {
+  const codeTagRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (codeTagRef.current) {
+      codeTagRef.current.position.y = 1.6 + Math.sin(t * 2.2) * 0.12;
+      codeTagRef.current.rotation.y = Math.sin(t * 1.5) * 0.15;
+    }
+  });
+
+  return (
+    <>
+      {/* Coding Laptop on Grass */}
+      <group position={[0, 0.1, 0.6]}>
+        {/* Base */}
+        <mesh position={[0, 0.03, 0]} castShadow>
+          <boxGeometry args={[0.66, 0.045, 0.44]} />
+          <meshStandardMaterial color="#18181b" roughness={0.6} />
+        </mesh>
+        {/* Keyboard */}
+        <mesh position={[0, 0.055, 0.02]}>
+          <boxGeometry args={[0.54, 0.01, 0.26]} />
+          <meshStandardMaterial color="#27272a" roughness={0.8} />
+        </mesh>
+        {/* Screen Lid */}
+        <group position={[0, 0.045, -0.2]} rotation={[-0.45, 0, 0]}>
+          <mesh position={[0, 0.24, 0]} castShadow>
+            <boxGeometry args={[0.66, 0.46, 0.035]} />
+            <meshStandardMaterial color="#18181b" roughness={0.6} />
+          </mesh>
+          {/* Glowing Code Screen displaying </> */}
+          <mesh position={[0, 0.24, 0.02]}>
+            <boxGeometry args={[0.6, 0.4, 0.01]} />
+            <meshStandardMaterial
+              color="#38bdf8"
+              emissive="#0284c7"
+              emissiveIntensity={isHovered ? 1.6 : 1.1}
+              roughness={0.2}
+            />
+          </mesh>
+          {/* Screen Light */}
+          <pointLight
+            position={[0, 0.24, 0.2]}
+            color="#38bdf8"
+            intensity={isHovered ? 1.6 : 1.0}
+            distance={2}
+          />
+        </group>
+      </group>
+
+      {/* Floating </> Code Tag Badge */}
+      <group ref={codeTagRef} position={[-0.75, 1.6, 0.35]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.48, 0.32, 0.08]} />
+          <meshStandardMaterial
+            color="#0284c7"
+            emissive="#0369a1"
+            emissiveIntensity={isHovered ? 1.2 : 0.6}
+            roughness={0.4}
+          />
+        </mesh>
+        {/* Code glyphs */}
+        <mesh position={[0, 0, 0.045]}>
+          <boxGeometry args={[0.36, 0.18, 0.01]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+      </group>
+    </>
+  );
+}
+
+// ==========================================
+// 9. SOCIAL MEDIA BOT HEADGEAR & PROPS
+// ==========================================
+export function SocialMediaBotHeadGear() {
+  return (
+    <group position={[0, 0.95, 0.42]}>
+      {/* Pink Ear Pads */}
+      <mesh position={[-0.74, -0.15, -0.42]} castShadow>
+        <boxGeometry args={[0.18, 0.36, 0.36]} />
+        <meshStandardMaterial color="#f43f5e" roughness={0.4} />
+      </mesh>
+      <mesh position={[0.74, -0.15, -0.42]} castShadow>
+        <boxGeometry args={[0.18, 0.36, 0.36]} />
+        <meshStandardMaterial color="#f43f5e" roughness={0.4} />
+      </mesh>
+      {/* Headband arch */}
+      <mesh position={[0, 0.18, -0.42]}>
+        <boxGeometry args={[1.36, 0.08, 0.12]} />
+        <meshStandardMaterial color="#e11d48" roughness={0.5} />
+      </mesh>
+
+      {/* Cool Dark Sunglasses */}
+      <mesh position={[0, -0.22, 0.25]} castShadow>
+        <boxGeometry args={[0.88, 0.24, 0.06]} />
+        <meshStandardMaterial color="#09090b" roughness={0.1} metalness={0.8} />
+      </mesh>
+      <mesh position={[-0.24, -0.22, 0.285]}>
+        <boxGeometry args={[0.34, 0.18, 0.01]} />
+        <meshStandardMaterial color="#18181b" roughness={0.2} />
+      </mesh>
+      <mesh position={[0.24, -0.22, 0.285]}>
+        <boxGeometry args={[0.34, 0.18, 0.01]} />
+        <meshStandardMaterial color="#18181b" roughness={0.2} />
+      </mesh>
+    </group>
+  );
+}
+
+export function SocialMediaBotProps({ isHovered = false }: { isHovered?: boolean }) {
+  const mediaCardRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (mediaCardRef.current) {
+      mediaCardRef.current.position.y = 1.6 + Math.sin(t * 2.4) * 0.12;
+      mediaCardRef.current.rotation.y = Math.sin(t * 1.6) * 0.15;
+    }
+  });
+
+  return (
+    <>
+      {/* Voxel Camera in Paws */}
+      <group position={[0, 0.25, 0.52]}>
+        {/* Camera Body */}
+        <mesh castShadow>
+          <boxGeometry args={[0.54, 0.36, 0.28]} />
+          <meshStandardMaterial color="#18181b" roughness={0.5} />
+        </mesh>
+        {/* Silver Top Plate */}
+        <mesh position={[0, 0.19, 0]}>
+          <boxGeometry args={[0.54, 0.04, 0.28]} />
+          <meshStandardMaterial color="#d4d4d8" metalness={0.8} roughness={0.2} />
+        </mesh>
+        {/* Lens Barrel */}
+        <mesh position={[0, 0, 0.16]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+          <cylinderGeometry args={[0.13, 0.13, 0.12, 16]} />
+          <meshStandardMaterial color="#09090b" metalness={0.6} roughness={0.3} />
+        </mesh>
+        {/* Lens Glass Element */}
+        <mesh position={[0, 0, 0.225]} rotation={[Math.PI / 2, 0, 0]}>
+          <circleGeometry args={[0.11, 16]} />
+          <meshStandardMaterial color="#0284c7" emissive="#0369a1" emissiveIntensity={0.6} />
+        </mesh>
+      </group>
+
+      {/* Floating Media / Video Card */}
+      <group ref={mediaCardRef} position={[0.82, 1.6, 0.32]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.58, 0.44, 0.04]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        </mesh>
+        {/* Play icon badge */}
+        <mesh position={[0, 0.04, 0.025]}>
+          <boxGeometry args={[0.48, 0.28, 0.01]} />
+          <meshStandardMaterial color="#f43f5e" />
+        </mesh>
+        <mesh position={[0, 0.04, 0.035]} rotation={[0, 0, -Math.PI / 2]}>
+          <coneGeometry args={[0.07, 0.12, 3]} />
+          <meshBasicMaterial color="#ffffff" />
+        </mesh>
+      </group>
+    </>
+  );
+}

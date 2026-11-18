@@ -25,10 +25,38 @@ const VoxelBotsCanvas = dynamic(
   }
 );
 
-const BOT_NAMES = ["Browser", "Researcher", "Builder", "Writer", "Automator"];
+const BOT_DATA = [
+  {
+    name: "Coding Bot",
+    icon: "</>",
+    description: "Plan, write, debug, and ship code.",
+  },
+  {
+    name: "Research Bot",
+    icon: "🔍",
+    description: "Search, read, and summarize the web.",
+  },
+  {
+    name: "Agent Builder",
+    icon: "📦",
+    description: "Create and customize your own AI agents.",
+  },
+  {
+    name: "Notes Bot",
+    icon: "📄",
+    description: "Capture, organize, and turn ideas into knowledge.",
+  },
+  {
+    name: "Social Media Bot",
+    icon: "📢",
+    description: "Create, schedule, and grow your presence.",
+  },
+];
+
+const BOT_NAMES = BOT_DATA.map((b) => b.name);
 
 export function MinecraftBotsSection() {
-  const [activeIndex, setActiveIndex] = useState(2); // Builder is center active by default
+  const [activeIndex, setActiveIndex] = useState(2); // Agent Builder is center active by default
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const handlePrev = () => {
@@ -40,7 +68,7 @@ export function MinecraftBotsSection() {
   };
 
   return (
-    <section id="bots" className="relative pt-8 pb-4 sm:pt-12 sm:pb-6 scroll-mt-20 bg-white text-[#131316] overflow-hidden">
+    <section id="bots" className="relative pt-16 pb-8 sm:pt-20 sm:pb-12 scroll-mt-24 bg-white text-[#131316] overflow-hidden">
       {/* Background Ambience */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_50%_at_50%_15%,rgba(163,230,53,0.06),transparent_80%)]" />
 
@@ -85,7 +113,7 @@ export function MinecraftBotsSection() {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative w-full -mt-8 sm:-mt-12 lg:-mt-16"
+          className="relative w-full -mt-6 sm:-mt-10 lg:-mt-12"
         >
           {/* Three.js Canvas with enlarged bots and zero gap below text */}
           <VoxelBotsCanvas
@@ -94,6 +122,25 @@ export function MinecraftBotsSection() {
             hoveredIndex={hoveredIndex}
             onHoverBot={setHoveredIndex}
           />
+
+          {/* Desktop & Tablet: Subtitle Descriptions under each Island matching Reference Image */}
+          <div className="hidden md:grid grid-cols-5 gap-3 sm:gap-6 max-w-6xl mx-auto -mt-6 sm:-mt-8 px-4 text-center relative z-10">
+            {BOT_DATA.map((bot, idx) => (
+              <div
+                key={bot.name}
+                onClick={() => setActiveIndex(idx)}
+                className={`cursor-pointer transition-all duration-300 p-2 rounded-xl ${
+                  activeIndex === idx
+                    ? "opacity-100 font-medium text-neutral-900 scale-102"
+                    : "opacity-60 hover:opacity-90 text-neutral-600"
+                }`}
+              >
+                <p className="text-xs sm:text-sm font-sans leading-relaxed">
+                  {bot.description}
+                </p>
+              </div>
+            ))}
+          </div>
 
           {/* Mobile Quick Carousel Navigation (Hidden on Tablet & Desktop) */}
           <div className="flex sm:hidden items-center justify-between w-full max-w-xs mx-auto -mt-6 px-4 relative z-10">
@@ -118,6 +165,13 @@ export function MinecraftBotsSection() {
             >
               <ChevronRight className="size-4" />
             </button>
+          </div>
+
+          {/* Active Bot Description on Mobile */}
+          <div className="block sm:hidden text-center mt-3 px-6">
+            <p className="text-xs font-sans text-neutral-600 leading-relaxed">
+              {BOT_DATA[activeIndex].description}
+            </p>
           </div>
         </motion.div>
       </div>
