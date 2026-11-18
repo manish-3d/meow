@@ -10,10 +10,13 @@ import { AgentConfigType } from "@/types/agent";
 import { AgentConfigProvider } from "@/context/agent-config-context";
 import { ChatPanel } from "@/components/custom/agent-space/chat-panel";
 import { ConfigurationPanel } from "@/components/custom/agent-space/configuration-panel";
+import { useWorkspaceUI } from "@/context/workspace-ui-context";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function AgentSpacePage() {
   const params = useParams();
   const agentId = params.agentId as string;
+  const { isConfigOpen } = useWorkspaceUI();
 
   const [agent, setAgent] = useState<AgentConfigType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -41,7 +44,7 @@ export default function AgentSpacePage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] gap-3">
-        <Loader2 className="size-6 animate-spin text-primary" />
+        <Loader2 className="size-6 animate-spin text-foreground" />
         <span className="text-xs text-muted-foreground">Initializing Agent Space...</span>
       </div>
     );
@@ -64,16 +67,28 @@ export default function AgentSpacePage() {
 
   return (
     <AgentConfigProvider initialAgent={agent} agentId={agentId}>
-      <div className="grid grid-cols-1 lg:grid-cols-12 h-[calc(100vh-3.5rem)] overflow-hidden">
-        {/* Center Column: Chat Viewport */}
-        <div className="lg:col-span-7 xl:col-span-8 h-full overflow-hidden border-b lg:border-b-0">
+      <div className="flex h-[calc(100vh-3.5rem)] w-full overflow-hidden bg-white">
+        {/* ── CENTER CHAT WORKSPACE (FLEXIBLE FULL-WIDTH) ── */}
+        <div className="flex-1 h-full min-w-0 overflow-hidden">
           <ChatPanel />
         </div>
 
-        {/* Right Column: Configuration & Observability Panel */}
-        <div className="lg:col-span-5 xl:col-span-4 h-full overflow-hidden">
-          <ConfigurationPanel />
-        </div>
+        {/* ── RIGHT CONFIGURATION PANEL (TOGGLEABLE WITH ANIMATION) ── */}
+        <AnimatePresence initial={false}>
+          {isConfigOpen && (
+            <motion.aside
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: "auto", opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+              className="w-[380px] xl:w-[420px] h-full shrink-0 overflow-hidden"
+            >
+              <div className="w-[380px] xl:w-[420px] h-full">
+                <ConfigurationPanel />
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
       </div>
     </AgentConfigProvider>
   );

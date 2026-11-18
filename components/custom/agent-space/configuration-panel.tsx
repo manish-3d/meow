@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import { Wrench, Calendar, Monitor, Cpu, Shuffle, Sparkles, Box } from "lucide-react";
+import { Wrench, Calendar, Monitor, Cpu, Shuffle, Sparkles, Box, PanelRightClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AgentConfigType } from "@/types/agent";
 import { useAgentConfig } from "@/context/agent-config-context";
+import { useWorkspaceUI } from "@/context/workspace-ui-context";
 import { ToolTab } from "./tool-tab";
 import { ScheduleTab } from "./schedule-tab";
 import { VmDesktopTab } from "./vm-desktop-tab";
@@ -20,6 +21,7 @@ interface ConfigurationPanelProps {
 
 export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: ConfigurationPanelProps) {
   const { agentConfig, updateAgentField } = useAgentConfig();
+  const { toggleConfig } = useWorkspaceUI();
   const currentAgent = propAgent || agentConfig;
   const [activeTab, setActiveTab] = useState<"model" | "tools" | "schedule" | "vm">("model");
   const [avatarSelectorOpen, setAvatarSelectorOpen] = useState(false);
@@ -79,16 +81,28 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
           </div>
         </div>
 
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={handleShuffleAvatar}
-          className="h-8 text-xs gap-1.5 px-3 shrink-0 rounded-xl border-black/[0.08] hover:bg-black/[0.03] text-foreground font-medium shadow-2xs"
-          title="Shuffle Agent Avatar"
-        >
-          <Shuffle className="size-3.5" />
-          <span>Shuffle</span>
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShuffleAvatar}
+            className="h-8 text-xs gap-1.5 px-3 rounded-xl border-black/[0.08] hover:bg-black/[0.03] text-foreground font-medium shadow-2xs"
+            title="Shuffle Agent Avatar"
+          >
+            <Shuffle className="size-3.5" />
+            <span>Shuffle</span>
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleConfig}
+            className="h-8 size-8 p-0 rounded-xl hover:bg-black/[0.04] text-muted-foreground hover:text-foreground transition-colors"
+            title="Hide Configuration Panel"
+          >
+            <PanelRightClose className="size-4" />
+          </Button>
+        </div>
       </div>
 
       {/* ── TABS NAVIGATION (Model, Tools, Schedule, VM) ── */}
