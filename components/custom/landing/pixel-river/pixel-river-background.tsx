@@ -19,60 +19,54 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
   // Subtle cursor parallax offsets
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  // Handle subtle cursor movement for living wallpaper parallax
+  // Handle subtle cursor movement and left/right zone detection
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handlePointerMove = (e: PointerEvent | MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
 
-      // Check if cursor is within hero container
-      if (
-        e.clientX < rect.left ||
-        e.clientX > rect.right ||
-        e.clientY < rect.top ||
-        e.clientY > rect.bottom
-      ) {
+      // Only track when cursor is within hero vertical bounds
+      if (e.clientY < rect.top || e.clientY > rect.bottom) {
+        setLeftActive(false);
+        setRightActive(false);
+        setOffset({ x: 0, y: 0 });
         return;
       }
 
-      const normX = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-      const normY = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-
-      // Gentle sub-pixel movement (max ±5px)
+      // Parallax offset
+      const normX = Math.max(-1, Math.min(1, ((e.clientX - rect.left) / rect.width) * 2 - 1));
+      const normY = Math.max(-1, Math.min(1, ((e.clientY - rect.top) / rect.height) * 2 - 1));
       setOffset({
         x: normX * 4,
         y: normY * 3,
       });
 
-      // Zone detection based on horizontal cursor percentage
+      // River zone detection
       const percentX = (e.clientX - rect.left) / rect.width;
-      if (percentX < 0.35) {
+      if (percentX >= 0 && percentX < 0.34) {
         setLeftActive(true);
-      } else if (percentX > 0.65) {
+        setRightActive(false);
+      } else if (percentX > 0.66 && percentX <= 1) {
         setRightActive(true);
+        setLeftActive(false);
       } else {
         setLeftActive(false);
         setRightActive(false);
       }
     };
 
-    const handleMouseLeave = () => {
+    const handlePointerLeave = () => {
       setLeftActive(false);
       setRightActive(false);
       setOffset({ x: 0, y: 0 });
     };
 
-    const node = containerRef.current;
-    if (node) {
-      node.addEventListener("mousemove", handleMouseMove, { passive: true });
-      node.addEventListener("mouseleave", handleMouseLeave);
-    }
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("mouseleave", handlePointerLeave);
 
     return () => {
-      if (node) {
-        node.removeEventListener("mousemove", handleMouseMove);
-        node.removeEventListener("mouseleave", handleMouseLeave);
-      }
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("mouseleave", handlePointerLeave);
     };
   }, []);
 
