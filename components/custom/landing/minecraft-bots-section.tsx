@@ -15,7 +15,7 @@ const VoxelBotsCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[400px] sm:h-[460px] lg:h-[500px] flex flex-col items-center justify-center bg-neutral-50/50 rounded-3xl border border-black/5 animate-pulse">
+      <div className="w-full h-[440px] sm:h-[500px] lg:h-[540px] flex flex-col items-center justify-center bg-neutral-50/50 rounded-3xl border border-black/5 animate-pulse">
         <div className="flex items-center gap-2 text-neutral-400 font-mono text-xs">
           <Sparkles className="size-4 animate-spin text-lime-500" />
           <span>Generating procedural 3D voxel islands...</span>
@@ -40,7 +40,7 @@ export function MinecraftBotsSection() {
   };
 
   return (
-    <section id="bots" className="relative pt-10 pb-4 sm:pt-14 sm:pb-6 scroll-mt-20 bg-white text-[#131316] overflow-hidden">
+    <section id="bots" className="relative pt-8 pb-4 sm:pt-12 sm:pb-6 scroll-mt-20 bg-white text-[#131316] overflow-hidden">
       {/* Background Ambience */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_50%_at_50%_15%,rgba(163,230,53,0.06),transparent_80%)]" />
 
@@ -79,15 +79,15 @@ export function MinecraftBotsSection() {
           Specialist AI agents each with their own computer, browser, and memory.
         </motion.p>
 
-        {/* --- 3D PROCEDURAL VOXEL SCENE (Matching Reference Image Exactly) --- */}
+        {/* --- 3D PROCEDURAL VOXEL SCENE (Pulled right up directly under the text) --- */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative w-full mt-2 sm:mt-4"
+          className="relative w-full -mt-8 sm:-mt-12 lg:-mt-16"
         >
-          {/* Three.js Canvas with the 5 islands: Browser, Researcher, Builder, Writer, Automator */}
+          {/* Three.js Canvas with enlarged bots and zero gap below text */}
           <VoxelBotsCanvas
             activeIndex={activeIndex}
             onSelectBot={setActiveIndex}

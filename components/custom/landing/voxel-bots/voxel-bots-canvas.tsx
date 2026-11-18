@@ -43,21 +43,21 @@ function useSignTexture(label: string, icon: string, isBuilder: boolean, isHighl
     if (isBuilder) {
       ctx.fillStyle = "#bef264";
       ctx.fill();
-      ctx.lineWidth = 8;
+      ctx.lineWidth = 9;
       ctx.strokeStyle = "#84cc16";
       ctx.stroke();
     } else {
       ctx.fillStyle = isHighlighted ? "#ffffff" : "#fbfbfb";
       ctx.fill();
-      ctx.lineWidth = 5;
-      ctx.strokeStyle = isHighlighted ? "rgba(0, 0, 0, 0.28)" : "rgba(0, 0, 0, 0.15)";
+      ctx.lineWidth = 6;
+      ctx.strokeStyle = isHighlighted ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.15)";
       ctx.stroke();
     }
 
     // Text & Icon in Minecraft Monospace style
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `bold ${isBuilder ? "54px" : "50px"} monospace, system-ui, sans-serif`;
+    ctx.font = `bold ${isBuilder ? "56px" : "52px"} monospace, system-ui, sans-serif`;
     ctx.fillStyle = isBuilder ? "#09090b" : "#18181b";
     ctx.fillText(`${icon}  ${label}`, 256, 65);
 
@@ -152,7 +152,7 @@ function BotIslandAnchor({
 
       {/* 3D Physical Voxel Sign Plate mounted directly on the front cliff face of the island block */}
       <mesh position={[0, -0.32, 2.18]} castShadow receiveShadow>
-        <boxGeometry args={[2.55, 0.64, 0.08]} />
+        <boxGeometry args={[2.7, 0.68, 0.08]} />
         <meshStandardMaterial
           color={isBuilder ? "#bef264" : "#ffffff"}
           emissive={isBuilder ? "#a3e635" : "#000000"}
@@ -163,8 +163,8 @@ function BotIslandAnchor({
 
       {/* Minecraft-Style Sign Face mounted on the block */}
       {signTexture && (
-        <mesh position={[0, -0.32, 2.23]}>
-          <planeGeometry args={[2.5, 0.62]} />
+        <mesh position={[0, -0.32, 2.24]}>
+          <planeGeometry args={[2.64, 0.65]} />
           <meshBasicMaterial
             map={signTexture}
             transparent
@@ -174,8 +174,8 @@ function BotIslandAnchor({
       )}
 
       {/* Contact Shadow disc on bottom plane */}
-      <mesh position={[0, -2.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[2.0 * scale, 32]} />
+      <mesh position={[0, -2.5, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[2.2 * scale, 32]} />
         <meshBasicMaterial
           color="#000000"
           transparent
@@ -196,22 +196,22 @@ function ResponsiveCameraController({ activeIndex }: { activeIndex: number }) {
 
     if (isMobile) {
       // On mobile, focus camera on the active bot's X coordinate
-      const botXPositions = [-9.6, -4.8, 0, 4.8, 9.6];
+      const botXPositions = [-10.8, -5.4, 0, 5.4, 10.8];
       const targetX = botXPositions[activeIndex] || 0;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.08);
       camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.4, 0.08);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 14.0, 0.08);
-      camera.lookAt(targetX, 0.5, 0);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 14.5, 0.08);
+      camera.lookAt(targetX, 1.2, 0);
     } else if (isTablet) {
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.08);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 4.0, 0.08);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 22.0, 0.08);
-      camera.lookAt(0, 0.5, 0);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.8, 0.08);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 21.0, 0.08);
+      camera.lookAt(0, 1.2, 0);
     } else {
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.08);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.8, 0.08);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 20.2, 0.08);
-      camera.lookAt(0, 0.55, 0);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.6, 0.08);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 18.5, 0.08);
+      camera.lookAt(0, 1.15, 0);
     }
   });
 
@@ -225,10 +225,10 @@ export function VoxelBotsCanvas({
   onHoverBot,
 }: VoxelBotsCanvasProps) {
   return (
-    <div className="relative w-full h-[400px] sm:h-[460px] lg:h-[500px] select-none">
+    <div className="relative w-full h-[440px] sm:h-[500px] lg:h-[540px] select-none">
       <Canvas
         shadows
-        camera={{ position: [0, 3.8, 20.2], fov: 36 }}
+        camera={{ position: [0, 3.6, 18.5], fov: 40 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
@@ -259,7 +259,7 @@ export function VoxelBotsCanvas({
         <directionalLight position={[0, -10, 10]} intensity={0.3} color="#ffffff" />
 
         {/* --- FLOOR GRID PLANE (Soft grid as seen in Reference Image) --- */}
-        <group position={[0, -2.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <group position={[0, -2.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <gridHelper
             args={[44, 44, 0xe4e4e7, 0xf4f4f5]}
             position={[0, 0, 0]}
@@ -267,11 +267,11 @@ export function VoxelBotsCanvas({
           />
         </group>
 
-        {/* --- 1. BROWSER ISLAND (Far Left: x = -9.6) --- */}
+        {/* --- 1. BROWSER ISLAND (Far Left: x = -10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={0}
-          basePosition={[-9.6, 0.05, -0.4]}
-          scale={0.78}
+          basePosition={[-10.8, 0.6, -0.4]}
+          scale={0.92}
           label="Browser"
           icon="🌐"
           isSelected={activeIndex === 0}
@@ -284,11 +284,11 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 2. RESEARCHER ISLAND (Mid Left: x = -4.8) --- */}
+        {/* --- 2. RESEARCHER ISLAND (Mid Left: x = -5.4, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={1}
-          basePosition={[-4.8, 0.25, 0.0]}
-          scale={0.78}
+          basePosition={[-5.4, 0.85, 0.0]}
+          scale={0.92}
           label="Researcher"
           icon="🔍"
           isSelected={activeIndex === 1}
@@ -304,11 +304,11 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 3. BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 0.70, scale = 0.96) --- */}
+        {/* --- 3. BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 1.35, enlarged scale = 1.15) --- */}
         <BotIslandAnchor
           index={2}
-          basePosition={[0, 0.70, 0.6]}
-          scale={0.96}
+          basePosition={[0, 1.35, 0.6]}
+          scale={1.15}
           label="Builder"
           icon="</>"
           isBuilder
@@ -325,11 +325,11 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 4. WRITER ISLAND (Mid Right: x = 4.8) --- */}
+        {/* --- 4. WRITER ISLAND (Mid Right: x = 5.4, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={3}
-          basePosition={[4.8, 0.25, 0.0]}
-          scale={0.78}
+          basePosition={[5.4, 0.85, 0.0]}
+          scale={0.92}
           label="Writer"
           icon="📄"
           isSelected={activeIndex === 3}
@@ -342,11 +342,11 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 5. AUTOMATOR ISLAND (Far Right: x = 9.6) --- */}
+        {/* --- 5. AUTOMATOR ISLAND (Far Right: x = 10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={4}
-          basePosition={[9.6, 0.05, -0.4]}
-          scale={0.78}
+          basePosition={[10.8, 0.6, -0.4]}
+          scale={0.92}
           label="Automator"
           icon="⚡"
           isSelected={activeIndex === 4}
