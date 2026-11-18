@@ -16,7 +16,6 @@ import {
   SocialMediaBotHeadGear,
   SocialMediaBotProps,
 } from "./bot-props";
-import { RoleBrandCube } from "./role-brand-cube";
 
 interface VoxelBotsCanvasProps {
   activeIndex: number;
@@ -98,7 +97,7 @@ function BotIslandAnchor({
   isHovered?: boolean;
   onSelect: () => void;
   onHover: (hovered: boolean) => void;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const currentY = useRef(basePosition[1]);
@@ -229,7 +228,7 @@ export function VoxelBotsCanvas({
   onHoverBot,
 }: VoxelBotsCanvasProps) {
   return (
-    <div className="relative w-full h-[440px] sm:h-[500px] lg:h-[540px] select-none">
+    <div className="relative w-full h-[400px] sm:h-[440px] lg:h-[460px] select-none">
       <Canvas
         shadows
         camera={{ position: [0, 3.6, 18.5], fov: 40 }}
@@ -262,15 +261,6 @@ export function VoxelBotsCanvas({
         <directionalLight position={[-16, 12, -8]} intensity={0.7} color="#d9f99d" />
         <directionalLight position={[0, -10, 10]} intensity={0.3} color="#ffffff" />
 
-        {/* --- FLOOR GRID PLANE (Soft grid as seen in Reference Image) --- */}
-        <group position={[0, -2.2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-          <gridHelper
-            args={[44, 44, 0xe4e4e7, 0xf4f4f5]}
-            position={[0, 0, 0]}
-            rotation={[Math.PI / 2, 0, 0]}
-          />
-        </group>
-
         {/* --- 1. CODING BOT ISLAND (Far Left: x = -10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={0}
@@ -289,14 +279,6 @@ export function VoxelBotsCanvas({
           >
             <CodingBotProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
           </VoxelCat>
-          {/* GitHub 3D Cube for Coding Bot */}
-          <RoleBrandCube
-            brand="github"
-            position={[0.78, 1.65, 0.3]}
-            size={0.42}
-            phase={0}
-            isHovered={hoveredIndex === 0 || activeIndex === 0}
-          />
         </BotIslandAnchor>
 
         {/* --- 2. RESEARCH BOT ISLAND (Mid Left: x = -5.4, enlarged scale = 0.92) --- */}
@@ -317,14 +299,6 @@ export function VoxelBotsCanvas({
           >
             <ResearcherProps isHovered={hoveredIndex === 1 || activeIndex === 1} />
           </VoxelCat>
-          {/* Google 3D Cube for Research Bot */}
-          <RoleBrandCube
-            brand="google"
-            position={[-0.78, 1.65, 0.3]}
-            size={0.42}
-            phase={1.2}
-            isHovered={hoveredIndex === 1 || activeIndex === 1}
-          />
         </BotIslandAnchor>
 
         {/* --- 3. AGENT BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 1.35, enlarged scale = 1.15) --- */}
@@ -346,14 +320,29 @@ export function VoxelBotsCanvas({
           >
             <BuilderProps isHovered={hoveredIndex === 2 || activeIndex === 2} />
           </VoxelCat>
-          {/* Glowing Code Cube for Agent Builder */}
-          <RoleBrandCube
-            brand="code"
-            position={[0, 1.95, 0.1]}
-            size={0.5}
-            phase={2.4}
-            isHovered={hoveredIndex === 2 || activeIndex === 2}
-          />
+
+          {/* Under-Island Glowing Lime Aura Ring (Matching Reference Image) */}
+          <group position={[0, -1.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <mesh>
+              <ringGeometry args={[1.7, 1.95, 64]} />
+              <meshBasicMaterial color="#a3e635" transparent opacity={0.75} side={THREE.DoubleSide} />
+            </mesh>
+            <mesh>
+              <ringGeometry args={[1.5, 2.15, 64]} />
+              <meshBasicMaterial color="#bef264" transparent opacity={0.3} side={THREE.DoubleSide} />
+            </mesh>
+            <pointLight color="#a3e635" intensity={3.0} distance={5} decay={2} />
+          </group>
+
+          {/* Under-island soft lime ground glow disc */}
+          <mesh position={[0, -2.48, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+            <circleGeometry args={[2.8, 32]} />
+            <meshBasicMaterial
+              color="#a3e635"
+              transparent
+              opacity={0.25}
+            />
+          </mesh>
         </BotIslandAnchor>
 
         {/* --- 4. NOTES BOT ISLAND (Mid Right: x = 5.4, enlarged scale = 0.92) --- */}
@@ -371,14 +360,6 @@ export function VoxelBotsCanvas({
           <VoxelCat isHovered={hoveredIndex === 3 || activeIndex === 3}>
             <WriterProps isHovered={hoveredIndex === 3 || activeIndex === 3} />
           </VoxelCat>
-          {/* Notion 3D Cube for Notes Bot */}
-          <RoleBrandCube
-            brand="notion"
-            position={[0.78, 1.65, 0.3]}
-            size={0.42}
-            phase={3.6}
-            isHovered={hoveredIndex === 3 || activeIndex === 3}
-          />
         </BotIslandAnchor>
 
         {/* --- 5. SOCIAL MEDIA BOT ISLAND (Far Right: x = 10.8, enlarged scale = 0.92) --- */}
@@ -399,14 +380,6 @@ export function VoxelBotsCanvas({
           >
             <SocialMediaBotProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
           </VoxelCat>
-          {/* Instagram Gradient 3D Cube for Social Media Bot */}
-          <RoleBrandCube
-            brand="instagram"
-            position={[-0.78, 1.65, 0.3]}
-            size={0.42}
-            phase={4.8}
-            isHovered={hoveredIndex === 4 || activeIndex === 4}
-          />
         </BotIslandAnchor>
       </Canvas>
     </div>
