@@ -36,35 +36,41 @@ export function WaterEffects() {
 
       {/* --- WATER PIXEL SHIMMERS & HIGHLIGHTS --- */}
       {/* Left River Stream Shimmers */}
-      <div className="absolute top-[42%] left-[12%] size-1.5 bg-white/80 rounded-xs animate-[shimmerSparkle_2.8s_ease-in-out_infinite]" />
-      <div className="absolute top-[48%] left-[8%] size-2 bg-sky-200/90 rounded-xs animate-[shimmerSparkle_3.2s_ease-in-out_infinite_1.2s]" />
-      <div className="absolute top-[62%] left-[16%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_2.4s_ease-in-out_infinite_0.6s]" />
-      <div className="absolute top-[75%] left-[22%] size-2 bg-sky-100/90 rounded-xs animate-[shimmerSparkle_3.5s_ease-in-out_infinite_1.8s]" />
+      <div className="absolute top-[54%] left-[5%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_2.8s_ease-in-out_infinite]" />
+      <div className="absolute top-[66%] left-[10%] size-2 bg-sky-200/90 rounded-xs animate-[shimmerSparkle_3.2s_ease-in-out_infinite_1.2s]" />
+      <div className="absolute top-[76%] left-[14%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_2.4s_ease-in-out_infinite_0.6s]" />
+      <div className="absolute top-[86%] left-[22%] size-2 bg-sky-100/90 rounded-xs animate-[shimmerSparkle_3.5s_ease-in-out_infinite_1.8s]" />
 
       {/* Right River Stream Shimmers */}
-      <div className="absolute top-[45%] right-[12%] size-1.5 bg-white/80 rounded-xs animate-[shimmerSparkle_3.0s_ease-in-out_infinite_0.4s]" />
-      <div className="absolute top-[58%] right-[18%] size-2 bg-sky-200/90 rounded-xs animate-[shimmerSparkle_2.6s_ease-in-out_infinite_1.5s]" />
-      <div className="absolute top-[72%] right-[24%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_3.4s_ease-in-out_infinite_0.9s]" />
+      <div className="absolute top-[56%] right-[6%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_3.0s_ease-in-out_infinite_0.4s]" />
+      <div className="absolute top-[68%] right-[12%] size-2 bg-sky-200/90 rounded-xs animate-[shimmerSparkle_2.6s_ease-in-out_infinite_1.5s]" />
+      <div className="absolute top-[80%] right-[16%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_3.4s_ease-in-out_infinite_0.9s]" />
+      <div className="absolute top-[90%] right-[26%] size-2 bg-sky-100/90 rounded-xs animate-[shimmerSparkle_2.9s_ease-in-out_infinite_1.4s]" />
 
-      {/* Waterfall Mist Micro-Rays (Left mini-waterfall) */}
-      <div className="absolute top-[64%] left-[17%] w-6 h-3 bg-white/40 blur-[1px] rounded-full animate-pulse" />
-      {/* Waterfall Mist Micro-Rays (Right cabin waterfall) */}
-      <div className="absolute top-[32%] right-[8%] w-8 h-4 bg-white/50 blur-[1px] rounded-full animate-pulse" />
-
-      {/* --- FLOATING WATER LOTUS BOBBING OVERLAYS --- */}
-      {/* Left Lotus Pad Subtle Bobbing */}
-      <div className="absolute top-[52%] left-[16.5%] w-7 h-5 pointer-events-none animate-[riverBob_3.4s_ease-in-out_infinite]">
-        <div className="w-full h-full rounded-full bg-pink-400/25 blur-[2px]" />
+      {/* --- FLOATING WATER LOTUS BOBBING OVERLAYS (Aligned to illustrated lotuses) --- */}
+      {/* Left Lotus Pad 1 */}
+      <div className="absolute top-[58%] left-[2.5%] w-8 h-6 pointer-events-none animate-[riverBob_3.4s_ease-in-out_infinite]">
+        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
       </div>
 
-      {/* Right Lotus Pad Subtle Bobbing */}
-      <div className="absolute top-[53%] right-[8.5%] w-7 h-5 pointer-events-none animate-[riverBob_3.6s_ease-in-out_infinite_0.8s]">
-        <div className="w-full h-full rounded-full bg-pink-400/25 blur-[2px]" />
+      {/* Left Lotus Pad 2 */}
+      <div className="absolute top-[80%] left-[7%] w-9 h-6 pointer-events-none animate-[riverBob_3.8s_ease-in-out_infinite_0.5s]">
+        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
       </div>
 
-      {/* Bottom Center Lotus Pad Subtle Bobbing */}
-      <div className="absolute top-[88%] left-[32%] w-8 h-6 pointer-events-none animate-[riverBob_3.2s_ease-in-out_infinite_1.5s]">
-        <div className="w-full h-full rounded-full bg-pink-400/25 blur-[2px]" />
+      {/* Right Lotus Pad 1 */}
+      <div className="absolute top-[62%] right-[2%] w-8 h-6 pointer-events-none animate-[riverBob_3.6s_ease-in-out_infinite_0.8s]">
+        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
+      </div>
+
+      {/* Right Lotus Pad 2 */}
+      <div className="absolute top-[78%] right-[8%] w-9 h-6 pointer-events-none animate-[riverBob_3.3s_ease-in-out_infinite_1.2s]">
+        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
+      </div>
+
+      {/* Right Lotus Pad 3 */}
+      <div className="absolute top-[88%] right-[23%] w-9 h-6 pointer-events-none animate-[riverBob_3.5s_ease-in-out_infinite_1.6s]">
+        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
       </div>
     </div>
   );

@@ -85,11 +85,11 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
       <div
         className="absolute inset-0 size-full pointer-events-none transition-transform duration-700 ease-out"
         style={{
-          transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(1.03)`,
+          transform: `translate3d(${offset.x}px, ${offset.y}px, 0) scale(1.02)`,
         }}
       >
         <Image
-          src="/hero-minecraft-bg.jpg"
+          src="/hero-pixel-river-bg.png"
           alt="Meow Bot Pixel River Landscape"
           fill
           priority
@@ -97,77 +97,73 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
           className="object-cover object-bottom sm:object-center select-none"
         />
 
-        {/* Soft edge fade for natural blending with navbar and next section */}
-        <div className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-white/95 via-white/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none" />
-
         {/* --- 2. AMBIENT WATER & CLOUD EFFECTS --- */}
         <WaterEffects />
 
-        {/* --- 3. LEFT RIVER CAT BOTS (Pop up along left river) --- */}
+        {/* --- 3. LEFT RIVER CAT BOTS (Pop up along left pixel water) --- */}
         <PixelCatBot
           personality="curious"
           isEmerged={leftActive}
-          x={13}
-          y={40}
+          x={6}
+          y={52}
           scale={1.05}
           staggerMs={0}
         />
         <PixelCatBot
           personality="swimmer"
           isEmerged={leftActive}
-          x={8}
-          y={51}
+          x={10}
+          y={64}
           scale={0.95}
           staggerMs={120}
         />
         <PixelCatBot
           personality="happy"
           isEmerged={leftActive}
-          x={17}
-          y={61}
+          x={18}
+          y={86}
           scale={1.0}
           staggerMs={240}
         />
         <PixelCatBot
           personality="researcher"
           isEmerged={leftActive}
-          x={23}
-          y={80}
+          x={27}
+          y={92}
           scale={1.05}
           staggerMs={360}
         />
 
-        {/* --- 4. RIGHT RIVER CAT BOTS (Pop up along right river) --- */}
+        {/* --- 4. RIGHT RIVER CAT BOTS (Pop up along right pixel water) --- */}
         <PixelCatBot
           personality="builder"
           isEmerged={rightActive}
-          x={87}
-          y={43}
-          scale={1.1}
+          x={93}
+          y={54}
+          scale={1.05}
           staggerMs={0}
         />
         <PixelCatBot
           personality="sleepy"
           isEmerged={rightActive}
-          x={80}
-          y={61}
+          x={90}
+          y={64}
           scale={1.0}
           staggerMs={140}
         />
         <PixelCatBot
           personality="happy"
           isEmerged={rightActive}
-          x={73}
-          y={77}
+          x={84}
+          y={79}
           scale={1.05}
           staggerMs={260}
         />
         <PixelCatBot
           personality="curious"
           isEmerged={rightActive}
-          x={91}
-          y={67}
+          x={75}
+          y={91}
           scale={0.95}
           staggerMs={380}
         />

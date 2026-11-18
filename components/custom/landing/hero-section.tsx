@@ -11,9 +11,9 @@ import { PixelRiverBackground } from "./pixel-river/pixel-river-background";
 export function HeroSection() {
   return (
     <PixelRiverBackground>
-      <section className="relative pt-28 pb-14 sm:pt-36 sm:pb-20 text-[#131316] overflow-hidden">
+      <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 min-h-[680px] sm:min-h-[780px] lg:min-h-[860px] flex flex-col justify-center text-[#131316] overflow-hidden">
         {/* Background Subtle Ambience */}
-        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(124,92,252,0.06),transparent_80%)]" />
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(124,92,252,0.04),transparent_80%)]" />
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         {/* H1 Headline: "meet [CharacterFaceFollow] meow bot" */}
