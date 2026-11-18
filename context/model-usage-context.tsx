@@ -24,6 +24,12 @@ interface ModelUsageContextType {
   setSelectedModelId: (id: string) => void;
   reasoningEffort: ReasoningEffort;
   setReasoningEffort: (effort: ReasoningEffort) => void;
+  temperature: number;
+  setTemperature: (temp: number) => void;
+  topP: number;
+  setTopP: (val: number) => void;
+  maxTokens: number;
+  setMaxTokens: (tokens: number) => void;
   apiKeys: Record<string, string>;
   setApiKey: (provider: string, key: string) => void;
   keyStatus: Record<string, KeyStatusInfo>;
@@ -52,6 +58,9 @@ const ModelUsageContext = createContext<ModelUsageContextType | undefined>(undef
 const STORAGE_KEYS = {
   MODEL: "meow_selected_model_id",
   EFFORT: "meow_reasoning_effort",
+  TEMPERATURE: "meow_model_temperature",
+  TOP_P: "meow_model_top_p",
+  MAX_TOKENS: "meow_model_max_tokens",
   KEYS: "meow_provider_api_keys",
   KEY_STATUS: "meow_key_status",
   ALL_TIME: "meow_all_time_token_usage",
@@ -61,6 +70,9 @@ const STORAGE_KEYS = {
 export function ModelUsageProvider({ children }: { children: React.ReactNode }) {
   const [selectedModelId, setSelectedModelIdState] = useState<string>("gemini-3-flash");
   const [reasoningEffort, setReasoningEffortState] = useState<ReasoningEffort>("medium");
+  const [temperature, setTemperatureState] = useState<number>(0.7);
+  const [topP, setTopPState] = useState<number>(0.9);
+  const [maxTokens, setMaxTokensState] = useState<number>(8192);
   const [apiKeys, setApiKeys] = useState<Record<string, string>>({
     google: "",
     anthropic: "",
@@ -110,6 +122,15 @@ export function ModelUsageProvider({ children }: { children: React.ReactNode }) 
         setReasoningEffortState(savedEffort);
       }
 
+      const savedTemp = localStorage.getItem(STORAGE_KEYS.TEMPERATURE);
+      if (savedTemp) setTemperatureState(parseFloat(savedTemp));
+
+      const savedTopP = localStorage.getItem(STORAGE_KEYS.TOP_P);
+      if (savedTopP) setTopPState(parseFloat(savedTopP));
+
+      const savedMaxTokens = localStorage.getItem(STORAGE_KEYS.MAX_TOKENS);
+      if (savedMaxTokens) setMaxTokensState(parseInt(savedMaxTokens, 10));
+
       const savedKeys = localStorage.getItem(STORAGE_KEYS.KEYS);
       if (savedKeys) {
         setApiKeys(JSON.parse(savedKeys));
@@ -145,6 +166,27 @@ export function ModelUsageProvider({ children }: { children: React.ReactNode }) 
     setReasoningEffortState(effort);
     try {
       localStorage.setItem(STORAGE_KEYS.EFFORT, effort);
+    } catch {}
+  }, []);
+
+  const setTemperature = useCallback((temp: number) => {
+    setTemperatureState(temp);
+    try {
+      localStorage.setItem(STORAGE_KEYS.TEMPERATURE, temp.toString());
+    } catch {}
+  }, []);
+
+  const setTopP = useCallback((val: number) => {
+    setTopPState(val);
+    try {
+      localStorage.setItem(STORAGE_KEYS.TOP_P, val.toString());
+    } catch {}
+  }, []);
+
+  const setMaxTokens = useCallback((tokens: number) => {
+    setMaxTokensState(tokens);
+    try {
+      localStorage.setItem(STORAGE_KEYS.MAX_TOKENS, tokens.toString());
     } catch {}
   }, []);
 
@@ -327,6 +369,12 @@ export function ModelUsageProvider({ children }: { children: React.ReactNode }) 
         setSelectedModelId,
         reasoningEffort,
         setReasoningEffort,
+        temperature,
+        setTemperature,
+        topP,
+        setTopP,
+        maxTokens,
+        setMaxTokens,
         apiKeys,
         setApiKey,
         keyStatus,

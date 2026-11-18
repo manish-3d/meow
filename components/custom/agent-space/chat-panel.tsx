@@ -1,16 +1,22 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Bot, User, ArrowUp, Loader2, Sparkles, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { motion, AnimatePresence } from "motion/react";
+import {
+  Bot,
+  User,
+  ArrowUp,
+  Loader2,
+  Paperclip,
+  Mic,
+} from "lucide-react";
 import { AgentConfigType } from "@/types/agent";
 import { useAgentConfig } from "@/context/agent-config-context";
 import { AgentResponseView } from "./agent-response-view";
 import { useModelUsage } from "@/context/model-usage-context";
-import { ModelSelectorBar } from "@/components/custom/models/model-selector-bar";
 import { MissingKeyDialog } from "@/components/custom/models/missing-key-dialog";
 import { ModelDefinition } from "@/lib/ai/models";
+import { DEFAULT_AVATAR } from "@/lib/avatars";
 
 export interface ChatMessage {
   id: string;
@@ -30,15 +36,18 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
   const { agentConfig } = useAgentConfig();
   const agent = propAgent || agentConfig || {
     agentId: "default",
-    name: "Meow Agent",
-    agentImage: "https://api.dicebear.com/7.x/bottts/svg?seed=fallback",
-    description: "",
+    name: "Social Media Bot",
+    agentImage: DEFAULT_AVATAR.path,
+    description: "Manage, create and grow your social media presence across platforms.",
     isActive: true,
   };
 
   const {
     selectedModel,
     reasoningEffort,
+    temperature,
+    topP,
+    maxTokens,
     apiKeys,
     isKeyConfiguredForModel,
     recordUsage,
@@ -50,18 +59,11 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
   const [targetMissingModel, setTargetMissingModel] = useState<ModelDefinition>(selectedModel);
   const [isKeyExhausted, setIsKeyExhausted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Initialize with agent welcome message
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: "welcome-msg",
-      role: "agent",
-      content: `Hello! I am ${agent.name}. How can I assist you today? You can ask me questions, test my instructions, or request browser automations and routines.`,
-      timestamp: "Just now",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
 
-  // Fetch conversation history from database on mount or when agentId changes
+  // Fetch conversation history from database
   useEffect(() => {
     let isMounted = true;
     if (!agent.agentId || agent.agentId === "default") return;
@@ -86,13 +88,6 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     };
   }, [agent.agentId]);
 
-  const quickPromptChips = [
-    "Summarize my top unread emails and alert me on Slack",
-    "Search Google News on your VM desktop for the latest AI breakthroughs",
-    "Check open pull requests on GitHub and summarize urgent issues",
-  ];
-
-  // Auto-scroll to bottom of conversation
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -101,11 +96,21 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     scrollToBottom();
   }, [messages, isStreaming]);
 
+  // Auto-resize textarea
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    const el = textareaRef.current;
+    if (el) {
+      el.style.height = "auto";
+      el.style.height = Math.min(el.scrollHeight, 140) + "px";
+    }
+  };
+
   const handleSend = async (messageText?: string) => {
     const textToSend = (messageText || input).trim();
     if (!textToSend || isStreaming || propLoading) return;
 
-    // Check if the selected model requires an API key and user has not configured it
+    // Verify key if required
     if (!selectedModel.isFree && !isKeyConfiguredForModel(selectedModel.id)) {
       setTargetMissingModel(selectedModel);
       setIsKeyExhausted(false);
@@ -130,10 +135,12 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
       isStreaming: true,
     };
 
-    // Append both user message and empty agent placeholder
     const nextMessages = [...messages, userMessage];
     setMessages([...nextMessages, agentPlaceholder]);
     setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+    }
     setIsStreaming(true);
     onSendMessage?.(textToSend);
 
@@ -148,6 +155,9 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
           modelId: selectedModel.id,
           customApiKey,
           effort: reasoningEffort,
+          temperature,
+          topP,
+          maxTokens,
           messages: nextMessages.map((m) => ({
             role: m.role,
             content: m.content,
@@ -160,7 +170,6 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
         const errText = errorData.error || `Server responded with ${response.status}`;
         const errLower = errText.toLowerCase();
 
-        // Handle Quota Exhaustion or Missing/Invalid Key errors
         if (
           response.status === 429 ||
           errLower.includes("quota") ||
@@ -207,13 +216,12 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
         );
       }
 
-      // Record token usage & billing stats
+      // Record token usage
       const promptChars = nextMessages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
       const promptEst = Math.max(1, Math.ceil(promptChars / 4));
       const completionEst = Math.max(1, Math.ceil(accumulatedText.length / 4));
       recordUsage(selectedModel.id, promptEst, completionEst);
 
-      // Finalize streaming state
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === agentMsgId ? { ...msg, isStreaming: false } : msg
@@ -224,11 +232,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
       const errText = err.message || "Unknown error";
       const errLower = errText.toLowerCase();
 
-      if (
-        errLower.includes("quota") ||
-        errLower.includes("credit") ||
-        errLower.includes("rate limit")
-      ) {
+      if (errLower.includes("quota") || errLower.includes("credit") || errLower.includes("rate limit")) {
         setTargetMissingModel(selectedModel);
         setIsKeyExhausted(true);
         setMissingKeyModalOpen(true);
@@ -257,195 +261,191 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     }
   };
 
-  const handleChipClick = (chipText: string) => {
-    handleSend(chipText);
-  };
-
-  const handleClearHistory = async () => {
-    try {
-      if (agent.agentId && agent.agentId !== "default") {
-        await fetch(`/api/agent/chat/history?agentId=${agent.agentId}`, {
-          method: "DELETE",
-        });
-      }
-    } catch (e) {
-      console.warn("Failed to clear history from DB:", e);
-    }
-    setMessages([
-      {
-        id: `welcome-${Date.now()}`,
-        role: "agent",
-        content: `Conversation reset. I am ${agent.name}. How can I assist you?`,
-        timestamp: "Just now",
-      },
-    ]);
-  };
+  const hasMessages = messages.length > 0;
+  const agentAvatarSrc = agent.agentImage || DEFAULT_AVATAR.path;
 
   return (
-    <div className="flex flex-col h-full bg-background overflow-hidden">
-      {/* Top Bar: Agent Header */}
-      <div className="h-14 border-b border-border/50 px-5 flex items-center justify-between shrink-0 bg-background/80 backdrop-blur">
-        <div className="flex items-center gap-3">
-          <div className="size-8 rounded-lg bg-muted border border-border overflow-hidden flex items-center justify-center p-0.5 shrink-0">
-            {agent.agentImage ? (
-              <img src={agent.agentImage} alt={agent.name} className="size-full object-contain" />
-            ) : (
-              <Bot className="size-4 text-primary" />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-bold text-foreground leading-tight">{agent.name}</span>
-              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" title="Agent Online" />
-            </div>
-            <span className="text-[11px] text-muted-foreground">
-              Autonomous Mode • Cloud VM Desktop & Tools Connected
-            </span>
-          </div>
-        </div>
+    <div className="flex flex-col h-full bg-white overflow-hidden relative">
+      {/* ── MESSAGES / WELCOME STAGE ── */}
+      <div className="flex-1 overflow-y-auto">
+        <AnimatePresence mode="wait">
+          {!hasMessages ? (
+            /* Stageshow: Centered Isometric Mascot & Persona Intro */
+            <motion.div
+              key="welcome-stage"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="flex flex-col items-center justify-center min-h-full px-6 py-16 text-center select-none"
+            >
+              {/* Isometric Character Base with Floating Cubes */}
+              <div className="relative mb-6 flex items-center justify-center">
+                {/* Floating Voxel Pixel Elements */}
+                <motion.div
+                  animate={{ y: [-2, 3, -2], opacity: [0.6, 0.9, 0.6] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -left-6 top-4 size-2.5 bg-neutral-300 rounded-[2px]"
+                />
+                <motion.div
+                  animate={{ y: [3, -3, 3], opacity: [0.5, 0.8, 0.5] }}
+                  transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute -right-5 top-7 size-2 bg-neutral-300 rounded-[2px]"
+                />
+                <motion.div
+                  animate={{ y: [-3, 2, -3], opacity: [0.4, 0.7, 0.4] }}
+                  transition={{ duration: 3.4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute right-7 -top-2 size-1.5 bg-neutral-400 rounded-[2px]"
+                />
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 px-2"
-          onClick={handleClearHistory}
-          title="Clear Conversation History"
-        >
-          <RefreshCw className="size-3" />
-          <span className="hidden sm:inline">Reset</span>
-        </Button>
-      </div>
+                {/* Pedestal / Island Base */}
+                <div className="relative">
+                  {/* Subtle isometric tile base under cat */}
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-28 h-6 bg-black/[0.04] rounded-full blur-[2px]" />
 
-      {/* Messages Scroll Viewport */}
-      <div className="flex-1 overflow-auto p-5 space-y-4">
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex gap-3 max-w-2xl ${msg.role === "user" ? "ml-auto flex-row-reverse" : "mr-auto"}`}
-          >
-            {/* Avatar */}
-            <div className="size-7 rounded-lg overflow-hidden shrink-0 flex items-center justify-center text-xs font-semibold bg-surface-2 border border-border-subtle shadow-2xs">
-              {msg.role === "agent" ? (
-                agent.agentImage ? (
-                  <img src={agent.agentImage} alt={agent.name} className="size-full object-cover" />
-                ) : (
-                  <Bot className="size-3.5 text-foreground" />
-                )
-              ) : (
-                <User className="size-3.5 text-muted-foreground" />
-              )}
-            </div>
-
-            {/* Bubble */}
-            <div className="space-y-1 max-w-[85%]">
-              <div
-                className={`px-3.5 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap break-words ${
-                  msg.role === "user"
-                    ? "bg-primary text-primary-foreground rounded-tr-xs shadow-xs"
-                    : "bg-surface-1 text-foreground border border-border-subtle rounded-tl-xs shadow-xs"
-                }`}
-              >
-                {/* Streaming Placeholder or Content */}
-                {msg.role === "agent" && msg.isStreaming && !msg.content ? (
-                  <div className="flex items-center gap-2 text-muted-foreground py-0.5 font-mono">
-                    <Loader2 className="size-3.5 animate-spin text-primary" />
-                    <span className="text-[11px]">Executing tools & reasoning...</span>
-                  </div>
-                ) : msg.role === "agent" && !msg.content ? (
-                  <span className="text-muted-foreground italic text-[11px]">
-                    No content received. Please try again.
-                  </span>
-                ) : msg.role === "agent" ? (
-                  <AgentResponseView
-                    content={msg.content}
-                    agentId={agent.agentId}
-                    isStreaming={msg.isStreaming}
-                  />
-                ) : (
-                  msg.content
-                )}
+                  {/* Character with gentle idle float */}
+                  <motion.div
+                    animate={{ y: [0, -5, 0] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                    className="relative size-24 flex items-center justify-center"
+                  >
+                    <img
+                      src={agentAvatarSrc}
+                      alt={agent.name}
+                      className="size-full object-contain filter drop-shadow-sm"
+                    />
+                  </motion.div>
+                </div>
               </div>
-              <span
-                className={`block text-[10px] font-mono tabular-nums text-muted-foreground px-1 ${
-                  msg.role === "user" ? "text-right" : "text-left"
-                }`}
-              >
-                {msg.timestamp}
-              </span>
+
+              {/* Title & Description */}
+              <h1 className="text-2xl font-bold text-foreground tracking-tight mb-2">
+                {agent.name}
+              </h1>
+              <p className="text-xs text-muted-foreground max-w-md leading-relaxed font-normal">
+                {agent.description || "Manage, create and grow your social media presence across platforms."}
+              </p>
+            </motion.div>
+          ) : (
+            /* Active Message Thread */
+            <div className="p-6 space-y-5 max-w-3xl mx-auto w-full">
+              {messages.map((msg, idx) => (
+                <motion.div
+                  key={msg.id}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2, delay: Math.min(idx * 0.02, 0.08) }}
+                  className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                >
+                  {msg.role === "agent" && (
+                    <div className="size-7 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-white border border-black/[0.08] shadow-2xs">
+                      <img src={agentAvatarSrc} alt={agent.name} className="size-full object-contain p-0.5" />
+                    </div>
+                  )}
+
+                  <div className={`space-y-1 max-w-[82%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col`}>
+                    <div
+                      className={`px-4 py-2.5 rounded-2xl text-xs leading-relaxed whitespace-pre-wrap break-words ${
+                        msg.role === "user"
+                          ? "bg-black text-white rounded-tr-xs shadow-xs"
+                          : "bg-neutral-50 text-foreground border border-black/[0.06] rounded-tl-xs shadow-2xs"
+                      }`}
+                    >
+                      {msg.role === "agent" && msg.isStreaming && !msg.content ? (
+                        <div className="flex items-center gap-2 text-muted-foreground py-0.5 font-mono">
+                          <Loader2 className="size-3.5 animate-spin text-black" />
+                          <span className="text-[11px]">Reasoning & executing...</span>
+                        </div>
+                      ) : msg.role === "agent" && !msg.content ? (
+                        <span className="text-muted-foreground italic text-[11px]">
+                          No content received. Please try again.
+                        </span>
+                      ) : msg.role === "agent" ? (
+                        <AgentResponseView
+                          content={msg.content}
+                          agentId={agent.agentId}
+                          isStreaming={msg.isStreaming}
+                        />
+                      ) : (
+                        msg.content
+                      )}
+                    </div>
+
+                    <span
+                      className={`text-[10px] font-mono tabular-nums text-muted-foreground px-1 ${
+                        msg.role === "user" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {msg.timestamp}
+                    </span>
+                  </div>
+
+                  {msg.role === "user" && (
+                    <div className="size-7 rounded-xl overflow-hidden shrink-0 flex items-center justify-center bg-neutral-100 border border-black/[0.08] shadow-2xs">
+                      <User className="size-3.5 text-foreground" />
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+              <div ref={messagesEndRef} />
             </div>
-          </div>
-        ))}
-        <div ref={messagesEndRef} />
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Bottom Area: Prompt Chips + Input Area */}
-      <div className="p-4 border-t border-border-subtle bg-surface-0/90 backdrop-blur space-y-3 shrink-0">
-        {/* Paused Agent Notice */}
-        {agent.isActive === false && (
-          <div className="flex items-center gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-400 text-xs">
-            <span className="font-semibold">Agent Paused:</span>
-            <span className="text-muted-foreground text-[11px]">
-              This agent is paused. Automated routines and conversations are suspended. Activate it in the Settings tab to resume.
-            </span>
-          </div>
-        )}
+      {/* ── FLOATING BOTTOM INPUT CAPSULE (MATCHING REFERENCE EXACTLY) ── */}
+      <div className="p-5 pt-2 bg-transparent shrink-0 max-w-3xl mx-auto w-full">
+        <div className="relative flex items-center gap-2 rounded-full border border-black/[0.1] bg-white shadow-xs px-4 py-2 hover:border-black/20 focus-within:border-black/30 transition-all">
+          {/* Paperclip */}
+          <button
+            type="button"
+            className="shrink-0 size-7 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Attach file"
+          >
+            <Paperclip className="size-4" />
+          </button>
 
-        {/* Suggestion Chips with Gradient Edge Fade */}
-        <div className="relative w-full overflow-hidden">
-          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 mask-fade-right scroll-smooth">
-            {quickPromptChips.map((chip, idx) => (
-              <button
-                key={idx}
-                type="button"
-                disabled={isStreaming || agent.isActive === false}
-                onClick={() => handleChipClick(chip)}
-                className="text-[11px] bg-surface-2 hover:bg-surface-3 text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-full border border-border-subtle whitespace-nowrap transition-all duration-150 shrink-0 shadow-2xs hover:border-foreground/20 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none"
-              >
-                {chip}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Model Bar (Model Selector Dropdown, Workload Effort, Model Usage & Billing Button) */}
-        <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
-          <ModelSelectorBar />
-        </div>
-
-        {/* Input Bar */}
-        <div className="relative rounded-xl border border-border-subtle bg-surface-1 focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/20 transition-all shadow-xs">
-          <Textarea
+          {/* Text input / textarea */}
+          <textarea
+            ref={textareaRef}
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={handleInputChange}
             onKeyDown={handleKeyDown}
             disabled={isStreaming || agent.isActive === false}
-            placeholder={
-              agent.isActive === false
-                ? "Agent is paused. Activate in Settings to message..."
-                : `Message ${agent.name}... (Press Enter to send, Shift+Enter for new line)`
-            }
-            rows={2}
-            className="w-full resize-none bg-transparent border-0 focus-visible:ring-0 text-xs p-3 pr-12 leading-relaxed disabled:opacity-60"
+            placeholder={`Message ${agent.name}...`}
+            rows={1}
+            style={{ minHeight: "24px", maxHeight: "120px" }}
+            className="flex-1 resize-none bg-transparent border-0 outline-none focus:ring-0 text-xs leading-relaxed text-foreground placeholder:text-muted-foreground/60 disabled:opacity-60 py-1"
           />
 
-          <Button
+          {/* Mic */}
+          <button
             type="button"
-            size="icon"
+            className="shrink-0 size-7 flex items-center justify-center rounded-full text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+            title="Voice message"
+          >
+            <Mic className="size-4" />
+          </button>
+
+          {/* Solid Black Send Button */}
+          <motion.button
+            type="button"
             onClick={() => handleSend()}
             disabled={!input.trim() || isStreaming || propLoading || agent.isActive === false}
+            whileTap={{ scale: 0.94 }}
             aria-label="Send message"
-            className="absolute bottom-2.5 right-2.5 size-7 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 transition-all active:scale-95 shadow-xs"
+            className="shrink-0 size-8 rounded-full bg-black text-white flex items-center justify-center hover:bg-neutral-800 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-2xs"
           >
             {isStreaming ? (
               <Loader2 className="size-3.5 animate-spin" />
             ) : (
-              <ArrowUp className="size-3.5" />
+              <ArrowUp className="size-3.5 stroke-[2.5]" />
             )}
-          </Button>
+          </motion.button>
         </div>
       </div>
 
-      {/* Missing Key or Quota Exhausted Dialog */}
+      {/* Missing Key Dialog */}
       <MissingKeyDialog
         open={missingKeyModalOpen}
         onOpenChange={setMissingKeyModalOpen}
