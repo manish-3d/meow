@@ -131,10 +131,10 @@ export default function WorkspaceLayout({
     <ModelUsageProvider>
       <WorkspaceUIProvider>
         <SidebarProvider>
-          <div className="flex min-h-screen w-full bg-white text-foreground">
+          <div className="flex h-screen w-full bg-white text-foreground overflow-hidden">
             <AppSidebar />
 
-            <main className="flex-1 flex flex-col min-w-0 bg-white">
+            <main className="flex-1 flex flex-col min-w-0 bg-white h-screen overflow-hidden">
               <WorkspaceHeader />
               <div className="flex-1 overflow-hidden bg-white">
                 {children}

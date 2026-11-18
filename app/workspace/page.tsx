@@ -46,66 +46,66 @@ export default function WorkspacePage() {
   const firstAgentId = agents.length > 0 ? agents[0].agentId : null;
 
   return (
-    <div className="relative h-full flex flex-col justify-between overflow-hidden bg-transparent select-none">
-      {/* ── 3D MINECRAFT SKY WORLD (CLOUDS, CENTRAL FLOATING ISLAND WITH LAPTOP CAT, BOTTOM GRASS) ── */}
+    <div className="relative h-full max-h-full flex flex-col justify-between overflow-hidden bg-transparent select-none">
+      {/* ── 3D MINECRAFT SKY WORLD (CENTRAL FLOATING ISLAND WITH LAPTOP CAT, BOTTOM GRASS) ── */}
       <VoxelWorkspaceScene />
 
       {/* ── HTML CONTENT LAYER (TITLE, SPACER & ACTION CARDS) ── */}
-      <div className="relative z-10 flex flex-col justify-between h-full pt-8 sm:pt-10 pb-8 sm:pb-10 px-4 sm:px-6 max-w-5xl mx-auto w-full pointer-events-auto">
+      <div className="relative z-10 flex flex-col justify-between h-full pt-4 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-6 max-w-4xl mx-auto w-full pointer-events-auto">
         {/* Top Header & Welcome Typography */}
         <motion.div
-          initial={{ opacity: 0, y: -10 }}
+          initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, ease: "easeOut" }}
-          className="text-center space-y-2.5 max-w-2xl mx-auto"
+          className="text-center space-y-1.5 max-w-2xl mx-auto"
         >
-          <div className="flex items-center justify-center gap-2.5 sm:gap-3.5">
-            <span className="text-[#8dcb16] text-xl sm:text-2xl font-bold select-none tracking-widest drop-shadow-xs">
+          <div className="flex items-center justify-center gap-2 sm:gap-3">
+            <span className="text-[#8dcb16] text-base sm:text-lg font-bold select-none tracking-widest drop-shadow-xs">
               ✦
             </span>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-foreground">
+            <h1 className="text-2xl sm:text-3xl md:text-[34px] font-extrabold tracking-tight text-foreground">
               Agent Workspace
             </h1>
-            <span className="text-[#8dcb16] text-xl sm:text-2xl font-bold select-none tracking-widest drop-shadow-xs">
+            <span className="text-[#8dcb16] text-base sm:text-lg font-bold select-none tracking-widest drop-shadow-xs">
               ✦
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed font-normal max-w-xl mx-auto px-4">
+          <p className="text-xs sm:text-[13px] text-muted-foreground leading-normal font-normal max-w-lg mx-auto px-4">
             Welcome to Meow Bot. Create, configure, and orchestrate autonomous AI
             agents with dedicated cloud VMs and tool integrations.
           </p>
         </motion.div>
 
-        {/* Central Breathing Window (Shows the 3D Voxel Cat on Island with Laptop) */}
-        <div className="min-h-[200px] sm:min-h-[250px] md:min-h-[290px] flex-1" />
+        {/* Central Breathing Window (Framing the 3D Voxel Cat on Island with Laptop) */}
+        <div className="min-h-[110px] sm:min-h-[140px] md:min-h-[160px] flex-1" />
 
-        {/* Action Cards Grid (Anchored neatly above the bottom grass terrain) */}
+        {/* Action Cards Grid (Fully contained in first view without scroll) */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 max-w-3xl mx-auto w-full"
+          transition={{ duration: 0.35, delay: 0.08, ease: "easeOut" }}
+          className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4 max-w-2xl sm:max-w-[680px] mx-auto w-full"
         >
           {/* Card 1: Create an AI Agent */}
-          <div className="rounded-3xl border border-black/[0.08] bg-white/95 backdrop-blur-md p-6 sm:p-7 shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_14px_38px_rgba(0,0,0,0.07)] hover:border-black/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="size-11 sm:size-12 rounded-2xl bg-[#f4fbe8] border border-[#8dcb16]/40 flex items-center justify-center text-[#276e1a] shadow-xs">
-                <Bot className="size-5 sm:size-6 stroke-[1.8]" />
+          <div className="rounded-2xl sm:rounded-3xl border border-black/[0.08] bg-white/95 backdrop-blur-md p-4 sm:p-5 shadow-[0_6px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_28px_rgba(0,0,0,0.06)] hover:border-black/20 transition-all flex flex-col justify-between group">
+            <div className="space-y-2">
+              <div className="size-9 sm:size-10 rounded-xl bg-[#f4fbe8] border border-[#8dcb16]/40 flex items-center justify-center text-[#276e1a] shadow-xs">
+                <Bot className="size-4 sm:size-5 stroke-[1.8]" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-foreground tracking-tight">
                 Create an AI Agent
               </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                 Build an agent with custom personality, objectives, cloud VM
                 desktop, and scheduled routines.
               </p>
             </div>
 
-            <div className="pt-5 sm:pt-6">
+            <div className="pt-3.5 sm:pt-4">
               <Link href="/workspace/create-agent" className="inline-block">
-                <Button className="h-10 px-5 rounded-full bg-[#276e1a] hover:bg-[#1f5815] text-white font-semibold text-xs gap-1.5 shadow-sm transition-all cursor-pointer">
-                  <Plus className="size-4 stroke-[2.5]" />
+                <Button className="h-8 sm:h-9 px-4 rounded-full bg-[#276e1a] hover:bg-[#1f5815] text-white font-semibold text-xs gap-1.5 shadow-xs transition-all cursor-pointer">
+                  <Plus className="size-3.5 stroke-[2.5]" />
                   <span>Create New Agent</span>
                 </Button>
               </Link>
@@ -113,21 +113,21 @@ export default function WorkspacePage() {
           </div>
 
           {/* Card 2: Automated Routines */}
-          <div className="rounded-3xl border border-black/[0.08] bg-white/95 backdrop-blur-md p-6 sm:p-7 shadow-[0_10px_30px_rgba(0,0,0,0.04)] hover:shadow-[0_14px_38px_rgba(0,0,0,0.07)] hover:border-black/20 transition-all flex flex-col justify-between group">
-            <div className="space-y-3">
-              <div className="size-11 sm:size-12 rounded-2xl bg-[#f4fbe8] border border-[#8dcb16]/40 flex items-center justify-center text-[#276e1a] shadow-xs">
-                <Sparkles className="size-5 sm:size-6 stroke-[1.8]" />
+          <div className="rounded-2xl sm:rounded-3xl border border-black/[0.08] bg-white/95 backdrop-blur-md p-4 sm:p-5 shadow-[0_6px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_10px_28px_rgba(0,0,0,0.06)] hover:border-black/20 transition-all flex flex-col justify-between group">
+            <div className="space-y-2">
+              <div className="size-9 sm:size-10 rounded-xl bg-[#f4fbe8] border border-[#8dcb16]/40 flex items-center justify-center text-[#276e1a] shadow-xs">
+                <Sparkles className="size-4 sm:size-5 stroke-[1.8]" />
               </div>
-              <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
+              <h2 className="text-sm sm:text-base font-bold text-foreground tracking-tight">
                 Automated Routines
               </h2>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed">
                 Connect Gmail, Slack, and Google Docs to run scheduled daily
                 summaries without opening your laptop.
               </p>
             </div>
 
-            <div className="pt-5 sm:pt-6">
+            <div className="pt-3.5 sm:pt-4">
               <Link
                 href={
                   firstAgentId
@@ -138,10 +138,10 @@ export default function WorkspacePage() {
               >
                 <Button
                   variant="outline"
-                  className="h-10 px-5 rounded-full border-black/[0.14] bg-white hover:bg-neutral-50 text-foreground font-semibold text-xs gap-1.5 shadow-2xs transition-all cursor-pointer"
+                  className="h-8 sm:h-9 px-4 rounded-full border-black/[0.14] bg-white hover:bg-neutral-50 text-foreground font-semibold text-xs gap-1.5 shadow-2xs transition-all cursor-pointer"
                 >
                   <span>Configure Routines</span>
-                  <ArrowRight className="size-3.5 stroke-[2]" />
+                  <ArrowRight className="size-3 stroke-[2]" />
                 </Button>
               </Link>
             </div>

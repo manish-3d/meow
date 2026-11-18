@@ -1,101 +1,11 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 
 // =========================================================================
-// 1. DRIFTING MINECRAFT VOXEL CLOUDS
-// =========================================================================
-
-interface CloudDef {
-  id: number;
-  initialX: number;
-  yRatio: number;
-  z: number;
-  width: number;
-  depth: number;
-  height: number;
-  speed: number;
-}
-
-function DriftingCloud({ cloud }: { cloud: CloudDef }) {
-  const groupRef = useRef<THREE.Group>(null);
-  const currentX = useRef(cloud.initialX);
-  const { viewport } = useThree();
-
-  const wrapBoundary = viewport.width / 2 + 5;
-  const cloudY = viewport.height * cloud.yRatio;
-
-  useFrame((_, delta) => {
-    if (groupRef.current) {
-      currentX.current += cloud.speed * delta;
-      if (currentX.current > wrapBoundary) {
-        currentX.current = -wrapBoundary;
-      }
-      groupRef.current.position.x = currentX.current;
-      groupRef.current.position.y = cloudY;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[cloud.initialX, cloudY, cloud.z]} scale={0.72}>
-      {/* Base Cloud Slab */}
-      <mesh castShadow={false}>
-        <boxGeometry args={[cloud.width, cloud.height, cloud.depth]} />
-        <meshStandardMaterial
-          color="#FFFFFF"
-          transparent
-          opacity={0.94}
-          roughness={0.7}
-        />
-      </mesh>
-      {/* Top Stepped Layer */}
-      <mesh position={[0.22, cloud.height * 0.72, 0]}>
-        <boxGeometry args={[cloud.width * 0.65, cloud.height * 0.65, cloud.depth * 0.78]} />
-        <meshStandardMaterial
-          color="#FFFFFF"
-          transparent
-          opacity={0.96}
-          roughness={0.7}
-        />
-      </mesh>
-      {/* Side Wing Block */}
-      <mesh position={[-cloud.width * 0.32, -cloud.height * 0.12, 0.12]}>
-        <boxGeometry args={[cloud.width * 0.44, cloud.height * 0.68, cloud.depth * 0.62]} />
-        <meshStandardMaterial
-          color="#FAFAFD"
-          transparent
-          opacity={0.9}
-          roughness={0.7}
-        />
-      </mesh>
-    </group>
-  );
-}
-
-function SkyClouds() {
-  const clouds: CloudDef[] = useMemo(
-    () => [
-      { id: 1, initialX: -4.8, yRatio: 0.37, z: -3.6, width: 3.4, depth: 1.6, height: 0.44, speed: 0.07 },
-      { id: 2, initialX: 4.6, yRatio: 0.39, z: -3.8, width: 3.6, depth: 1.8, height: 0.46, speed: 0.08 },
-      { id: 3, initialX: -1.2, yRatio: 0.45, z: -5.4, width: 5.0, depth: 2.2, height: 0.5, speed: 0.05 },
-      { id: 4, initialX: 8.0, yRatio: 0.43, z: -4.8, width: 4.2, depth: 2.0, height: 0.45, speed: 0.06 },
-    ],
-    []
-  );
-
-  return (
-    <>
-      {clouds.map((cloud) => (
-        <DriftingCloud key={cloud.id} cloud={cloud} />
-      ))}
-    </>
-  );
-}
-
-// =========================================================================
-// 2. HEADPHONE LAPTOP CAT (AUTHENTIC TO REFERENCE)
+// 1. HEADPHONE LAPTOP CAT (AUTHENTIC TO REFERENCE)
 // =========================================================================
 
 function HeadphoneLaptopCat() {
@@ -236,7 +146,6 @@ function HeadphoneLaptopCat() {
         </mesh>
 
         {/* ── HEADPHONES (Black headband + glowing green cat cups) ── */}
-        {/* Top Arch Headband */}
         <mesh position={[0, 0.62, 0]} castShadow>
           <boxGeometry args={[1.44, 0.1, 0.28]} />
           <meshStandardMaterial color={headphoneBlack} roughness={0.5} />
@@ -256,7 +165,6 @@ function HeadphoneLaptopCat() {
             <boxGeometry args={[0.2, 0.4, 0.4]} />
             <meshStandardMaterial color={headphoneLime} roughness={0.4} />
           </mesh>
-          {/* White Cat Silhouette on Earcup */}
           <mesh position={[-0.13, 0, 0]}>
             <boxGeometry args={[0.02, 0.18, 0.18]} />
             <meshBasicMaterial color="#FFFFFF" />
@@ -273,7 +181,6 @@ function HeadphoneLaptopCat() {
             <boxGeometry args={[0.2, 0.4, 0.4]} />
             <meshStandardMaterial color={headphoneLime} roughness={0.4} />
           </mesh>
-          {/* White Cat Silhouette on Earcup */}
           <mesh position={[0.13, 0, 0]}>
             <boxGeometry args={[0.02, 0.18, 0.18]} />
             <meshBasicMaterial color="#FFFFFF" />
@@ -399,7 +306,7 @@ function HeadphoneLaptopCat() {
 }
 
 // =========================================================================
-// 3. SINGLE CENTRAL FLOATING MINECRAFT GRASS ISLAND (ISOMETRIC 3/4 ANGLE)
+// 2. SINGLE CENTRAL FLOATING MINECRAFT GRASS ISLAND (ISOMETRIC 3/4 ANGLE)
 // =========================================================================
 
 function FloatingIslandHero() {
@@ -409,7 +316,7 @@ function FloatingIslandHero() {
     const t = state.clock.getElapsedTime();
     if (islandGroup.current) {
       // Gentle floating / bobbing in the sky
-      islandGroup.current.position.y = 0.58 + Math.sin(t * 1.5) * 0.05;
+      islandGroup.current.position.y = 0.52 + Math.sin(t * 1.5) * 0.04;
       islandGroup.current.rotation.y = -0.38 + Math.sin(t * 0.8) * 0.02;
     }
   });
@@ -425,9 +332,9 @@ function FloatingIslandHero() {
   return (
     <group
       ref={islandGroup}
-      position={[0, 0.58, 0]}
+      position={[0, 0.52, 0]}
       rotation={[0.26, -0.38, 0]}
-      scale={0.5}
+      scale={0.46}
     >
       {/* Cat centered comfortably on Island */}
       <group position={[0, 0.22, 0]}>
@@ -441,7 +348,6 @@ function FloatingIslandHero() {
       </mesh>
 
       {/* Stepped Grass Overhang Fringe Tabs (Minecraft Drooping Voxel Sides) */}
-      {/* Front Face Fringe */}
       <mesh position={[-0.8, -0.28, 1.61]} castShadow receiveShadow>
         <boxGeometry args={[0.6, 0.24, 0.06]} />
         <meshStandardMaterial color={grassSide} roughness={0.8} />
@@ -455,7 +361,6 @@ function FloatingIslandHero() {
         <meshStandardMaterial color={grassDark} roughness={0.8} />
       </mesh>
 
-      {/* Right Face Fringe */}
       <mesh position={[1.61, -0.3, -0.6]} castShadow receiveShadow>
         <boxGeometry args={[0.06, 0.28, 0.65]} />
         <meshStandardMaterial color={grassSide} roughness={0.8} />
@@ -465,7 +370,6 @@ function FloatingIslandHero() {
         <meshStandardMaterial color={grassSide} roughness={0.8} />
       </mesh>
 
-      {/* Left Face Fringe */}
       <mesh position={[-1.61, -0.28, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.06, 0.26, 1.4]} />
         <meshStandardMaterial color={grassSide} roughness={0.8} />
@@ -528,14 +432,14 @@ function FloatingIslandHero() {
 }
 
 // =========================================================================
-// 4. BOTTOM MINECRAFT GRASS & DIRT GROUND STRIP
+// 3. BOTTOM MINECRAFT GRASS & DIRT GROUND STRIP
 // =========================================================================
 
 function BottomGrassGround() {
   const { viewport } = useThree();
   const width = Math.max(viewport.width + 8, 26);
-  // Anchored cleanly at the bottom
-  const posY = -viewport.height / 2 + 0.08;
+  // Anchored cleanly at the bottom edge
+  const posY = -viewport.height / 2 + 0.06;
 
   const grassTop = "#74c22b";
   const grassSide = "#62a820";
@@ -545,31 +449,31 @@ function BottomGrassGround() {
     <group position={[0, posY, 0.4]}>
       {/* Top Grass Plateau */}
       <mesh position={[0, 0, 0]} receiveShadow>
-        <boxGeometry args={[width, 0.34, 2.8]} />
+        <boxGeometry args={[width, 0.32, 2.8]} />
         <meshStandardMaterial color={grassTop} roughness={0.7} />
       </mesh>
 
       {/* Stepped Grass Side Fringe */}
-      <mesh position={[0, -0.2, 1.41]} receiveShadow>
+      <mesh position={[0, -0.18, 1.41]} receiveShadow>
         <boxGeometry args={[width, 0.16, 0.08]} />
         <meshStandardMaterial color={grassSide} roughness={0.8} />
       </mesh>
 
       {/* Dirt Foundation */}
-      <mesh position={[0, -0.56, 0]} receiveShadow>
+      <mesh position={[0, -0.54, 0]} receiveShadow>
         <boxGeometry args={[width, 0.58, 2.6]} />
         <meshStandardMaterial color={dirtBase} roughness={0.9} />
       </mesh>
 
       {/* Minecraft Grass Blades Sprouting Up Along Bottom Edge */}
       {[-7.2, -5.6, -4.3, -2.9, -1.5, 0.1, 1.7, 3.3, 4.9, 6.5].map((x, i) => (
-        <group key={i} position={[x, 0.18, 0.6]}>
+        <group key={i} position={[x, 0.16, 0.6]}>
           <mesh castShadow>
-            <boxGeometry args={[0.08, 0.18, 0.08]} />
+            <boxGeometry args={[0.07, 0.16, 0.07]} />
             <meshStandardMaterial color="#8dcb16" roughness={0.7} />
           </mesh>
-          <mesh position={[0.08, -0.04, 0]} castShadow>
-            <boxGeometry args={[0.07, 0.11, 0.07]} />
+          <mesh position={[0.07, -0.04, 0]} castShadow>
+            <boxGeometry args={[0.06, 0.1, 0.06]} />
             <meshStandardMaterial color="#62a820" roughness={0.7} />
           </mesh>
         </group>
@@ -579,7 +483,7 @@ function BottomGrassGround() {
 }
 
 // =========================================================================
-// 5. MAIN 3D WORKSPACE SCENE
+// 4. MAIN 3D WORKSPACE SCENE (CLEAN PASTEL SKY WITHOUT CLOUDS)
 // =========================================================================
 
 export function VoxelWorkspaceScene() {
@@ -588,18 +492,18 @@ export function VoxelWorkspaceScene() {
       className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden"
       style={{
         background:
-          "linear-gradient(180deg, #cde3fa 0%, #dbeafc 30%, #f0e6f6 60%, #fff7f2 85%, #ffffff 100%)",
+          "linear-gradient(180deg, #cbe3fa 0%, #dae9fb 30%, #f0e6f6 60%, #fff7f2 85%, #ffffff 100%)",
       }}
     >
       <Canvas
         shadows
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         dpr={[1, 1.5]}
-        camera={{ position: [0, 1.5, 7.0], fov: 42 }}
+        camera={{ position: [0, 1.4, 6.8], fov: 40 }}
         style={{ pointerEvents: "none", width: "100%", height: "100%" }}
       >
         {/* Soft, warm Minecraft morning daylight */}
-        <ambientLight color="#fffaf5" intensity={1.05} />
+        <ambientLight color="#fffaf5" intensity={1.1} />
         <directionalLight
           position={[5, 9, 7]}
           intensity={1.4}
@@ -610,9 +514,6 @@ export function VoxelWorkspaceScene() {
         />
         <directionalLight position={[-6, -2, -4]} intensity={0.3} color="#bae6fd" />
         <hemisphereLight color="#bae6fd" groundColor="#fed7aa" intensity={0.7} />
-
-        {/* Drifting Clouds in Upper Sky */}
-        <SkyClouds />
 
         {/* Central Hero: Headphone Laptop Cat on Floating Grass Island (3/4 Angle) */}
         <FloatingIslandHero />
