@@ -16,7 +16,6 @@ function HeadphoneCat() {
 
   const [isBlinking, setIsBlinking] = useState(false);
 
-  // Periodic blinking
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     const triggerBlink = () => {
@@ -56,34 +55,31 @@ function HeadphoneCat() {
     if (rightEyeRef.current) rightEyeRef.current.scale.y = eyeScaleY;
   });
 
-  // Palette
   const furWhite = "#FAF9F6";
-  const calicoPatch = "#E08244"; // Cute warm orange-brown calico patch
+  const calicoPatch = "#E08244";
   const earPink = "#FFAAA6";
   const eyeBlack = "#18181B";
   const eyeSparkle = "#FFFFFF";
   const nosePink = "#33272A";
-  const headphoneBand = "#2E1065"; // Deep purple headband
-  const headphoneCup = "#7C3AED"; // Bright violet ear cushion
-  const pawAccent = "#F472B6"; // Pink paw emblem on headphones
+  const headphoneBand = "#2E1065";
+  const headphoneCup = "#7C3AED";
+  const pawAccent = "#F472B6";
 
   return (
     <group position={[0, 0.28, 0]}>
-      {/* --- HEAD GROUP --- */}
+      {/* Head */}
       <group ref={headGroup} position={[0, 1.05, 0]}>
-        {/* Head Main Cube (1.24w x 1.04h x 1.04d) */}
         <mesh position={[0, 0, 0]} castShadow receiveShadow>
           <boxGeometry args={[1.24, 1.04, 1.04]} />
           <meshStandardMaterial color={furWhite} roughness={0.65} />
         </mesh>
 
-        {/* Calico spot on right side of head */}
         <mesh position={[0.42, 0.32, 0.3]}>
           <boxGeometry args={[0.42, 0.42, 0.48]} />
           <meshStandardMaterial color={calicoPatch} roughness={0.7} />
         </mesh>
 
-        {/* Cheeks / Jaw subtle flare */}
+        {/* Cheeks */}
         <mesh position={[0.64, -0.16, 0.06]} castShadow>
           <boxGeometry args={[0.12, 0.42, 0.54]} />
           <meshStandardMaterial color={furWhite} roughness={0.65} />
@@ -93,39 +89,34 @@ function HeadphoneCat() {
           <meshStandardMaterial color={furWhite} roughness={0.65} />
         </mesh>
 
-        {/* Left Ear Base */}
+        {/* Ears */}
         <mesh position={[-0.4, 0.64, 0]} castShadow>
           <boxGeometry args={[0.32, 0.34, 0.32]} />
           <meshStandardMaterial color={furWhite} roughness={0.65} />
         </mesh>
-        {/* Left Ear Tip */}
         <mesh position={[-0.42, 0.84, 0]} castShadow>
           <boxGeometry args={[0.18, 0.16, 0.18]} />
           <meshStandardMaterial color={furWhite} roughness={0.65} />
         </mesh>
-        {/* Left Ear Pink Inner */}
         <mesh position={[-0.39, 0.62, 0.16]}>
           <boxGeometry args={[0.2, 0.22, 0.04]} />
           <meshStandardMaterial color={earPink} roughness={0.7} />
         </mesh>
 
-        {/* Right Ear Base (Calico tinted) */}
         <mesh position={[0.4, 0.64, 0]} castShadow>
           <boxGeometry args={[0.32, 0.34, 0.32]} />
           <meshStandardMaterial color={calicoPatch} roughness={0.7} />
         </mesh>
-        {/* Right Ear Tip */}
         <mesh position={[0.42, 0.84, 0]} castShadow>
           <boxGeometry args={[0.18, 0.16, 0.18]} />
           <meshStandardMaterial color={calicoPatch} roughness={0.7} />
         </mesh>
-        {/* Right Ear Pink Inner */}
         <mesh position={[0.39, 0.62, 0.16]}>
           <boxGeometry args={[0.2, 0.22, 0.04]} />
           <meshStandardMaterial color={earPink} roughness={0.7} />
         </mesh>
 
-        {/* Left Eye */}
+        {/* Eyes */}
         <group position={[-0.3, 0.04, 0.53]}>
           <mesh ref={leftEyeRef}>
             <boxGeometry args={[0.2, 0.24, 0.04]} />
@@ -137,7 +128,6 @@ function HeadphoneCat() {
           </mesh>
         </group>
 
-        {/* Right Eye */}
         <group position={[0.3, 0.04, 0.53]}>
           <mesh ref={rightEyeRef}>
             <boxGeometry args={[0.2, 0.24, 0.04]} />
@@ -163,7 +153,7 @@ function HeadphoneCat() {
           <meshStandardMaterial color="#262626" roughness={0.6} />
         </mesh>
 
-        {/* Whisker details */}
+        {/* Whiskers */}
         <mesh position={[-0.52, -0.08, 0.51]}>
           <boxGeometry args={[0.2, 0.025, 0.02]} />
           <meshStandardMaterial color="#52525b" roughness={0.8} />
@@ -181,15 +171,12 @@ function HeadphoneCat() {
           <meshStandardMaterial color="#52525b" roughness={0.8} />
         </mesh>
 
-        {/* --- HEADPHONES ACCESSORY --- */}
+        {/* Headphones */}
         <group position={[0, 0.22, 0]}>
-          {/* Headband arch across top */}
           <mesh position={[0, 0.5, 0]} castShadow>
             <boxGeometry args={[1.38, 0.1, 0.24]} />
             <meshStandardMaterial color={headphoneBand} roughness={0.5} />
           </mesh>
-
-          {/* Left Ear Cushion */}
           <group position={[-0.7, 0.04, 0]}>
             <mesh castShadow>
               <boxGeometry args={[0.22, 0.46, 0.42]} />
@@ -205,8 +192,6 @@ function HeadphoneCat() {
               <meshStandardMaterial color={pawAccent} roughness={0.5} />
             </mesh>
           </group>
-
-          {/* Right Ear Cushion */}
           <group position={[0.7, 0.04, 0]}>
             <mesh castShadow>
               <boxGeometry args={[0.22, 0.46, 0.42]} />
@@ -225,7 +210,7 @@ function HeadphoneCat() {
         </group>
       </group>
 
-      {/* --- BODY / TORSO --- */}
+      {/* Body */}
       <group position={[0, 0.38, 0]}>
         <mesh position={[0, 0, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.84, 0.7, 0.72]} />
@@ -237,7 +222,7 @@ function HeadphoneCat() {
         </mesh>
       </group>
 
-      {/* --- FRONT PAWS RESTING FORWARD --- */}
+      {/* Paws */}
       <mesh position={[-0.3, 0.12, 0.38]} castShadow>
         <boxGeometry args={[0.22, 0.22, 0.28]} />
         <meshStandardMaterial color={furWhite} roughness={0.7} />
@@ -247,7 +232,7 @@ function HeadphoneCat() {
         <meshStandardMaterial color={furWhite} roughness={0.7} />
       </mesh>
 
-      {/* --- BACK TAIL --- */}
+      {/* Tail */}
       <group ref={tailGroup} position={[0, 0.22, -0.36]}>
         <mesh position={[0, 0.1, -0.16]} castShadow>
           <boxGeometry args={[0.15, 0.15, 0.28]} />
@@ -269,19 +254,14 @@ function HeadphoneCat() {
 function MinecraftLantern({ scale = 1 }: { scale?: number }) {
   return (
     <group scale={scale}>
-      {/* Top Iron Ring / Handle */}
       <mesh position={[0, 0.38, 0]}>
         <boxGeometry args={[0.1, 0.12, 0.04]} />
         <meshStandardMaterial color="#27272a" roughness={0.5} />
       </mesh>
-
-      {/* Iron Roof Cap */}
       <mesh position={[0, 0.28, 0]} castShadow>
         <boxGeometry args={[0.34, 0.08, 0.34]} />
         <meshStandardMaterial color="#18181b" roughness={0.6} />
       </mesh>
-
-      {/* Glass Body Panels */}
       <mesh position={[0, 0.12, 0]}>
         <boxGeometry args={[0.28, 0.24, 0.28]} />
         <meshStandardMaterial
@@ -291,8 +271,6 @@ function MinecraftLantern({ scale = 1 }: { scale?: number }) {
           roughness={0.1}
         />
       </mesh>
-
-      {/* 4 Iron Corner Struts */}
       <mesh position={[-0.13, 0.12, -0.13]}>
         <boxGeometry args={[0.035, 0.24, 0.035]} />
         <meshStandardMaterial color="#18181b" roughness={0.6} />
@@ -309,22 +287,16 @@ function MinecraftLantern({ scale = 1 }: { scale?: number }) {
         <boxGeometry args={[0.035, 0.24, 0.035]} />
         <meshStandardMaterial color="#18181b" roughness={0.6} />
       </mesh>
-
-      {/* Glowing Torch / Fire Core Inside */}
       <mesh position={[0, 0.12, 0]}>
         <boxGeometry args={[0.14, 0.16, 0.14]} />
         <meshStandardMaterial
           color="#f59e0b"
           emissive="#f59e0b"
-          emissiveIntensity={2.2}
+          emissiveIntensity={2.5}
           roughness={0.2}
         />
       </mesh>
-
-      {/* Warm Point Light Cast by the Lantern */}
-      <pointLight color="#fbbf24" intensity={2.4} distance={4.5} decay={2} />
-
-      {/* Iron Base Tray */}
+      <pointLight color="#fbbf24" intensity={2.8} distance={5} decay={2} />
       <mesh position={[0, -0.04, 0]} castShadow>
         <boxGeometry args={[0.34, 0.08, 0.34]} />
         <meshStandardMaterial color="#18181b" roughness={0.6} />
@@ -381,7 +353,7 @@ function HangingVine({
 }
 
 // =========================================================================
-// 4. UPPER-LEFT FLOATING PLATFORM (CAT + OAK PLANKS + VINES + LEAVES)
+// 4. UPPER-LEFT CAT ISLAND (MASCOT ANCHOR)
 // =========================================================================
 
 function UpperLeftCatIsland() {
@@ -401,7 +373,6 @@ function UpperLeftCatIsland() {
     }
   });
 
-  // Minecraft Oak Planks & Foliage palette
   const oakLight = "#b47b48";
   const oakMed = "#9e6533";
   const oakDark = "#7e4a1e";
@@ -416,18 +387,15 @@ function UpperLeftCatIsland() {
       position={[anchorX, anchorY, 0]}
       scale={0.38}
     >
-      {/* Cat sitting atop the platform */}
       <group position={[0, 0.22, 0.1]} scale={1}>
         <HeadphoneCat />
       </group>
 
-      {/* --- OAK PLANKS MAIN SURFACE (2.6w x 0.38h x 2.2d) --- */}
+      {/* Oak Planks */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.5, 0.38, 2.1]} />
         <meshStandardMaterial color={oakMed} roughness={0.85} />
       </mesh>
-
-      {/* Planks Grooves */}
       <mesh position={[-0.75, 0.2, 0]} receiveShadow>
         <boxGeometry args={[0.7, 0.03, 2.06]} />
         <meshStandardMaterial color={oakLight} roughness={0.8} />
@@ -441,21 +409,7 @@ function UpperLeftCatIsland() {
         <meshStandardMaterial color={oakDark} roughness={0.9} />
       </mesh>
 
-      {/* Timber Corner Logs */}
-      <mesh position={[-1.28, 0.02, 0.85]} castShadow>
-        <boxGeometry args={[0.1, 0.34, 0.36]} />
-        <meshStandardMaterial color={oakDark} roughness={0.9} />
-      </mesh>
-      <mesh position={[1.28, 0.02, 0.85]} castShadow>
-        <boxGeometry args={[0.1, 0.34, 0.36]} />
-        <meshStandardMaterial color={oakLight} roughness={0.8} />
-      </mesh>
-      <mesh position={[0.55, -0.22, 1.06]} castShadow>
-        <boxGeometry args={[0.45, 0.1, 0.08]} />
-        <meshStandardMaterial color={oakMed} roughness={0.85} />
-      </mesh>
-
-      {/* Underside stepped support blocks */}
+      {/* Underside blocks */}
       <mesh position={[0, -0.28, 0]} castShadow receiveShadow>
         <boxGeometry args={[2.0, 0.28, 1.6]} />
         <meshStandardMaterial color={oakUnderside} roughness={0.9} />
@@ -465,7 +419,7 @@ function UpperLeftCatIsland() {
         <meshStandardMaterial color={oakUnderside} roughness={0.95} />
       </mesh>
 
-      {/* --- GREEN LEAF FOLIAGE BLOCKS ON BACK CORNER --- */}
+      {/* Leaf blocks */}
       <mesh position={[-1.0, 0.38, -0.8]} castShadow>
         <boxGeometry args={[0.65, 0.6, 0.65]} />
         <meshStandardMaterial color={leafGreen1} roughness={0.85} />
@@ -479,14 +433,13 @@ function UpperLeftCatIsland() {
         <meshStandardMaterial color={leafGreen3} roughness={0.85} />
       </mesh>
 
-      {/* --- HANGING GREEN VINES UNDERNEATH --- */}
+      {/* Hanging Vines */}
       <HangingVine position={[-1.0, -0.2, 1.05]} length={6} offset={0.2} />
       <HangingVine position={[-0.7, -0.2, 1.05]} length={4} offset={1.1} />
       <HangingVine position={[-0.38, -0.2, 1.05]} length={7} offset={2.4} />
       <HangingVine position={[0.15, -0.2, 1.05]} length={3} offset={3.2} />
       <HangingVine position={[0.8, -0.2, 1.05]} length={5} offset={4.1} />
       <HangingVine position={[1.05, -0.2, 1.05]} length={3} offset={0.8} />
-
       <HangingVine position={[-1.26, -0.2, 0.3]} length={5} offset={1.7} />
       <HangingVine position={[-1.26, -0.2, -0.3]} length={4} offset={2.9} />
     </group>
@@ -494,124 +447,255 @@ function UpperLeftCatIsland() {
 }
 
 // =========================================================================
-// 5. UPPER-RIGHT FLOATING TIMBER & LEAF ISLAND WITH COZY LANTERN
+// 5. DRIFTING ISLAND 1: WOODEN PLATFORM WITH COZY LANTERN (LEFT TO RIGHT)
 // =========================================================================
 
-function UpperRightLanternIsland() {
+function DriftingLanternIsland() {
   const groupRef = useRef<THREE.Group>(null);
+  const currentX = useRef(1.8);
   const { viewport } = useThree();
 
-  // Anchored in the upper-right sky pocket with breathing room from messages
-  const anchorX = viewport.width / 2 - 0.88;
-  const anchorY = viewport.height / 2 - 0.85;
+  const speed = 0.18;
+  const wrapRight = viewport.width / 2 + 3.5;
+  const wrapLeft = -viewport.width / 2 - 3.5;
+  const anchorY = viewport.height / 2 - 0.95;
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     const t = state.clock.getElapsedTime();
     if (groupRef.current) {
-      // Counter-phase gentle bobbing
-      groupRef.current.position.y = anchorY + Math.sin(t * 1.5 + 1.4) * 0.045;
-      groupRef.current.position.x = anchorX;
-      groupRef.current.rotation.z = Math.sin(t * 1.2 + 0.5) * 0.012;
-      groupRef.current.rotation.x = Math.cos(t * 1.0 + 0.8) * 0.008;
+      currentX.current += speed * delta;
+      if (currentX.current > wrapRight) {
+        currentX.current = wrapLeft;
+      }
+      groupRef.current.position.x = currentX.current;
+      groupRef.current.position.y = anchorY + Math.sin(t * 1.5 + 1.2) * 0.04;
+      groupRef.current.rotation.z = Math.sin(t * 1.1 + 0.5) * 0.012;
     }
   });
-
-  const oakLight = "#b47b48";
-  const oakMed = "#9e6533";
-  const oakDark = "#7e4a1e";
-  const oakUnderside = "#653a17";
-  const leaf1 = "#2d6a4f";
-  const leaf2 = "#40916c";
-  const leaf3 = "#52b788";
 
   return (
     <group
       ref={groupRef}
-      position={[anchorX, anchorY, 0]}
+      position={[currentX.current, anchorY, -1.5]}
       scale={0.28}
     >
-      {/* --- OAK PLANKS SURFACE (2.4w x 0.38h x 2.0d) --- */}
-      <mesh position={[0, 0, 0]} castShadow receiveShadow>
+      <mesh castShadow receiveShadow>
         <boxGeometry args={[2.3, 0.38, 1.9]} />
-        <meshStandardMaterial color={oakMed} roughness={0.85} />
+        <meshStandardMaterial color="#9e6533" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, -0.26, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.8, 0.24, 1.4]} />
+        <meshStandardMaterial color="#653a17" roughness={0.9} />
       </mesh>
 
-      {/* Planks Texture Variations */}
-      <mesh position={[-0.65, 0.2, 0]} receiveShadow>
-        <boxGeometry args={[0.65, 0.03, 1.86]} />
-        <meshStandardMaterial color={oakLight} roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 0.2, 0]} receiveShadow>
-        <boxGeometry args={[0.65, 0.03, 1.86]} />
-        <meshStandardMaterial color={oakMed} roughness={0.85} />
-      </mesh>
-      <mesh position={[0.65, 0.2, 0]} receiveShadow>
-        <boxGeometry args={[0.65, 0.03, 1.86]} />
-        <meshStandardMaterial color={oakDark} roughness={0.9} />
-      </mesh>
-
-      {/* Stepped Underside */}
-      <mesh position={[0, -0.28, 0]} castShadow receiveShadow>
-        <boxGeometry args={[1.8, 0.26, 1.4]} />
-        <meshStandardMaterial color={oakUnderside} roughness={0.9} />
-      </mesh>
-      <mesh position={[-0.1, -0.44, 0.1]} castShadow receiveShadow>
-        <boxGeometry args={[1.0, 0.18, 0.9]} />
-        <meshStandardMaterial color={oakUnderside} roughness={0.95} />
-      </mesh>
-
-      {/* --- LUSH GREEN LEAF BLOCKS ON THE ISLAND --- */}
-      {/* Big Main Leaf Cluster */}
+      {/* Leaf Blocks */}
       <mesh position={[0.55, 0.44, -0.2]} castShadow>
         <boxGeometry args={[0.85, 0.72, 0.85]} />
-        <meshStandardMaterial color={leaf1} roughness={0.85} />
+        <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
       </mesh>
-      {/* Secondary Top Leaf Block */}
       <mesh position={[0.45, 0.88, -0.15]} castShadow>
         <boxGeometry args={[0.6, 0.55, 0.6]} />
-        <meshStandardMaterial color={leaf2} roughness={0.85} />
-      </mesh>
-      {/* Side Accent Leaf Block */}
-      <mesh position={[0.9, 0.35, 0.3]} castShadow>
-        <boxGeometry args={[0.55, 0.48, 0.55]} />
-        <meshStandardMaterial color={leaf3} roughness={0.85} />
+        <meshStandardMaterial color="#40916c" roughness={0.85} />
       </mesh>
 
-      {/* --- MINECRAFT WOODEN FENCE POST & GLOWING LANTERN --- */}
-      {/* Oak Fence Post */}
+      {/* Oak Post & Lantern */}
       <mesh position={[-0.55, 0.28, 0.2]} castShadow>
         <boxGeometry args={[0.16, 0.42, 0.16]} />
-        <meshStandardMaterial color={oakDark} roughness={0.8} />
+        <meshStandardMaterial color="#7e4a1e" roughness={0.8} />
       </mesh>
-      {/* Cozy Minecraft Lantern Resting on Fence Post */}
       <group position={[-0.55, 0.64, 0.2]}>
-        <MinecraftLantern scale={1.1} />
+        <MinecraftLantern scale={1.15} />
       </group>
 
-      {/* --- HANGING GREEN VINES UNDERNEATH --- */}
+      {/* Vines */}
       <HangingVine position={[-0.85, -0.2, 0.95]} length={6} offset={0.5} />
       <HangingVine position={[-0.5, -0.2, 0.95]} length={4} offset={1.8} />
       <HangingVine position={[-0.1, -0.2, 0.95]} length={7} offset={3.1} />
       <HangingVine position={[0.4, -0.2, 0.95]} length={5} offset={4.2} />
       <HangingVine position={[0.75, -0.2, 0.95]} length={3} offset={1.3} />
-
-      {/* Right-edge Vines */}
       <HangingVine position={[1.16, -0.2, 0.2]} length={5} offset={2.2} />
-      <HangingVine position={[1.16, -0.2, -0.3]} length={4} offset={3.7} />
     </group>
   );
 }
 
 // =========================================================================
-// 6. BOTTOM TERRAIN: MINECRAFT GREEN GRASS & WOODEN FOUNDATION
+// 6. DRIFTING ISLAND 2: WOODEN CABIN / HOUSE WITH VINES (RIGHT TO LEFT)
 // =========================================================================
 
-function BottomMinecraftTerrain() {
+function DriftingCottageIsland() {
+  const groupRef = useRef<THREE.Group>(null);
+  const currentX = useRef(-1.2);
+  const { viewport } = useThree();
+
+  const speed = 0.14;
+  const wrapLeft = -viewport.width / 2 - 4.0;
+  const wrapRight = viewport.width / 2 + 4.0;
+  const anchorY = viewport.height / 2 - 1.25;
+
+  useFrame((state, delta) => {
+    const t = state.clock.getElapsedTime();
+    if (groupRef.current) {
+      currentX.current -= speed * delta;
+      if (currentX.current < wrapLeft) {
+        currentX.current = wrapRight;
+      }
+      groupRef.current.position.x = currentX.current;
+      groupRef.current.position.y = anchorY + Math.sin(t * 1.7 + 2.5) * 0.035;
+      groupRef.current.rotation.z = Math.sin(t * 1.2 + 1.8) * 0.01;
+    }
+  });
+
+  return (
+    <group
+      ref={groupRef}
+      position={[currentX.current, anchorY, -2.4]}
+      scale={0.25}
+    >
+      {/* Wood Platform */}
+      <mesh castShadow receiveShadow>
+        <boxGeometry args={[2.8, 0.38, 2.4]} />
+        <meshStandardMaterial color="#9e6533" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, -0.26, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.2, 0.26, 1.8]} />
+        <meshStandardMaterial color="#653a17" roughness={0.9} />
+      </mesh>
+
+      {/* House Walls */}
+      <mesh position={[-0.2, 0.58, 0]} castShadow receiveShadow>
+        <boxGeometry args={[1.5, 0.8, 1.4]} />
+        <meshStandardMaterial color="#b47b48" roughness={0.8} />
+      </mesh>
+      {/* Corner Pillars */}
+      <mesh position={[-0.92, 0.58, 0.68]} castShadow>
+        <boxGeometry args={[0.2, 0.84, 0.2]} />
+        <meshStandardMaterial color="#5e3619" roughness={0.85} />
+      </mesh>
+      <mesh position={[0.52, 0.58, 0.68]} castShadow>
+        <boxGeometry args={[0.2, 0.84, 0.2]} />
+        <meshStandardMaterial color="#5e3619" roughness={0.85} />
+      </mesh>
+      <mesh position={[-0.92, 0.58, -0.68]} castShadow>
+        <boxGeometry args={[0.2, 0.84, 0.2]} />
+        <meshStandardMaterial color="#5e3619" roughness={0.85} />
+      </mesh>
+      <mesh position={[0.52, 0.58, -0.68]} castShadow>
+        <boxGeometry args={[0.2, 0.84, 0.2]} />
+        <meshStandardMaterial color="#5e3619" roughness={0.85} />
+      </mesh>
+
+      {/* Door */}
+      <mesh position={[-0.2, 0.44, 0.72]}>
+        <boxGeometry args={[0.3, 0.56, 0.05]} />
+        <meshStandardMaterial color="#78350f" roughness={0.85} />
+      </mesh>
+
+      {/* Glowing Window */}
+      <mesh position={[0.25, 0.62, 0.72]}>
+        <boxGeometry args={[0.24, 0.24, 0.04]} />
+        <meshStandardMaterial
+          color="#fef08a"
+          emissive="#fef08a"
+          emissiveIntensity={1.0}
+        />
+      </mesh>
+
+      {/* Roof */}
+      <mesh position={[-0.2, 1.05, 0]} castShadow>
+        <boxGeometry args={[1.8, 0.16, 1.6]} />
+        <meshStandardMaterial color="#78350f" roughness={0.85} />
+      </mesh>
+      <mesh position={[-0.2, 1.22, 0]} castShadow>
+        <boxGeometry args={[1.3, 0.18, 1.6]} />
+        <meshStandardMaterial color="#78350f" roughness={0.85} />
+      </mesh>
+      <mesh position={[-0.2, 1.38, 0]} castShadow>
+        <boxGeometry args={[0.8, 0.16, 1.6]} />
+        <meshStandardMaterial color="#5e3619" roughness={0.9} />
+      </mesh>
+
+      {/* Chimney */}
+      <mesh position={[0.35, 1.45, -0.3]} castShadow>
+        <boxGeometry args={[0.24, 0.45, 0.24]} />
+        <meshStandardMaterial color="#71717a" roughness={0.9} />
+      </mesh>
+
+      {/* Mini Lantern by Door */}
+      <group position={[-0.55, 0.72, 0.75]}>
+        <MinecraftLantern scale={0.7} />
+      </group>
+
+      {/* Foliage */}
+      <mesh position={[0.95, 0.45, -0.1]} castShadow>
+        <boxGeometry args={[0.7, 0.65, 0.7]} />
+        <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
+      </mesh>
+
+      {/* Vines */}
+      <HangingVine position={[-1.1, -0.2, 1.15]} length={6} offset={0.8} />
+      <HangingVine position={[-0.6, -0.2, 1.15]} length={4} offset={2.1} />
+      <HangingVine position={[0.1, -0.2, 1.15]} length={7} offset={3.5} />
+      <HangingVine position={[0.7, -0.2, 1.15]} length={5} offset={1.4} />
+      <HangingVine position={[1.1, -0.2, 1.15]} length={3} offset={2.8} />
+      <HangingVine position={[-1.35, -0.2, 0.3]} length={5} offset={3.9} />
+    </group>
+  );
+}
+
+// =========================================================================
+// 7. MINECRAFT OAK TREE (BOTTOM-LEFT CORNER)
+// =========================================================================
+
+function MinecraftOakTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  const trunkColor = "#653a17";
+  const leafDark = "#2d6a4f";
+  const leafMed = "#386641";
+  const leafLight = "#52b788";
+
+  return (
+    <group position={position} scale={scale}>
+      {/* Oak Wood Trunk */}
+      <mesh position={[0, 1.0, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.38, 2.0, 0.38]} />
+        <meshStandardMaterial color={trunkColor} roughness={0.85} />
+      </mesh>
+      <mesh position={[0.16, 0.2, 0]} castShadow>
+        <boxGeometry args={[0.16, 0.4, 0.34]} />
+        <meshStandardMaterial color={trunkColor} roughness={0.85} />
+      </mesh>
+      <mesh position={[-0.16, 0.2, 0]} castShadow>
+        <boxGeometry args={[0.16, 0.4, 0.34]} />
+        <meshStandardMaterial color={trunkColor} roughness={0.85} />
+      </mesh>
+
+      {/* Stepped Voxel Leaf Canopy */}
+      <mesh position={[0, 1.85, 0]} castShadow>
+        <boxGeometry args={[1.5, 0.6, 1.5]} />
+        <meshStandardMaterial color={leafDark} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 2.35, 0]} castShadow>
+        <boxGeometry args={[1.2, 0.5, 1.2]} />
+        <meshStandardMaterial color={leafMed} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 2.75, 0]} castShadow>
+        <boxGeometry args={[0.85, 0.4, 0.85]} />
+        <meshStandardMaterial color={leafLight} roughness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
+// =========================================================================
+// 8. RICH GROUND TERRAIN (GRASS, OAK TREE, TIMBER & LANTERN)
+// =========================================================================
+
+function ElevatedMinecraftGround() {
   const { viewport } = useThree();
   const terrainWidth = Math.max(viewport.width + 6, 22);
-  const posY = -viewport.height / 2 - 0.28; // Hugs bottom edge cleanly behind composer
 
-  // Palette
+  // Elevated to anchor the bottom horizon right behind the input capsule
+  const posY = -viewport.height / 2 + 0.36;
+
   const grassTop = "#6ebb2f";
   const grassSide = "#5ea325";
   const woodLog = "#9e6533";
@@ -619,56 +703,82 @@ function BottomMinecraftTerrain() {
   const dirtBase = "#754522";
 
   return (
-    <group position={[0, posY, 0.2]}>
-      {/* --- TOP LAYER: MINECRAFT GRASS PLATEAU --- */}
+    <group position={[0, posY, 0.3]}>
+      {/* Top Grass Plateau */}
       <mesh position={[0, 0, 0]} receiveShadow>
-        <boxGeometry args={[terrainWidth, 0.36, 2.6]} />
+        <boxGeometry args={[terrainWidth, 0.42, 2.8]} />
         <meshStandardMaterial color={grassTop} roughness={0.7} />
       </mesh>
 
       {/* Stepped Grass Side Fringe Tabs */}
-      <mesh position={[0, -0.2, 1.31]} receiveShadow>
-        <boxGeometry args={[terrainWidth, 0.16, 0.06]} />
+      <mesh position={[0, -0.24, 1.41]} receiveShadow>
+        <boxGeometry args={[terrainWidth, 0.2, 0.08]} />
         <meshStandardMaterial color={grassSide} roughness={0.8} />
       </mesh>
 
-      {/* --- MIDDLE LAYER: OAK LOG / WOODEN TRIM BEAM --- */}
-      <mesh position={[0, -0.36, 0]} receiveShadow>
-        <boxGeometry args={[terrainWidth, 0.26, 2.4]} />
+      {/* Oak Log Timber Trim */}
+      <mesh position={[0, -0.42, 0]} receiveShadow>
+        <boxGeometry args={[terrainWidth, 0.3, 2.6]} />
         <meshStandardMaterial color={woodLog} roughness={0.85} />
       </mesh>
-      {/* Front Wooden Trim Strip */}
-      <mesh position={[0, -0.36, 1.22]} castShadow receiveShadow>
-        <boxGeometry args={[terrainWidth, 0.22, 0.06]} />
+      <mesh position={[0, -0.42, 1.32]} castShadow receiveShadow>
+        <boxGeometry args={[terrainWidth, 0.24, 0.08]} />
         <meshStandardMaterial color={woodTrim} roughness={0.9} />
       </mesh>
 
-      {/* --- BOTTOM LAYER: DIRT FOUNDATION SLAB --- */}
-      <mesh position={[0, -0.68, 0]} receiveShadow>
-        <boxGeometry args={[terrainWidth, 0.48, 2.3]} />
+      {/* Dirt Foundation */}
+      <mesh position={[0, -0.82, 0]} receiveShadow>
+        <boxGeometry args={[terrainWidth, 0.56, 2.5]} />
         <meshStandardMaterial color={dirtBase} roughness={0.9} />
       </mesh>
 
-      {/* --- RIGHT-SIDE TIMBER POST WITH COMPACT LANTERN --- */}
-      <group position={[viewport.width / 2 - 1.2, 0.18, 0.4]}>
-        <mesh position={[0, 0, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.2, 0.28, 0.2]} />
+      {/* --- BOTTOM-LEFT CORNER: MINECRAFT OAK TREE --- */}
+      <MinecraftOakTree
+        position={[-viewport.width / 2 + 0.62, 0.22, 0.5]}
+        scale={0.44}
+      />
+
+      {/* Mini foliage shrub beside the tree */}
+      <group position={[-viewport.width / 2 + 1.8, 0.22, 0.6]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.34, 0.32, 0.34]} />
+          <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
+        </mesh>
+      </group>
+
+      {/* --- BOTTOM-RIGHT CORNER: TIMBER POST WITH GLOWING LANTERN --- */}
+      <group position={[viewport.width / 2 - 0.95, 0.22, 0.5]}>
+        <mesh position={[0, 0.24, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.18, 0.48, 0.18]} />
           <meshStandardMaterial color={woodTrim} roughness={0.85} />
         </mesh>
-        <group position={[0, 0.22, 0]}>
-          <MinecraftLantern scale={0.65} />
+        <group position={[0, 0.55, 0]}>
+          <MinecraftLantern scale={0.9} />
         </group>
       </group>
 
-      {/* --- LEFT-SIDE MINI GRASS / LEAF SHRUB DETAIL --- */}
-      <group position={[-viewport.width / 2 + 1.4, 0.14, 0.4]}>
-        <mesh castShadow>
-          <boxGeometry args={[0.38, 0.24, 0.38]} />
-          <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
+      {/* --- FLOWERS IN THE GRASS --- */}
+      {/* Red Poppy */}
+      <group position={[-viewport.width / 2 + 2.6, 0.22, 0.8]}>
+        <mesh position={[0, 0.1, 0]}>
+          <boxGeometry args={[0.035, 0.2, 0.035]} />
+          <meshStandardMaterial color="#4d7c0f" roughness={0.7} />
         </mesh>
-        <mesh position={[0.2, -0.04, 0.08]} castShadow>
-          <boxGeometry args={[0.26, 0.18, 0.26]} />
-          <meshStandardMaterial color="#40916c" roughness={0.85} />
+        <mesh position={[0, 0.22, 0]} castShadow>
+          <boxGeometry args={[0.15, 0.13, 0.15]} />
+          <meshStandardMaterial color="#ef4444" roughness={0.6} />
+        </mesh>
+      </group>
+
+      {/* Yellow Dandelion */}
+      <group position={[viewport.width / 2 - 1.8, 0.22, 0.8]}>
+        <mesh position={[0, 0.09, 0]}>
+          <boxGeometry args={[0.035, 0.18, 0.035]} />
+          <meshStandardMaterial color="#4d7c0f" roughness={0.7} />
+        </mesh>
+        <mesh position={[0, 0.2, 0]} castShadow>
+          <boxGeometry args={[0.14, 0.13, 0.14]} />
+          <meshStandardMaterial color="#eab308" roughness={0.6} />
         </mesh>
       </group>
     </group>
@@ -676,7 +786,7 @@ function BottomMinecraftTerrain() {
 }
 
 // =========================================================================
-// 7. MAIN MINECRAFT SKY & TERRAIN ENVIRONMENT EXPORT
+// 9. MAIN MINECRAFT LIVING WORLD EXPORT
 // =========================================================================
 
 export function MinecraftSkyEnvironment() {
@@ -695,7 +805,6 @@ export function MinecraftSkyEnvironment() {
         camera={{ position: [0, 0, 8], fov: 45 }}
         style={{ pointerEvents: "none", width: "100%", height: "100%" }}
       >
-        {/* Soft, warm Minecraft morning lighting */}
         <ambientLight color="#ffffff" intensity={0.9} />
         <directionalLight
           position={[6, 10, 8]}
@@ -712,14 +821,17 @@ export function MinecraftSkyEnvironment() {
           intensity={0.65}
         />
 
-        {/* 1. Upper-left: Floating wooden platform with headphone cat, green leaves & hanging vines */}
+        {/* 1. Upper-left: Headphone Cat sitting on wooden platform with green leaves & hanging vines */}
         <UpperLeftCatIsland />
 
-        {/* 2. Upper-right: Floating wooden platform with green leaves, hanging vines & cozy glowing lantern */}
-        <UpperRightLanternIsland />
+        {/* 2. Drifting Island 1: Floating wooden platform with glowing lantern & foliage (Left to Right) */}
+        <DriftingLanternIsland />
 
-        {/* 3. Bottom area: Subtle Minecraft green grass & wooden log foundation with cozy lantern */}
-        <BottomMinecraftTerrain />
+        {/* 3. Drifting Island 2: Floating wooden cabin / cottage with chimney, window, foliage & vines (Right to Left) */}
+        <DriftingCottageIsland />
+
+        {/* 4. Bottom Area: Elevated lush Minecraft grass terrain, oak tree, flowers, timber beam & glowing lantern */}
+        <ElevatedMinecraftGround />
       </Canvas>
     </div>
   );
