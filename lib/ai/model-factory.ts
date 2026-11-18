@@ -32,11 +32,11 @@ export function getLanguageModel({
       ? createGoogleGenerativeAI({ apiKey: apiKey.trim() })
       : defaultGoogle;
 
-    // Map internal ID to Google model name
+    // Map internal ID to Google model name supported by Google API
     const googleModelName =
       modelId === "gemini-2.5-pro"
-        ? "gemini-2.5-pro"
-        : "gemini-2.5-flash";
+        ? "gemini-3.1-pro-preview"
+        : "gemini-3-flash-preview";
 
     return googleClient(googleModelName);
   }
