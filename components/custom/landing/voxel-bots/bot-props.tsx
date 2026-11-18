@@ -338,21 +338,6 @@ export function BrowserProps({ isHovered = false }: { isHovered?: boolean }) {
 // 3. BUILDER PROPS (CENTERPIECE)
 // ==========================================
 export function BuilderProps({ isHovered = false }: { isHovered?: boolean }) {
-  const codeCubeRef = useRef<THREE.Group>(null);
-  const orbitCubesRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (codeCubeRef.current) {
-      codeCubeRef.current.position.y = 1.95 + Math.sin(t * 2.5) * 0.14;
-      codeCubeRef.current.rotation.y = t * 1.4;
-      codeCubeRef.current.rotation.x = Math.sin(t * 1.2) * 0.2;
-    }
-    if (orbitCubesRef.current) {
-      orbitCubesRef.current.rotation.y = t * 0.9;
-    }
-  });
-
   return (
     <>
       {/* Coding Laptop on Grass */}
@@ -391,60 +376,6 @@ export function BuilderProps({ isHovered = false }: { isHovered?: boolean }) {
             distance={2}
           />
         </group>
-      </group>
-
-      {/* --- Floating Glowing Code Cube (Centerpiece above Builder) --- */}
-      <group ref={codeCubeRef} position={[0, 1.95, 0.1]}>
-        {/* Center Lime Cube */}
-        <mesh castShadow>
-          <boxGeometry args={[0.55, 0.55, 0.55]} />
-          <meshStandardMaterial
-            color="#bef264"
-            emissive="#a3e635"
-            emissiveIntensity={isHovered ? 2.0 : 1.4}
-            roughness={0.2}
-          />
-        </mesh>
-        {/* Wireframe Outline / Edge bevel */}
-        <mesh>
-          <boxGeometry args={[0.57, 0.57, 0.57]} />
-          <meshBasicMaterial color="#ffffff" wireframe />
-        </mesh>
-        {/* Cube Glow Light */}
-        <pointLight
-          color="#a3e635"
-          intensity={isHovered ? 3.8 : 2.4}
-          distance={4}
-          decay={2}
-        />
-      </group>
-
-      {/* Orbiting Mini Lime Voxel Cubes */}
-      <group ref={orbitCubesRef} position={[0, 1.8, 0]}>
-        <mesh position={[1.1, 0.2, 0]} castShadow>
-          <boxGeometry args={[0.18, 0.18, 0.18]} />
-          <meshStandardMaterial
-            color="#bef264"
-            emissive="#a3e635"
-            emissiveIntensity={0.8}
-          />
-        </mesh>
-        <mesh position={[-1.0, -0.3, 0.4]} castShadow>
-          <boxGeometry args={[0.15, 0.15, 0.15]} />
-          <meshStandardMaterial
-            color="#bef264"
-            emissive="#a3e635"
-            emissiveIntensity={0.7}
-          />
-        </mesh>
-        <mesh position={[0.2, 0.4, -1.0]} castShadow>
-          <boxGeometry args={[0.16, 0.16, 0.16]} />
-          <meshStandardMaterial
-            color="#bef264"
-            emissive="#a3e635"
-            emissiveIntensity={0.6}
-          />
-        </mesh>
       </group>
     </>
   );
@@ -717,16 +648,6 @@ export function CreatorProps({ isHovered = false }: { isHovered?: boolean }) {
 // 6. WRITER PROPS
 // ==========================================
 export function WriterProps({ isHovered = false }: { isHovered?: boolean }) {
-  const floatingDocRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (floatingDocRef.current) {
-      floatingDocRef.current.position.y = 1.6 + Math.sin(t * 2) * 0.12;
-      floatingDocRef.current.rotation.y = Math.sin(t * 1.4) * 0.15;
-    }
-  });
-
   return (
     <>
       {/* Tablet / Writing Pad in Paws */}
@@ -758,28 +679,6 @@ export function WriterProps({ isHovered = false }: { isHovered?: boolean }) {
         <mesh position={[0, -0.1, 0.032]}>
           <boxGeometry args={[0.3, 0.02, 0.005]} />
           <meshStandardMaterial color="#71717a" roughness={0.8} />
-        </mesh>
-      </group>
-
-      {/* Floating Document Sheet */}
-      <group ref={floatingDocRef} position={[0.8, 1.55, 0.3]} rotation={[0, -0.2, 0.1]}>
-        <mesh castShadow>
-          <boxGeometry args={[0.34, 0.44, 0.015]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.9} />
-        </mesh>
-        {/* Top green bookmark tag */}
-        <mesh position={[0.1, 0.2, 0.01]}>
-          <boxGeometry args={[0.08, 0.08, 0.01]} />
-          <meshBasicMaterial color="#22c55e" />
-        </mesh>
-        {/* Text lines */}
-        <mesh position={[0, 0.06, 0.01]}>
-          <boxGeometry args={[0.24, 0.02, 0.005]} />
-          <meshStandardMaterial color="#a1a1aa" roughness={0.9} />
-        </mesh>
-        <mesh position={[0, -0.04, 0.01]}>
-          <boxGeometry args={[0.22, 0.02, 0.005]} />
-          <meshStandardMaterial color="#a1a1aa" roughness={0.9} />
         </mesh>
       </group>
     </>
@@ -867,16 +766,6 @@ export function CodingBotVisor() {
 }
 
 export function CodingBotProps({ isHovered = false }: { isHovered?: boolean }) {
-  const codeTagRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (codeTagRef.current) {
-      codeTagRef.current.position.y = 1.6 + Math.sin(t * 2.2) * 0.12;
-      codeTagRef.current.rotation.y = Math.sin(t * 1.5) * 0.15;
-    }
-  });
-
   return (
     <>
       {/* Coding Laptop on Grass */}
@@ -915,24 +804,6 @@ export function CodingBotProps({ isHovered = false }: { isHovered?: boolean }) {
             distance={2}
           />
         </group>
-      </group>
-
-      {/* Floating </> Code Tag Badge */}
-      <group ref={codeTagRef} position={[-0.75, 1.6, 0.35]}>
-        <mesh castShadow>
-          <boxGeometry args={[0.48, 0.32, 0.08]} />
-          <meshStandardMaterial
-            color="#0284c7"
-            emissive="#0369a1"
-            emissiveIntensity={isHovered ? 1.2 : 0.6}
-            roughness={0.4}
-          />
-        </mesh>
-        {/* Code glyphs */}
-        <mesh position={[0, 0, 0.045]}>
-          <boxGeometry args={[0.36, 0.18, 0.01]} />
-          <meshBasicMaterial color="#ffffff" />
-        </mesh>
       </group>
     </>
   );
@@ -977,16 +848,6 @@ export function SocialMediaBotHeadGear() {
 }
 
 export function SocialMediaBotProps({ isHovered = false }: { isHovered?: boolean }) {
-  const mediaCardRef = useRef<THREE.Group>(null);
-
-  useFrame((state) => {
-    const t = state.clock.getElapsedTime();
-    if (mediaCardRef.current) {
-      mediaCardRef.current.position.y = 1.6 + Math.sin(t * 2.4) * 0.12;
-      mediaCardRef.current.rotation.y = Math.sin(t * 1.6) * 0.15;
-    }
-  });
-
   return (
     <>
       {/* Voxel Camera in Paws */}
@@ -1010,23 +871,6 @@ export function SocialMediaBotProps({ isHovered = false }: { isHovered?: boolean
         <mesh position={[0, 0, 0.225]} rotation={[Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.11, 16]} />
           <meshStandardMaterial color="#0284c7" emissive="#0369a1" emissiveIntensity={0.6} />
-        </mesh>
-      </group>
-
-      {/* Floating Media / Video Card */}
-      <group ref={mediaCardRef} position={[0.82, 1.6, 0.32]}>
-        <mesh castShadow>
-          <boxGeometry args={[0.58, 0.44, 0.04]} />
-          <meshStandardMaterial color="#ffffff" roughness={0.8} />
-        </mesh>
-        {/* Play icon badge */}
-        <mesh position={[0, 0.04, 0.025]}>
-          <boxGeometry args={[0.48, 0.28, 0.01]} />
-          <meshStandardMaterial color="#f43f5e" />
-        </mesh>
-        <mesh position={[0, 0.04, 0.035]} rotation={[0, 0, -Math.PI / 2]}>
-          <coneGeometry args={[0.07, 0.12, 3]} />
-          <meshBasicMaterial color="#ffffff" />
         </mesh>
       </group>
     </>

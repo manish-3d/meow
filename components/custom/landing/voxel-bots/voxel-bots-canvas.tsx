@@ -16,7 +16,7 @@ import {
   SocialMediaBotHeadGear,
   SocialMediaBotProps,
 } from "./bot-props";
-import { BrandOrbitCubes } from "./brand-orbit-cubes";
+import { RoleBrandCube } from "./role-brand-cube";
 
 interface VoxelBotsCanvasProps {
   activeIndex: number;
@@ -271,9 +271,6 @@ export function VoxelBotsCanvas({
           />
         </group>
 
-        {/* --- FLOATING 3D BRAND LOGO ORBIT CUBES (GitHub, Instagram, X, YouTube, Slack) --- */}
-        <BrandOrbitCubes />
-
         {/* --- 1. CODING BOT ISLAND (Far Left: x = -10.8, enlarged scale = 0.92) --- */}
         <BotIslandAnchor
           index={0}
@@ -292,6 +289,14 @@ export function VoxelBotsCanvas({
           >
             <CodingBotProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
           </VoxelCat>
+          {/* GitHub 3D Cube for Coding Bot */}
+          <RoleBrandCube
+            brand="github"
+            position={[0.78, 1.65, 0.3]}
+            size={0.42}
+            phase={0}
+            isHovered={hoveredIndex === 0 || activeIndex === 0}
+          />
         </BotIslandAnchor>
 
         {/* --- 2. RESEARCH BOT ISLAND (Mid Left: x = -5.4, enlarged scale = 0.92) --- */}
@@ -312,6 +317,14 @@ export function VoxelBotsCanvas({
           >
             <ResearcherProps isHovered={hoveredIndex === 1 || activeIndex === 1} />
           </VoxelCat>
+          {/* Google 3D Cube for Research Bot */}
+          <RoleBrandCube
+            brand="google"
+            position={[-0.78, 1.65, 0.3]}
+            size={0.42}
+            phase={1.2}
+            isHovered={hoveredIndex === 1 || activeIndex === 1}
+          />
         </BotIslandAnchor>
 
         {/* --- 3. AGENT BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 1.35, enlarged scale = 1.15) --- */}
@@ -333,6 +346,14 @@ export function VoxelBotsCanvas({
           >
             <BuilderProps isHovered={hoveredIndex === 2 || activeIndex === 2} />
           </VoxelCat>
+          {/* Glowing Code Cube for Agent Builder */}
+          <RoleBrandCube
+            brand="code"
+            position={[0, 1.95, 0.1]}
+            size={0.5}
+            phase={2.4}
+            isHovered={hoveredIndex === 2 || activeIndex === 2}
+          />
         </BotIslandAnchor>
 
         {/* --- 4. NOTES BOT ISLAND (Mid Right: x = 5.4, enlarged scale = 0.92) --- */}
@@ -350,6 +371,14 @@ export function VoxelBotsCanvas({
           <VoxelCat isHovered={hoveredIndex === 3 || activeIndex === 3}>
             <WriterProps isHovered={hoveredIndex === 3 || activeIndex === 3} />
           </VoxelCat>
+          {/* Notion 3D Cube for Notes Bot */}
+          <RoleBrandCube
+            brand="notion"
+            position={[0.78, 1.65, 0.3]}
+            size={0.42}
+            phase={3.6}
+            isHovered={hoveredIndex === 3 || activeIndex === 3}
+          />
         </BotIslandAnchor>
 
         {/* --- 5. SOCIAL MEDIA BOT ISLAND (Far Right: x = 10.8, enlarged scale = 0.92) --- */}
@@ -370,6 +399,14 @@ export function VoxelBotsCanvas({
           >
             <SocialMediaBotProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
           </VoxelCat>
+          {/* Instagram Gradient 3D Cube for Social Media Bot */}
+          <RoleBrandCube
+            brand="instagram"
+            position={[-0.78, 1.65, 0.3]}
+            size={0.42}
+            phase={4.8}
+            isHovered={hoveredIndex === 4 || activeIndex === 4}
+          />
         </BotIslandAnchor>
       </Canvas>
     </div>
