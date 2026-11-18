@@ -10,9 +10,12 @@ import { ChatGptLogo, ClaudeLogo, GeminiLogo, GrokLogo } from "./brand-logos";
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-[92vh] sm:min-h-screen flex flex-col justify-center pt-24 pb-14 sm:pt-28 sm:pb-16 text-[#131316] overflow-hidden">
+    <section className="relative isolate min-h-[92vh] sm:min-h-screen flex flex-col justify-center pt-24 pb-14 sm:pt-28 sm:pb-16 text-[#131316] overflow-hidden">
       {/* Minecraft River & Landscape Background Image */}
-      <div className="pointer-events-none absolute inset-0 -z-10 select-none">
+      <div 
+        className="pointer-events-none absolute inset-0 z-0 select-none bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: "url('/hero-minecraft-bg.jpg')" }}
+      >
         <Image
           src="/hero-minecraft-bg.jpg"
           alt="Meow Bot Minecraft World"
