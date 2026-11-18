@@ -250,10 +250,10 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
         prev.map((msg) =>
           msg.id === agentMsgId
             ? {
-                ...msg,
-                content: `⚠️ Failed to get response from ${agent.name}: ${errText}`,
-                isStreaming: false,
-              }
+              ...msg,
+              content: `⚠️ Failed to get response from ${agent.name}: ${errText}`,
+              isStreaming: false,
+            }
             : msg
         )
       );
@@ -332,7 +332,7 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
             </motion.div>
           ) : (
             /* Active Message Thread with Frosted Translucent Cards */
-            <div className="pt-28 md:pt-32 px-4 md:px-6 pb-6 space-y-6 max-w-3xl mx-auto w-full">
+            <div className="pt-28 md:pt-32 px-4 md:px-6 pb-28 md:pb-32 space-y-6 max-w-3xl mx-auto w-full">
               {messages.map((msg, idx) => (
                 <motion.div
                   key={msg.id}
@@ -349,11 +349,10 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
 
                   <div className={`space-y-1.5 max-w-[85%] ${msg.role === "user" ? "items-end" : "items-start"} flex flex-col`}>
                     <div
-                      className={`text-xs leading-relaxed whitespace-pre-wrap break-words ${
-                        msg.role === "user"
-                          ? "px-4 py-2.5 bg-black text-white rounded-2xl rounded-tr-xs shadow-xs"
-                          : "px-5 py-4 bg-white/85 backdrop-blur-md text-foreground border border-white/70 rounded-2xl rounded-tl-xs shadow-xs"
-                      }`}
+                      className={`text-xs leading-relaxed whitespace-pre-wrap break-words ${msg.role === "user"
+                        ? "px-4 py-2.5 bg-black text-white rounded-2xl rounded-tr-xs shadow-xs"
+                        : "px-5 py-4 bg-white/85 backdrop-blur-md text-foreground border border-white/70 rounded-2xl rounded-tl-xs shadow-xs"
+                        }`}
                     >
                       {msg.role === "agent" && msg.isStreaming && !msg.content ? (
                         <div className="flex items-center gap-2 text-muted-foreground py-0.5 font-mono">
@@ -376,9 +375,8 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
                     </div>
 
                     <span
-                      className={`text-[10px] font-mono tabular-nums text-muted-foreground/80 px-1 ${
-                        msg.role === "user" ? "text-right" : "text-left"
-                      }`}
+                      className={`text-[10px] font-mono tabular-nums text-muted-foreground/80 px-1 ${msg.role === "user" ? "text-right" : "text-left"
+                        }`}
                     >
                       {msg.timestamp}
                     </span>
