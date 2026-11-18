@@ -14,8 +14,6 @@ import {
   Loader2,
   LayoutDashboard,
   Users,
-  CalendarClock,
-  Wrench,
   ChevronRight,
   LogOut,
   SlidersHorizontal,
@@ -42,8 +40,6 @@ import { DEFAULT_AVATAR } from "@/lib/avatars";
 const NAV_ITEMS = [
   { label: "Workspace", href: "/workspace", icon: LayoutDashboard },
   { label: "Agents", href: "/workspace", icon: Users, badge: true },
-  { label: "Routines", href: "#", icon: CalendarClock },
-  { label: "Tools & Integrations", href: "#", icon: Wrench },
   { label: "Marketplace", href: "#", icon: Store, action: "marketplace" },
 ];
 
