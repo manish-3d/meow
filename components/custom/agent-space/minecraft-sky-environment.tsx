@@ -643,50 +643,76 @@ function DriftingCottageIsland() {
 }
 
 // =========================================================================
-// 7. MINECRAFT OAK TREE (BOTTOM-LEFT CORNER)
+// 7. TALL MINECRAFT TIMBER LAMP POST (BIG & PROMINENT)
 // =========================================================================
 
-function MinecraftOakTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
-  const trunkColor = "#653a17";
-  const leafDark = "#2d6a4f";
-  const leafMed = "#386641";
-  const leafLight = "#52b788";
+function MinecraftLampPost({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
+  const woodTrim = "#7e4a1e";
+  const woodLog = "#9e6533";
+  const stonePlinth = "#52525b";
+  const ironBand = "#27272a";
 
   return (
     <group position={position} scale={scale}>
-      {/* Oak Wood Trunk */}
-      <mesh position={[0, 1.0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.38, 2.0, 0.38]} />
-        <meshStandardMaterial color={trunkColor} roughness={0.85} />
+      {/* Cobblestone Plinth Base */}
+      <mesh position={[0, 0.08, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.42, 0.16, 0.42]} />
+        <meshStandardMaterial color={stonePlinth} roughness={0.9} />
       </mesh>
-      <mesh position={[0.16, 0.2, 0]} castShadow>
-        <boxGeometry args={[0.16, 0.4, 0.34]} />
-        <meshStandardMaterial color={trunkColor} roughness={0.85} />
-      </mesh>
-      <mesh position={[-0.16, 0.2, 0]} castShadow>
-        <boxGeometry args={[0.16, 0.4, 0.34]} />
-        <meshStandardMaterial color={trunkColor} roughness={0.85} />
+      <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.32, 0.1, 0.32]} />
+        <meshStandardMaterial color={stonePlinth} roughness={0.9} />
       </mesh>
 
-      {/* Stepped Voxel Leaf Canopy */}
-      <mesh position={[0, 1.85, 0]} castShadow>
-        <boxGeometry args={[1.5, 0.6, 1.5]} />
-        <meshStandardMaterial color={leafDark} roughness={0.85} />
+      {/* Tall Wooden Post / Pillar (Height 1.7 units) */}
+      <mesh position={[0, 1.1, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.18, 1.7, 0.18]} />
+        <meshStandardMaterial color={woodLog} roughness={0.85} />
       </mesh>
-      <mesh position={[0, 2.35, 0]} castShadow>
-        <boxGeometry args={[1.2, 0.5, 1.2]} />
-        <meshStandardMaterial color={leafMed} roughness={0.85} />
+
+      {/* Decorative Iron Braces along the post */}
+      <mesh position={[0, 0.65, 0]} castShadow>
+        <boxGeometry args={[0.22, 0.06, 0.22]} />
+        <meshStandardMaterial color={ironBand} roughness={0.6} />
       </mesh>
-      <mesh position={[0, 2.75, 0]} castShadow>
-        <boxGeometry args={[0.85, 0.4, 0.85]} />
-        <meshStandardMaterial color={leafLight} roughness={0.85} />
+      <mesh position={[0, 1.45, 0]} castShadow>
+        <boxGeometry args={[0.22, 0.06, 0.22]} />
+        <meshStandardMaterial color={ironBand} roughness={0.6} />
       </mesh>
+
+      {/* Top Cross-Cap Overhang & Brackets */}
+      <mesh position={[0, 2.02, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.34, 0.1, 0.34]} />
+        <meshStandardMaterial color={woodTrim} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 2.12, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.44, 0.1, 0.44]} />
+        <meshStandardMaterial color={woodTrim} roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 2.22, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.28, 0.08, 0.28]} />
+        <meshStandardMaterial color={stonePlinth} roughness={0.9} />
+      </mesh>
+
+      {/* Glowing Minecraft Lantern perched on top */}
+      <group position={[0, 2.28, 0]}>
+        <MinecraftLantern scale={1.15} />
+      </group>
+
+      {/* Warm Ambient Firelight */}
+      <pointLight
+        position={[0, 2.45, 0.25]}
+        color="#fef08a"
+        intensity={1.2}
+        distance={4.0}
+        decay={2}
+      />
     </group>
   );
 }
 
 // =========================================================================
-// 8. RICH GROUND TERRAIN (GRASS, OAK TREE, TIMBER & LANTERN)
+// 8. RICH GROUND TERRAIN (GRASS, TIMBER, MATCHING TALL LAMPS)
 // =========================================================================
 
 function ElevatedMinecraftGround() {
@@ -701,6 +727,10 @@ function ElevatedMinecraftGround() {
   const woodLog = "#9e6533";
   const woodTrim = "#7e4a1e";
   const dirtBase = "#754522";
+
+  // Position lamps safely inside layout with comfortable padding from screen edges
+  // Using 0.82 of half-width guarantees zero clipping at edges and clear separation from chat
+  const lampOffset = Math.min((viewport.width / 2) * 0.82, viewport.width / 2 - 0.75);
 
   return (
     <group position={[0, posY, 0.3]}>
@@ -732,34 +762,37 @@ function ElevatedMinecraftGround() {
         <meshStandardMaterial color={dirtBase} roughness={0.9} />
       </mesh>
 
-      {/* --- BOTTOM-LEFT CORNER: MINECRAFT OAK TREE --- */}
-      <MinecraftOakTree
-        position={[-viewport.width / 2 + 0.62, 0.22, 0.5]}
-        scale={0.44}
+      {/* --- MATCHING TALL LAMP POST (LEFT SIDE) --- */}
+      <MinecraftLampPost
+        position={[-lampOffset, 0.22, 0.5]}
+        scale={0.95}
       />
 
-      {/* Mini foliage shrub beside the tree */}
-      <group position={[-viewport.width / 2 + 1.8, 0.22, 0.6]}>
+      {/* Mini foliage shrub beside left lamp */}
+      <group position={[-lampOffset + 0.5, 0.22, 0.6]}>
         <mesh castShadow>
-          <boxGeometry args={[0.34, 0.32, 0.34]} />
+          <boxGeometry args={[0.3, 0.26, 0.3]} />
           <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
         </mesh>
       </group>
 
-      {/* --- BOTTOM-RIGHT CORNER: TIMBER POST WITH GLOWING LANTERN --- */}
-      <group position={[viewport.width / 2 - 0.95, 0.22, 0.5]}>
-        <mesh position={[0, 0.24, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.18, 0.48, 0.18]} />
-          <meshStandardMaterial color={woodTrim} roughness={0.85} />
+      {/* --- MATCHING TALL LAMP POST (RIGHT SIDE) --- */}
+      <MinecraftLampPost
+        position={[lampOffset, 0.22, 0.5]}
+        scale={0.95}
+      />
+
+      {/* Mini foliage shrub beside right lamp */}
+      <group position={[lampOffset - 0.5, 0.22, 0.6]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.3, 0.26, 0.3]} />
+          <meshStandardMaterial color="#2d6a4f" roughness={0.85} />
         </mesh>
-        <group position={[0, 0.55, 0]}>
-          <MinecraftLantern scale={0.9} />
-        </group>
       </group>
 
       {/* --- FLOWERS IN THE GRASS --- */}
       {/* Red Poppy */}
-      <group position={[-viewport.width / 2 + 2.6, 0.22, 0.8]}>
+      <group position={[-lampOffset + 0.95, 0.22, 0.8]}>
         <mesh position={[0, 0.1, 0]}>
           <boxGeometry args={[0.035, 0.2, 0.035]} />
           <meshStandardMaterial color="#4d7c0f" roughness={0.7} />
@@ -771,7 +804,7 @@ function ElevatedMinecraftGround() {
       </group>
 
       {/* Yellow Dandelion */}
-      <group position={[viewport.width / 2 - 1.8, 0.22, 0.8]}>
+      <group position={[lampOffset - 0.95, 0.22, 0.8]}>
         <mesh position={[0, 0.09, 0]}>
           <boxGeometry args={[0.035, 0.18, 0.035]} />
           <meshStandardMaterial color="#4d7c0f" roughness={0.7} />
