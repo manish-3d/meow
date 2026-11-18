@@ -2,30 +2,27 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import {
-  Monitor,
   Globe,
   Power,
   Play,
   RefreshCw,
-  ExternalLink,
   Maximize2,
-  Minimize2,
   X,
-  AlertCircle,
   Loader2,
-  Sparkles,
-  ShieldCheck,
-  Terminal,
   Hand,
   CheckCircle2,
+  Lock,
+  ArrowRight,
+  Shield,
   Laptop,
   Cloud,
+  Terminal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/toast";
 import { useAgentConfig } from "@/context/agent-config-context";
 import axios from "axios";
+import { motion, AnimatePresence } from "motion/react";
 
 export function VmDesktopTab() {
   const { agentConfig } = useAgentConfig();
@@ -41,6 +38,7 @@ export function VmDesktopTab() {
   const [switchingMode, setSwitchingMode] = useState(false);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [currentUrl, setCurrentUrl] = useState("https://news.google.com");
+  const [navInput, setNavInput] = useState("https://news.google.com");
   const [autoPauseSeconds, setAutoPauseSeconds] = useState(180);
 
   // 1. Fetch live browser session status
@@ -56,6 +54,7 @@ export function VmDesktopTab() {
       }
       if (res.data.currentUrl) {
         setCurrentUrl(res.data.currentUrl);
+        setNavInput(res.data.currentUrl);
       }
       if (res.data.configuredMode) {
         setConfiguredMode(res.data.configuredMode);
@@ -105,15 +104,11 @@ export function VmDesktopTab() {
       setMode(targetMode);
 
       toast.add({
-        title: targetMode === "browserbase" ? "Browserbase Cloud Selected" : "Local Playwright Selected",
-        description:
-          targetMode === "browserbase"
-            ? "Default mode: Cloud container with live debugger stream. Offline background routines run 24/7."
-            : "Local mode: Runs on your host Google Chrome with $0 API quota consumption.",
+        title: targetMode === "browserbase" ? "Cloud VM Selected" : "Local Chrome Selected",
+        description: targetMode === "browserbase" ? "Cloud CDP container active." : "Zero-quota local host execution.",
         type: "success",
       });
 
-      // Refresh session status to reflect updated configuration
       await fetchStatus(true);
     } catch (err: any) {
       toast.add({
@@ -143,18 +138,14 @@ export function VmDesktopTab() {
       setAutoPauseSeconds(180);
 
       toast.add({
-        title: res.data.mode === "browserbase" ? "Browserbase Cloud Active" : "Local Playwright Active",
-        description:
-          res.data.mode === "browserbase"
-            ? "Cloud CDP browser connected with live debugger stream."
-            : "Running on host Google Chrome/Edge with $0 cost.",
+        title: "Browser Ready",
+        description: res.data.mode === "browserbase" ? "Cloud VM live." : "Local Playwright connected.",
         type: "success",
       });
     } catch (err: any) {
-      const errMsg = err?.response?.data?.error || err?.message || "Failed to start browser";
       toast.add({
-        title: "Browser Activation Failed",
-        description: errMsg,
+        title: "Launch Failed",
+        description: err?.response?.data?.error || err?.message || "Failed to start browser",
         type: "error",
       });
     } finally {
@@ -172,13 +163,13 @@ export function VmDesktopTab() {
       setSessionStatus("closed");
       setStreamUrl(null);
       toast.add({
-        title: "Browser Session Closed",
-        description: "Browser closed and system memory reclaimed.",
+        title: "Session Closed",
+        description: "Browser closed and memory freed.",
         type: "info",
       });
     } catch (err: any) {
       toast.add({
-        title: "Error Closing Browser",
+        title: "Error Closing",
         description: err?.message || "Failed to close browser",
         type: "error",
       });
@@ -203,15 +194,13 @@ export function VmDesktopTab() {
 
       setSessionStatus(res.data.status);
       toast.add({
-        title: isInterrupted ? "Agent Resumed" : "User Takeover Active",
-        description: isInterrupted
-          ? "Autonomous agent is back in control."
-          : "Agent paused! You can now interact with the window and resolve CAPTCHAs or logins.",
+        title: isInterrupted ? "Agent Resumed" : "Manual Takeover",
+        description: isInterrupted ? "Agent resumed navigation." : "Manual control active.",
         type: isInterrupted ? "info" : "success",
       });
     } catch (err: any) {
       toast.add({
-        title: "Interruption Failed",
+        title: "Action Failed",
         description: err?.message || "Could not toggle control",
         type: "error",
       });
@@ -220,39 +209,30 @@ export function VmDesktopTab() {
     }
   };
 
-  // 7. Quick URL Navigation
-  const handleLaunchUrl = async (urlToOpen: string) => {
-    if (!agentId) return;
-    setCurrentUrl(urlToOpen);
+  // 7. URL Navigation
+  const handleNavigate = async (urlTarget?: string) => {
+    const target = (urlTarget || navInput).trim();
+    if (!agentId || !target) return;
+    const formatted = target.startsWith("http://") || target.startsWith("https://") ? target : `https://${target}`;
+
+    setCurrentUrl(formatted);
+    setNavInput(formatted);
     setActionLoading(true);
 
     try {
-      toast.add({
-        title: "Navigating Browser",
-        description: `Navigating to ${urlToOpen}...`,
-        type: "info",
-      });
-
       const res = await axios.post("/api/agent/browser/execute", {
         agentId,
-        targetUrl: urlToOpen,
+        targetUrl: formatted,
         mode: configuredMode,
       });
 
-      if (res.data.screenshotUrl) {
-        setLastScreenshot(res.data.screenshotUrl);
-      }
+      if (res.data.screenshotUrl) setLastScreenshot(res.data.screenshotUrl);
       if (res.data.currentUrl) {
         setCurrentUrl(res.data.currentUrl);
+        setNavInput(res.data.currentUrl);
       }
       setSessionStatus("active");
       setAutoPauseSeconds(180);
-
-      toast.add({
-        title: "Navigation Complete",
-        description: `Page successfully loaded and analyzed.`,
-        type: "success",
-      });
     } catch (e: any) {
       console.warn("Navigation error:", e);
       toast.add({
@@ -265,368 +245,330 @@ export function VmDesktopTab() {
     }
   };
 
+  const isActive = sessionStatus === "active" || sessionStatus === "running" || sessionStatus === "interrupted";
+  const isInterrupted = sessionStatus === "interrupted";
+
+  const quickShortcuts = [
+    { label: "Google", url: "https://news.google.com" },
+    { label: "GitHub", url: "https://github.com/trending" },
+    { label: "Reddit", url: "https://reddit.com" },
+    { label: "Hacker News", url: "https://news.ycombinator.com" },
+  ];
+
   return (
-    <div className="space-y-4 pt-2">
-      {/* Engine Status & Mode Header Card */}
-      <div className="p-3.5 rounded-xl border border-border/70 bg-card text-card-foreground shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <div
-              className={`size-2.5 rounded-full transition-colors ${
-                sessionStatus === "running" || sessionStatus === "active"
-                  ? "bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500/50"
-                  : sessionStatus === "interrupted"
-                  ? "bg-purple-500 shadow-sm shadow-purple-500/50"
-                  : "bg-muted-foreground/40"
-              }`}
-            />
-            <div className="flex flex-col">
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold leading-none text-foreground capitalize">
-                  Browser: {sessionStatus}
-                </span>
-                <Badge
-                  variant="outline"
-                  className={`text-[9px] font-mono py-0 px-1.5 ${
-                    (sessionStatus === "active" || sessionStatus === "running" ? mode : configuredMode) === "browserbase"
-                      ? "bg-primary/10 text-primary border-primary/20"
-                      : "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
-                  }`}
-                >
-                  {(sessionStatus === "active" || sessionStatus === "running" ? mode : configuredMode) === "browserbase"
-                    ? "☁️ Browserbase CDP"
-                    : "💻 Local Chrome ($0 Free)"}
-                </Badge>
-              </div>
-              <span className="text-[10px] text-muted-foreground mt-0.5">
-                {sessionStatus === "interrupted"
-                  ? "User is in manual control. Click Resume to return control to agent."
-                  : sessionStatus === "active" || sessionStatus === "running"
-                  ? `Active session • Auto-pauses in ${Math.floor(autoPauseSeconds / 60)}:${(autoPauseSeconds % 60).toString().padStart(2, "0")}`
-                  : `Ready to launch (${configuredMode === "browserbase" ? "Browserbase Cloud" : "Local Chrome"}).`}
-              </span>
-            </div>
+    <div className="space-y-4 pt-1 pb-6 text-xs select-none">
+      {/* ── 1. SEGMENTED ENGINE SWITCHER & SESSION ACTIONS ── */}
+      <div className="flex items-center justify-between gap-2 p-1 bg-neutral-100/90 rounded-2xl border border-black/[0.04]">
+        {/* Clean Segmented Control (Matching Routine Modal Style) */}
+        <div className="flex items-center gap-1 p-0.5">
+          <button
+            type="button"
+            onClick={() => handleSwitchMode("browserbase")}
+            disabled={switchingMode}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all cursor-pointer ${
+              configuredMode === "browserbase"
+                ? "bg-white text-foreground font-semibold shadow-2xs border border-black/[0.06]"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Cloud className="size-3.5" />
+            <span>Cloud VM</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleSwitchMode("local")}
+            disabled={switchingMode}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs transition-all cursor-pointer ${
+              configuredMode === "local"
+                ? "bg-white text-foreground font-semibold shadow-2xs border border-black/[0.06]"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Laptop className="size-3.5" />
+            <span>Local Chrome</span>
+          </button>
+        </div>
+
+        {/* Live Status Pill & Actions */}
+        <div className="flex items-center gap-1.5 pr-1">
+          {isActive ? (
+            <>
+              {/* Take Control Pill */}
+              <button
+                type="button"
+                onClick={handleToggleInterrupt}
+                disabled={actionLoading}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-semibold transition-all cursor-pointer ${
+                  isInterrupted
+                    ? "bg-black text-white shadow-2xs"
+                    : "bg-white border border-black/[0.08] text-foreground hover:bg-neutral-50 shadow-2xs"
+                }`}
+                title={isInterrupted ? "Return control to agent" : "Take over browser manually"}
+              >
+                <Hand className="size-3" />
+                <span>{isInterrupted ? "Resume" : "Take Control"}</span>
+              </button>
+
+              {/* Power / Close Button */}
+              <button
+                type="button"
+                onClick={handleCloseBrowser}
+                disabled={actionLoading}
+                className="size-7 rounded-xl flex items-center justify-center text-muted-foreground hover:text-rose-600 hover:bg-white transition-colors cursor-pointer"
+                title="Terminate Browser Session"
+              >
+                <Power className="size-3.5" />
+              </button>
+            </>
+          ) : (
+            <button
+              type="button"
+              onClick={() => handleStartBrowser(false)}
+              disabled={actionLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black text-white text-[11px] font-semibold hover:bg-neutral-800 transition-all shadow-2xs cursor-pointer"
+            >
+              {actionLoading ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                <Play className="size-3 fill-current" />
+              )}
+              <span>Launch</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── 2. STAGESHOW MINIATURE BROWSER FRAME (HERO COMPONENT) ── */}
+      <div className="rounded-2xl border border-black/[0.08] overflow-hidden bg-white shadow-xs">
+        {/* Browser Chrome Window Header */}
+        <div className="h-9 bg-neutral-50/80 border-b border-black/[0.06] px-3 flex items-center justify-between gap-2.5">
+          {/* Traffic Lights */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div className="size-2.5 rounded-full bg-neutral-300" />
+            <div className="size-2.5 rounded-full bg-neutral-300" />
+            <div className="size-2.5 rounded-full bg-neutral-300" />
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              size="sm"
-              variant="ghost"
-              className="size-7 p-0 text-muted-foreground hover:text-foreground"
+          {/* Interactive URL Pill Bar */}
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleNavigate();
+            }}
+            className="flex-1 max-w-sm flex items-center gap-1.5 bg-white px-2.5 py-1 rounded-xl border border-black/[0.08] shadow-2xs group focus-within:border-black/30 transition-all"
+          >
+            <Lock className="size-2.5 text-muted-foreground/80 shrink-0" />
+            <input
+              type="text"
+              value={navInput}
+              onChange={(e) => setNavInput(e.target.value)}
+              placeholder="Enter URL to navigate..."
+              disabled={actionLoading}
+              className="flex-1 bg-transparent border-0 outline-none text-[10px] text-foreground font-mono placeholder:text-muted-foreground/60 truncate"
+            />
+            {actionLoading ? (
+              <Loader2 className="size-2.5 animate-spin text-muted-foreground shrink-0" />
+            ) : (
+              <button
+                type="submit"
+                className="opacity-0 group-hover:opacity-100 focus-within:opacity-100 transition-opacity text-muted-foreground hover:text-foreground shrink-0 cursor-pointer"
+                title="Navigate"
+              >
+                <ArrowRight className="size-2.5" />
+              </button>
+            )}
+          </form>
+
+          {/* Window Utilities */}
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              type="button"
               onClick={() => fetchStatus()}
               disabled={loading}
+              className="size-6 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-black/[0.04] transition-colors"
               title="Refresh status"
             >
               <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} />
-            </Button>
+            </button>
 
-            {/* Human Interruption Button */}
-            {(sessionStatus === "active" || sessionStatus === "running" || sessionStatus === "interrupted") && (
-              <Button
-                size="sm"
-                variant={sessionStatus === "interrupted" ? "default" : "outline"}
-                className={`h-7 text-xs gap-1.5 font-medium ${
-                  sessionStatus === "interrupted"
-                    ? "bg-purple-600 hover:bg-purple-700 text-white"
-                    : "border-purple-500/40 text-purple-600 hover:bg-purple-500/10"
-                }`}
-                onClick={handleToggleInterrupt}
-                disabled={actionLoading}
-                title="Pause agent and take over control manually"
+            {(streamUrl || lastScreenshot) && (
+              <button
+                type="button"
+                onClick={() => setIsFullScreen(true)}
+                className="size-6 rounded-lg flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-black/[0.04] transition-colors"
+                title="Fullscreen"
               >
-                <Hand className="size-3" />
-                {sessionStatus === "interrupted" ? "Resume Agent" : "Take Control"}
-              </Button>
-            )}
-
-            {sessionStatus === "active" || sessionStatus === "running" || sessionStatus === "interrupted" ? (
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 text-xs gap-1.5 border-border hover:bg-muted font-medium text-destructive hover:text-destructive"
-                onClick={handleCloseBrowser}
-                disabled={actionLoading}
-              >
-                <Power className="size-3" />
-                Close
-              </Button>
-            ) : (
-              <Button
-                size="sm"
-                className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 font-medium"
-                onClick={() => handleStartBrowser(false)}
-                disabled={actionLoading}
-              >
-                {actionLoading ? (
-                  <Loader2 className="size-3 animate-spin" />
-                ) : (
-                  <Play className="size-3" />
-                )}
-                Launch Browser
-              </Button>
+                <Maximize2 className="size-3" />
+              </button>
             )}
           </div>
         </div>
 
-        {/* Dual-Mode Selector: Cloud vs Local */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 p-1.5 rounded-lg bg-muted/50 border border-border/60">
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => handleSwitchMode("browserbase")}
-              disabled={switchingMode}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all ${
-                configuredMode === "browserbase"
-                  ? "bg-background text-primary font-semibold shadow-xs border border-primary/20"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Cloud className="size-3.5 text-primary" />
-              <span>Browserbase (Cloud - Default)</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSwitchMode("local")}
-              disabled={switchingMode}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all ${
-                configuredMode === "local"
-                  ? "bg-background text-emerald-600 dark:text-emerald-400 font-semibold shadow-xs border border-emerald-500/20"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Laptop className="size-3.5 text-emerald-500" />
-              <span>Local Chrome ($0 Free)</span>
-            </button>
-          </div>
-
-          <span className="text-[10px] text-muted-foreground px-1 sm:text-right">
-            {configuredMode === "browserbase"
-              ? "☁️ Cloud sandbox with live debugger"
-              : "💻 Free host Chrome (saves quota)"}
-          </span>
-        </div>
-
-        {/* Mode-specific Contextual Banner */}
-        {configuredMode === "browserbase" ? (
-          <div className="flex items-start gap-2 p-2 rounded-lg bg-primary/5 border border-primary/15 text-[11px] text-muted-foreground leading-relaxed">
-            <Cloud className="size-3.5 text-primary shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-foreground">Browserbase Cloud Sandbox: </span>
-              Autonomous browsing runs in a managed remote Chromium instance. Scheduled background routines (Inngest) execute 24/7 automatically even if your PC is off.
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start gap-2 p-2 rounded-lg bg-emerald-500/5 border border-emerald-500/20 text-[11px] text-muted-foreground leading-relaxed">
-            <Laptop className="size-3.5 text-emerald-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-semibold text-foreground">Local Playwright Mode: </span>
-              Runs directly on your machine's Google Chrome / Edge with zero API quota usage. Offline scheduled routines will still safely route to Browserbase Cloud.
-            </div>
-          </div>
-        )}
-
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
-          Autonomous browser execution powered by <strong>Playwright</strong>. Connects locally to your host Google Chrome with $0 API costs, or cloud sessions via Browserbase. You can take over control anytime to solve logins or inspect actions.
-        </p>
-
-        {/* Quick Launch Shortcuts */}
-        <div className="flex items-center gap-1.5 pt-1 overflow-x-auto no-scrollbar">
-          <span className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wider shrink-0 mr-1">
-            Shortcuts:
-          </span>
-          <button
-            type="button"
-            onClick={() => handleLaunchUrl("https://news.google.com")}
-            className="text-[10px] px-2 py-0.5 rounded-md border border-border/60 bg-muted/40 hover:bg-muted text-foreground transition-colors shrink-0"
-          >
-            Google News
-          </button>
-          <button
-            type="button"
-            onClick={() => handleLaunchUrl("https://github.com/trending")}
-            className="text-[10px] px-2 py-0.5 rounded-md border border-border/60 bg-muted/40 hover:bg-muted text-foreground transition-colors shrink-0"
-          >
-            GitHub Trending
-          </button>
-          <button
-            type="button"
-            onClick={() => handleLaunchUrl("https://tubeguruji.com")}
-            className="text-[10px] px-2 py-0.5 rounded-md border border-border/60 bg-muted/40 hover:bg-muted text-foreground transition-colors shrink-0"
-          >
-            Tube Guruji
-          </button>
-        </div>
-      </div>
-
-      {/* Live Viewport Card */}
-      <div className="rounded-xl border border-border/70 overflow-hidden bg-background shadow-xs relative">
-        {/* Browser Top Chrome Header */}
-        <div className="h-8 bg-muted/60 border-b border-border/60 px-3 flex items-center justify-between gap-2 text-xs">
-          <div className="flex items-center gap-1.5">
-            <div className="size-2 rounded-full bg-red-400/80" />
-            <div className="size-2 rounded-full bg-amber-400/80" />
-            <div className="size-2 rounded-full bg-emerald-400/80" />
-          </div>
-
-          <div className="flex-1 max-w-xs flex items-center gap-1.5 bg-background px-2.5 py-0.5 rounded-md text-[10px] text-muted-foreground border border-border/50 truncate">
-            <Globe className="size-2.5 shrink-0 text-primary" />
-            <span className="truncate">{currentUrl}</span>
-          </div>
-
-          {(streamUrl || lastScreenshot) && (
-            <Button
-              size="sm"
-              variant="ghost"
-              className="h-6 px-1.5 text-[10px] text-muted-foreground hover:text-foreground gap-1"
-              onClick={() => setIsFullScreen(true)}
-              title="Expand to Fullscreen Viewport"
-            >
-              <Maximize2 className="size-3" />
-              <span className="hidden sm:inline">Fullscreen</span>
-            </Button>
-          )}
-        </div>
-
-        {/* Viewport Content Area */}
-        <div className="h-[280px] w-full bg-muted/20 relative flex items-center justify-center overflow-hidden">
+        {/* Browser Viewport Canvas */}
+        <div className="h-[280px] w-full bg-neutral-50/50 relative flex items-center justify-center overflow-hidden">
           {streamUrl ? (
-            /* Mode 1: Browserbase Live Debugger Stream (Full Interactive Iframe) */
+            /* Mode 1: Live Interactive Stream */
             <iframe
               src={streamUrl}
-              className="size-full border-0"
-              title="Browserbase Live Stream"
+              className="size-full border-0 bg-white"
+              title="Live Browser Stream"
               allow="clipboard-read; clipboard-write"
             />
           ) : lastScreenshot ? (
-            /* Mode 2: Local Playwright Live Captured Screenshot */
-            <div className="relative size-full flex items-center justify-center bg-black/5 overflow-auto p-2">
+            /* Mode 2: Live Snapshot */
+            <div className="relative size-full flex items-center justify-center bg-neutral-100/40 p-2 overflow-auto">
               <img
                 src={lastScreenshot}
-                alt="Live Browser Page"
-                className="max-h-full max-w-full rounded border border-border shadow-md object-contain"
+                alt="Browser Screen"
+                className="max-h-full max-w-full rounded-lg border border-black/[0.08] shadow-xs object-contain"
               />
-              <div className="absolute bottom-2 right-2 flex items-center gap-1.5">
-                <Badge variant="outline" className="text-[9px] bg-background/90 backdrop-blur font-mono">
-                  Live Snapshot • {new Date().toLocaleTimeString()}
-                </Badge>
+              <div className="absolute bottom-2.5 right-2.5">
+                <span className="text-[9px] font-mono font-medium px-2 py-0.5 rounded-full bg-white/90 border border-black/[0.08] text-foreground shadow-2xs">
+                  Live Snapshot
+                </span>
               </div>
             </div>
-          ) : sessionStatus === "active" || sessionStatus === "running" ? (
-            /* Active but waiting for navigation */
-            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-card/60 backdrop-blur-xs">
-              <div
-                className={`size-10 rounded-full flex items-center justify-center ${
-                  mode === "browserbase"
-                    ? "bg-primary/10 text-primary"
-                    : "bg-emerald-500/10 text-emerald-600"
-                }`}
-              >
+          ) : isActive ? (
+            /* Mode 3: Session Active, Awaiting Command */
+            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3">
+              <div className="size-10 rounded-2xl bg-white border border-black/[0.08] shadow-2xs flex items-center justify-center">
                 {mode === "browserbase" ? (
-                  <Cloud className="size-5" />
+                  <Cloud className="size-4 text-foreground" />
                 ) : (
-                  <Laptop className="size-5" />
+                  <Laptop className="size-4 text-foreground" />
                 )}
               </div>
-              <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">
-                  {mode === "browserbase"
-                    ? "Browserbase Cloud Ready"
-                    : "Local Chrome Ready"}
-                </h5>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Browser session is live. Click a shortcut or ask your agent in chat to navigate any webpage.
-                </p>
+              <div className="space-y-1">
+                <span className="font-semibold text-xs text-foreground block">
+                  {mode === "browserbase" ? "Cloud Browser Ready" : "Local Chrome Connected"}
+                </span>
+                <span className="text-[11px] text-muted-foreground block font-mono">
+                  Auto-pause in {Math.floor(autoPauseSeconds / 60)}:{(autoPauseSeconds % 60).toString().padStart(2, "0")}
+                </span>
               </div>
-              <Badge variant="outline" className="text-[10px] font-mono bg-background">
-                {mode === "browserbase"
-                  ? "Cloud CDP Session • Debugger Stream"
-                  : "Host Chrome / Edge • 100% Free"}
-              </Badge>
             </div>
           ) : (
-            /* Inactive / Closed */
-            <div className="size-full flex flex-col items-center justify-center p-6 text-center space-y-3 bg-muted/30">
-              <div className="size-10 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground">
-                <Monitor className="size-5" />
+            /* Mode 4: Standby / Quick Launchpad */
+            <div className="flex flex-col items-center justify-center p-6 text-center space-y-3.5">
+              <div className="size-10 rounded-2xl bg-white border border-black/[0.08] shadow-2xs flex items-center justify-center">
+                <Globe className="size-4 text-muted-foreground" />
               </div>
-              <div className="space-y-1 max-w-xs">
-                <h5 className="text-xs font-semibold text-foreground">Browser Automation Inactive</h5>
-                <p className="text-[11px] text-muted-foreground leading-relaxed">
-                  Launch the browser to enable autonomous website navigation, research, and live screenshots.
-                </p>
+              <div className="space-y-0.5">
+                <span className="font-semibold text-xs text-foreground block">
+                  Browser Standby
+                </span>
+                <span className="text-[11px] text-muted-foreground block">
+                  Launch a session or select a destination
+                </span>
               </div>
-              <Button
-                size="sm"
-                onClick={() => handleStartBrowser(false)}
-                disabled={actionLoading}
-                className="h-7 text-xs gap-1.5 bg-primary text-primary-foreground font-medium"
-              >
-                {actionLoading ? <Loader2 className="size-3 animate-spin" /> : <Play className="size-3" />}
-                Launch Browser
-              </Button>
+
+              {/* Quick Launch Pills */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 max-w-xs pt-1">
+                {quickShortcuts.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleNavigate(item.url)}
+                    className="text-[10px] font-medium bg-white hover:bg-neutral-100 text-foreground px-2.5 py-1 rounded-xl border border-black/[0.08] transition-all shadow-2xs cursor-pointer active:scale-95"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Full-Screen Interactive Modal Overlay */}
-      {isFullScreen && (
-        <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-sm flex flex-col animate-in fade-in duration-150">
-          <div className="h-12 border-b border-border bg-card px-4 flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <Monitor className="size-4 text-primary" />
-                <span className="text-xs font-bold text-foreground">
-                  Meow Browser Automation — {agentConfig?.name || "Agent"}
-                </span>
-              </div>
-              <Badge variant="outline" className="text-[10px] font-mono bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                {mode === "browserbase" ? "Browserbase Cloud Stream" : "Local Playwright Stream"}
-              </Badge>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                size="sm"
-                variant={sessionStatus === "interrupted" ? "default" : "outline"}
-                className="h-7 text-xs gap-1.5 font-medium"
-                onClick={handleToggleInterrupt}
-              >
-                <Hand className="size-3" />
-                {sessionStatus === "interrupted" ? "Resume Agent" : "Take Control"}
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="size-7 p-0 text-muted-foreground hover:text-foreground"
-                onClick={() => setIsFullScreen(false)}
-                title="Exit Fullscreen"
-              >
-                <X className="size-4" />
-              </Button>
-            </div>
-          </div>
-
-          <div className="flex-1 bg-black/20 p-4 flex items-center justify-center overflow-auto">
-            {streamUrl ? (
-              <iframe
-                src={streamUrl}
-                className="size-full rounded-lg border border-border shadow-2xl bg-white"
-                title="Browser Fullscreen Stream"
-                allow="clipboard-read; clipboard-write"
-              />
-            ) : lastScreenshot ? (
-              <img
-                src={lastScreenshot}
-                alt="Live Browser Page Fullscreen"
-                className="max-h-full max-w-full rounded-lg border border-border shadow-2xl object-contain"
-              />
-            ) : (
-              <div className="text-muted-foreground text-xs">No active visual stream.</div>
-            )}
+      {/* ── 3. TELEMETRY & SPEC CARD (COMPONENT-DENSE, ZERO FLUFF) ── */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="p-2.5 rounded-2xl border border-black/[0.08] bg-white space-y-0.5 shadow-2xs">
+          <span className="text-[10px] text-muted-foreground block">Status</span>
+          <div className="flex items-center gap-1.5">
+            <span
+              className={`size-1.5 rounded-full shrink-0 ${
+                isActive ? "bg-emerald-500 animate-pulse" : "bg-neutral-300"
+              }`}
+            />
+            <span className="text-xs font-semibold font-mono text-foreground capitalize truncate">
+              {sessionStatus}
+            </span>
           </div>
         </div>
-      )}
+
+        <div className="p-2.5 rounded-2xl border border-black/[0.08] bg-white space-y-0.5 shadow-2xs">
+          <span className="text-[10px] text-muted-foreground block">Runtime</span>
+          <span className="text-xs font-semibold font-mono text-foreground truncate block">
+            {configuredMode === "browserbase" ? "Cloud CDP" : "Host Chrome"}
+          </span>
+        </div>
+
+        <div className="p-2.5 rounded-2xl border border-black/[0.08] bg-white space-y-0.5 shadow-2xs">
+          <span className="text-[10px] text-muted-foreground block">Cost</span>
+          <span className="text-xs font-semibold font-mono text-emerald-600 block">
+            {configuredMode === "browserbase" ? "Free Tier" : "$0.00"}
+          </span>
+        </div>
+      </div>
+
+      {/* ── 4. FULLSCREEN OVERLAY MODAL ── */}
+      <AnimatePresence>
+        {isFullScreen && (
+          <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex flex-col p-4 animate-in fade-in duration-150">
+            <div className="flex-1 bg-white rounded-2xl border border-black/[0.1] shadow-2xl flex flex-col overflow-hidden">
+              {/* Header */}
+              <div className="h-11 border-b border-black/[0.08] px-4 flex items-center justify-between shrink-0 bg-neutral-50/80">
+                <div className="flex items-center gap-2">
+                  <Globe className="size-3.5 text-foreground" />
+                  <span className="text-xs font-semibold text-foreground font-mono">
+                    {currentUrl}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {isActive && (
+                    <button
+                      type="button"
+                      onClick={handleToggleInterrupt}
+                      className="px-2.5 py-1 rounded-xl text-[11px] font-semibold bg-black text-white shadow-2xs"
+                    >
+                      {isInterrupted ? "Resume Agent" : "Take Control"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsFullScreen(false)}
+                    className="size-7 rounded-xl flex items-center justify-center hover:bg-black/[0.06] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="size-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Viewport */}
+              <div className="flex-1 bg-neutral-100 flex items-center justify-center overflow-auto p-4">
+                {streamUrl ? (
+                  <iframe
+                    src={streamUrl}
+                    className="size-full rounded-xl border border-black/[0.08] shadow-md bg-white"
+                    title="Browser Fullscreen Stream"
+                    allow="clipboard-read; clipboard-write"
+                  />
+                ) : lastScreenshot ? (
+                  <img
+                    src={lastScreenshot}
+                    alt="Browser Fullscreen Snapshot"
+                    className="max-h-full max-w-full rounded-xl border border-black/[0.08] shadow-md object-contain"
+                  />
+                ) : (
+                  <span className="text-xs text-muted-foreground font-mono">No live stream.</span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
