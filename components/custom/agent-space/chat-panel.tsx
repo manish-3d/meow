@@ -298,36 +298,22 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
               <span className="text-sm font-bold text-foreground leading-tight">{agent.name}</span>
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" title="Agent Online" />
             </div>
-            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-              <span className="font-semibold text-foreground">{selectedModel.name}</span>
-              <span>•</span>
-              <span>Autonomous Mode</span>
-              {selectedModel.isFree ? (
-                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
-                  Free Default
-                </span>
-              ) : (
-                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold border border-sky-500/20">
-                  BYOK
-                </span>
-              )}
-            </div>
+            <span className="text-[11px] text-muted-foreground">
+              Autonomous Mode • Cloud VM Desktop & Tools Connected
+            </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <ModelSelectorBar compact />
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 px-2"
-            onClick={handleClearHistory}
-            title="Clear Conversation History"
-          >
-            <RefreshCw className="size-3" />
-            <span className="hidden sm:inline">Reset</span>
-          </Button>
-        </div>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 px-2"
+          onClick={handleClearHistory}
+          title="Clear Conversation History"
+        >
+          <RefreshCw className="size-3" />
+          <span className="hidden sm:inline">Reset</span>
+        </Button>
       </div>
 
       {/* Messages Scroll Viewport */}
