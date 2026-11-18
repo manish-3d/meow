@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Shuffle, Settings2, Wrench, Calendar, Monitor, Sparkles } from "lucide-react";
+import { Shuffle, Settings2, Wrench, Calendar, Monitor, Sparkles, Cpu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AgentConfigType } from "@/types/agent";
@@ -10,6 +10,7 @@ import { SettingTab } from "./setting-tab";
 import { ToolTab } from "./tool-tab";
 import { ScheduleTab } from "./schedule-tab";
 import { VmDesktopTab } from "./vm-desktop-tab";
+import { ModelsTab } from "./models-tab";
 
 interface ConfigurationPanelProps {
   agent?: AgentConfigType;
@@ -74,10 +75,14 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
       {/* Tabbed Navigation Bar */}
       <div className="flex-1 overflow-auto p-4">
         <Tabs defaultValue="settings" className="w-full">
-          <TabsList className="w-full grid grid-cols-4 h-8 p-0.5 bg-surface-2 border border-border-subtle rounded-lg">
+          <TabsList className="w-full grid grid-cols-5 h-8 p-0.5 bg-surface-2 border border-border-subtle rounded-lg">
             <TabsTrigger value="settings" className="text-[11px] font-medium gap-1 px-1 transition-all">
               <Settings2 className="size-3" />
               <span className="hidden sm:inline">Settings</span>
+            </TabsTrigger>
+            <TabsTrigger value="models" className="text-[11px] font-medium gap-1 px-1 transition-all">
+              <Cpu className="size-3 text-primary" />
+              <span className="hidden sm:inline">Models</span>
             </TabsTrigger>
             <TabsTrigger value="tools" className="text-[11px] font-medium gap-1 px-1 transition-all">
               <Wrench className="size-3" />
@@ -95,6 +100,10 @@ export function ConfigurationPanel({ agent: propAgent, onUpdateAgent }: Configur
 
           <TabsContent value="settings">
             <SettingTab onSave={onUpdateAgent} />
+          </TabsContent>
+
+          <TabsContent value="models">
+            <ModelsTab />
           </TabsContent>
 
           <TabsContent value="tools">

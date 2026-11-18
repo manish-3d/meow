@@ -7,6 +7,8 @@ import { eq, and } from "drizzle-orm";
 import { streamText, isStepCount, tool } from "ai";
 import { z } from "zod";
 import { defaultGeminiModel } from "@/lib/ai/gemini";
+import { getLanguageModel } from "@/lib/ai/model-factory";
+import { getModelById, EFFORT_CONFIG, ReasoningEffort } from "@/lib/ai/models";
 import { composio, getActiveUserConnections } from "@/lib/composio/client";
 import { runPlaywrightBrowserTask } from "@/lib/browser/client";
 
@@ -20,11 +22,28 @@ export async function POST(req: NextRequest) {
   const userEmail = session.user.email;
 
   try {
-    const { agentId, messages, message, timezone } = await req.json();
+    const { agentId, messages, message, timezone, modelId, customApiKey, effort } = await req.json();
     const userTimezone = timezone || "UTC";
+    const activeModelId = modelId || "gemini-2.5-flash";
+    const reasoningEffort: ReasoningEffort = effort || "medium";
 
     if (!agentId) {
       return NextResponse.json({ error: "agentId is required" }, { status: 400 });
+    }
+
+    // 0. Resolve language model instance based on user selection & keys
+    let selectedModelInstance;
+    try {
+      selectedModelInstance = getLanguageModel({
+        modelId: activeModelId,
+        apiKey: customApiKey,
+        effort: reasoningEffort,
+      });
+    } catch (modelErr: any) {
+      return NextResponse.json(
+        { error: modelErr.message || "Model initialization failed." },
+        { status: 400 }
+      );
     }
 
     // 1. Fetch agent configuration to extract instructions and persona
@@ -220,6 +239,10 @@ Respond with a JSON block of type "routine":
 3. For all other standard conversational questions, immediate tool actions (e.g. "summarize my emails right now"), or general help:
 Respond directly with clear, concise markdown text.`;
 
+    // 5b. Append reasoning effort instructions to system prompt
+    const effortConfig = EFFORT_CONFIG[reasoningEffort] || EFFORT_CONFIG.medium;
+    const fullSystemPrompt = `${systemPrompt}\n\n### Reasoning & Workload Intensity (${effortConfig.label}):\n${effortConfig.instruction}`;
+
     // Persist incoming user message to chat history
     const lastUserMessage = chatMessages.filter((m) => m.role === "user").pop();
     if (lastUserMessage?.content) {
@@ -235,11 +258,11 @@ Respond directly with clear, concise markdown text.`;
       }
     }
 
-    // 6. Stream response using Vercel AI SDK + Google Gemini
+    // 6. Stream response using Vercel AI SDK + Resolved Language Model
     const hasTools = Object.keys(dynamicTools).length > 0;
     const result = streamText({
-      model: defaultGeminiModel,
-      system: systemPrompt,
+      model: selectedModelInstance,
+      system: fullSystemPrompt,
       messages: chatMessages,
       ...(hasTools && {
         tools: dynamicTools,
@@ -261,7 +284,10 @@ Respond directly with clear, concise markdown text.`;
       },
     });
 
-    return result.toTextStreamResponse();
+    const response = result.toTextStreamResponse();
+    response.headers.set("x-model-id", activeModelId);
+    response.headers.set("x-reasoning-effort", reasoningEffort);
+    return response;
   } catch (error: any) {
     console.error("Error in /api/agent/chat:", error);
     return NextResponse.json(

@@ -7,6 +7,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { AgentConfigType } from "@/types/agent";
 import { useAgentConfig } from "@/context/agent-config-context";
 import { AgentResponseView } from "./agent-response-view";
+import { useModelUsage } from "@/context/model-usage-context";
+import { ModelSelectorBar } from "@/components/custom/models/model-selector-bar";
+import { MissingKeyDialog } from "@/components/custom/models/missing-key-dialog";
+import { ModelDefinition } from "@/lib/ai/models";
 
 export interface ChatMessage {
   id: string;
@@ -32,8 +36,19 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     isActive: true,
   };
 
+  const {
+    selectedModel,
+    reasoningEffort,
+    apiKeys,
+    isKeyConfiguredForModel,
+    recordUsage,
+  } = useModelUsage();
+
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
+  const [missingKeyModalOpen, setMissingKeyModalOpen] = useState(false);
+  const [targetMissingModel, setTargetMissingModel] = useState<ModelDefinition>(selectedModel);
+  const [isKeyExhausted, setIsKeyExhausted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Initialize with agent welcome message
@@ -90,6 +105,14 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     const textToSend = (messageText || input).trim();
     if (!textToSend || isStreaming || propLoading) return;
 
+    // Check if the selected model requires an API key and user has not configured it
+    if (!selectedModel.isFree && !isKeyConfiguredForModel(selectedModel.id)) {
+      setTargetMissingModel(selectedModel);
+      setIsKeyExhausted(false);
+      setMissingKeyModalOpen(true);
+      return;
+    }
+
     const userMsgId = `user-${Date.now()}`;
     const userMessage: ChatMessage = {
       id: userMsgId,
@@ -115,12 +138,16 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
     onSendMessage?.(textToSend);
 
     try {
+      const customApiKey = apiKeys[selectedModel.provider] || "";
       const response = await fetch("/api/agent/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           agentId: agent.agentId,
           timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+          modelId: selectedModel.id,
+          customApiKey,
+          effort: reasoningEffort,
           messages: nextMessages.map((m) => ({
             role: m.role,
             content: m.content,
@@ -130,7 +157,30 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Server responded with ${response.status}`);
+        const errText = errorData.error || `Server responded with ${response.status}`;
+        const errLower = errText.toLowerCase();
+
+        // Handle Quota Exhaustion or Missing/Invalid Key errors
+        if (
+          response.status === 429 ||
+          errLower.includes("quota") ||
+          errLower.includes("credit") ||
+          errLower.includes("balance") ||
+          errLower.includes("rate limit")
+        ) {
+          setTargetMissingModel(selectedModel);
+          setIsKeyExhausted(true);
+          setMissingKeyModalOpen(true);
+        } else if (
+          response.status === 400 &&
+          (errLower.includes("api key") || errLower.includes("key required") || errLower.includes("unauthorized"))
+        ) {
+          setTargetMissingModel(selectedModel);
+          setIsKeyExhausted(false);
+          setMissingKeyModalOpen(true);
+        }
+
+        throw new Error(errText);
       }
 
       if (!response.body) {
@@ -157,6 +207,12 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
         );
       }
 
+      // Record token usage & billing stats
+      const promptChars = nextMessages.reduce((sum, m) => sum + (m.content?.length || 0), 0);
+      const promptEst = Math.max(1, Math.ceil(promptChars / 4));
+      const completionEst = Math.max(1, Math.ceil(accumulatedText.length / 4));
+      recordUsage(selectedModel.id, promptEst, completionEst);
+
       // Finalize streaming state
       setMessages((prev) =>
         prev.map((msg) =>
@@ -165,12 +221,25 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
       );
     } catch (err: any) {
       console.error("Chat streaming error:", err);
+      const errText = err.message || "Unknown error";
+      const errLower = errText.toLowerCase();
+
+      if (
+        errLower.includes("quota") ||
+        errLower.includes("credit") ||
+        errLower.includes("rate limit")
+      ) {
+        setTargetMissingModel(selectedModel);
+        setIsKeyExhausted(true);
+        setMissingKeyModalOpen(true);
+      }
+
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === agentMsgId
             ? {
                 ...msg,
-                content: `⚠️ Failed to get response from ${agent.name}: ${err.message || "Unknown error"}`,
+                content: `⚠️ Failed to get response from ${agent.name}: ${errText}`,
                 isStreaming: false,
               }
             : msg
@@ -229,22 +298,36 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
               <span className="text-sm font-bold text-foreground leading-tight">{agent.name}</span>
               <span className="size-2 rounded-full bg-emerald-500 animate-pulse" title="Agent Online" />
             </div>
-            <span className="text-[11px] text-muted-foreground">
-              Gemini 3 Flash • Composio Native Tools • Autonomous Mode
-            </span>
+            <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+              <span className="font-semibold text-foreground">{selectedModel.name}</span>
+              <span>•</span>
+              <span>Autonomous Mode</span>
+              {selectedModel.isFree ? (
+                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold border border-emerald-500/20">
+                  Free Default
+                </span>
+              ) : (
+                <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 font-semibold border border-sky-500/20">
+                  BYOK
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 px-2"
-          onClick={handleClearHistory}
-          title="Clear Conversation History"
-        >
-          <RefreshCw className="size-3" />
-          <span className="hidden sm:inline">Reset</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <ModelSelectorBar compact />
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 text-xs text-muted-foreground hover:text-foreground gap-1.5 px-2"
+            onClick={handleClearHistory}
+            title="Clear Conversation History"
+          >
+            <RefreshCw className="size-3" />
+            <span className="hidden sm:inline">Reset</span>
+          </Button>
+        </div>
       </div>
 
       {/* Messages Scroll Viewport */}
@@ -338,6 +421,11 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
           </div>
         </div>
 
+        {/* Model Bar (Model Selector Dropdown, Workload Effort, Model Usage & Billing Button) */}
+        <div className="flex items-center justify-between gap-2 flex-wrap pt-0.5">
+          <ModelSelectorBar />
+        </div>
+
         {/* Input Bar */}
         <div className="relative rounded-xl border border-border-subtle bg-surface-1 focus-within:border-foreground/30 focus-within:ring-2 focus-within:ring-ring/20 transition-all shadow-xs">
           <Textarea
@@ -370,6 +458,14 @@ export function ChatPanel({ agent: propAgent, onSendMessage, loading: propLoadin
           </Button>
         </div>
       </div>
+
+      {/* Missing Key or Quota Exhausted Dialog */}
+      <MissingKeyDialog
+        open={missingKeyModalOpen}
+        onOpenChange={setMissingKeyModalOpen}
+        targetModel={targetMissingModel}
+        isExhausted={isKeyExhausted}
+      />
     </div>
   );
 }
