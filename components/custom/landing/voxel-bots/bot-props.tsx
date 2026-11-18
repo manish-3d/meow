@@ -712,3 +712,136 @@ export function CreatorProps({ isHovered = false }: { isHovered?: boolean }) {
     </>
   );
 }
+
+// ==========================================
+// 6. WRITER PROPS
+// ==========================================
+export function WriterProps({ isHovered = false }: { isHovered?: boolean }) {
+  const floatingDocRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (floatingDocRef.current) {
+      floatingDocRef.current.position.y = 1.6 + Math.sin(t * 2) * 0.12;
+      floatingDocRef.current.rotation.y = Math.sin(t * 1.4) * 0.15;
+    }
+  });
+
+  return (
+    <>
+      {/* Tablet / Writing Pad in Paws */}
+      <group position={[0, 0.28, 0.48]} rotation={[0.4, 0, 0]}>
+        {/* Tablet Frame */}
+        <mesh castShadow>
+          <boxGeometry args={[0.54, 0.68, 0.04]} />
+          <meshStandardMaterial color="#27272a" roughness={0.6} />
+        </mesh>
+        {/* Screen / Document Surface */}
+        <mesh position={[0, -0.01, 0.025]}>
+          <boxGeometry args={[0.46, 0.58, 0.01]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.8} />
+        </mesh>
+        {/* Green Accent Header / Bookmark Tab */}
+        <mesh position={[0, 0.24, 0.032]}>
+          <boxGeometry args={[0.46, 0.08, 0.01]} />
+          <meshStandardMaterial color="#22c55e" roughness={0.6} />
+        </mesh>
+        {/* Text Lines */}
+        <mesh position={[0, 0.1, 0.032]}>
+          <boxGeometry args={[0.36, 0.02, 0.005]} />
+          <meshStandardMaterial color="#71717a" roughness={0.8} />
+        </mesh>
+        <mesh position={[0, 0.0, 0.032]}>
+          <boxGeometry args={[0.34, 0.02, 0.005]} />
+          <meshStandardMaterial color="#71717a" roughness={0.8} />
+        </mesh>
+        <mesh position={[0, -0.1, 0.032]}>
+          <boxGeometry args={[0.3, 0.02, 0.005]} />
+          <meshStandardMaterial color="#71717a" roughness={0.8} />
+        </mesh>
+      </group>
+
+      {/* Floating Document Sheet */}
+      <group ref={floatingDocRef} position={[0.8, 1.55, 0.3]} rotation={[0, -0.2, 0.1]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.34, 0.44, 0.015]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.9} />
+        </mesh>
+        {/* Top green bookmark tag */}
+        <mesh position={[0.1, 0.2, 0.01]}>
+          <boxGeometry args={[0.08, 0.08, 0.01]} />
+          <meshBasicMaterial color="#22c55e" />
+        </mesh>
+        {/* Text lines */}
+        <mesh position={[0, 0.06, 0.01]}>
+          <boxGeometry args={[0.24, 0.02, 0.005]} />
+          <meshStandardMaterial color="#a1a1aa" roughness={0.9} />
+        </mesh>
+        <mesh position={[0, -0.04, 0.01]}>
+          <boxGeometry args={[0.22, 0.02, 0.005]} />
+          <meshStandardMaterial color="#a1a1aa" roughness={0.9} />
+        </mesh>
+      </group>
+    </>
+  );
+}
+
+// ==========================================
+// 7. AUTOMATOR PROPS
+// ==========================================
+export function AutomatorProps({ isHovered = false }: { isHovered?: boolean }) {
+  const lightningCubeRef = useRef<THREE.Group>(null);
+
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    if (lightningCubeRef.current) {
+      lightningCubeRef.current.position.y = 1.65 + Math.sin(t * 2.5) * 0.12;
+      lightningCubeRef.current.rotation.y = t * 1.6;
+      lightningCubeRef.current.rotation.z = Math.sin(t * 1.5) * 0.2;
+    }
+  });
+
+  return (
+    <>
+      {/* Tuxedo Bowtie on Cat Collar */}
+      <group position={[0, 0.52, 0.42]}>
+        <mesh>
+          <boxGeometry args={[0.16, 0.08, 0.04]} />
+          <meshStandardMaterial color="#18181b" roughness={0.5} />
+        </mesh>
+        <mesh position={[-0.1, 0, 0]}>
+          <coneGeometry args={[0.06, 0.08, 3]} />
+          <meshStandardMaterial color="#18181b" roughness={0.5} />
+        </mesh>
+        <mesh position={[0.1, 0, 0]} rotation={[0, 0, Math.PI]}>
+          <coneGeometry args={[0.06, 0.08, 3]} />
+          <meshStandardMaterial color="#18181b" roughness={0.5} />
+        </mesh>
+      </group>
+
+      {/* Floating Yellow Power / Lightning Cube beside Cat's ear */}
+      <group ref={lightningCubeRef} position={[0.78, 1.65, 0.35]}>
+        <mesh castShadow>
+          <boxGeometry args={[0.38, 0.38, 0.38]} />
+          <meshStandardMaterial
+            color="#facc15"
+            emissive="#eab308"
+            emissiveIntensity={isHovered ? 1.6 : 1.0}
+            roughness={0.3}
+          />
+        </mesh>
+        {/* Wireframe bevel */}
+        <mesh>
+          <boxGeometry args={[0.39, 0.39, 0.39]} />
+          <meshBasicMaterial color="#ffffff" wireframe />
+        </mesh>
+        {/* Yellow point light */}
+        <pointLight
+          color="#facc15"
+          intensity={isHovered ? 2.5 : 1.4}
+          distance={3}
+        />
+      </group>
+    </>
+  );
+}

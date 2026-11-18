@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { motion } from "motion/react";
 import { 
-  ChevronDown, 
   ChevronLeft, 
   ChevronRight,
   Sparkles
@@ -16,7 +15,7 @@ const VoxelBotsCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[360px] sm:h-[400px] lg:h-[440px] flex flex-col items-center justify-center bg-neutral-50/50 rounded-3xl border border-black/5 animate-pulse">
+      <div className="w-full h-[400px] sm:h-[460px] lg:h-[500px] flex flex-col items-center justify-center bg-neutral-50/50 rounded-3xl border border-black/5 animate-pulse">
         <div className="flex items-center gap-2 text-neutral-400 font-mono text-xs">
           <Sparkles className="size-4 animate-spin text-lime-500" />
           <span>Generating procedural 3D voxel islands...</span>
@@ -26,7 +25,7 @@ const VoxelBotsCanvas = dynamic(
   }
 );
 
-const BOT_NAMES = ["Researcher", "Browser", "Builder", "Operator", "Creator"];
+const BOT_NAMES = ["Browser", "Researcher", "Builder", "Writer", "Automator"];
 
 export function MinecraftBotsSection() {
   const [activeIndex, setActiveIndex] = useState(2); // Builder is center active by default
@@ -41,7 +40,7 @@ export function MinecraftBotsSection() {
   };
 
   return (
-    <section id="bots" className="relative pt-10 pb-8 sm:pt-14 sm:pb-10 scroll-mt-20 bg-white text-[#131316] overflow-hidden">
+    <section id="bots" className="relative pt-10 pb-4 sm:pt-14 sm:pb-6 scroll-mt-20 bg-white text-[#131316] overflow-hidden">
       {/* Background Ambience */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_70%_50%_at_50%_15%,rgba(163,230,53,0.06),transparent_80%)]" />
 
@@ -80,15 +79,15 @@ export function MinecraftBotsSection() {
           Specialist AI agents each with their own computer, browser, and memory.
         </motion.p>
 
-        {/* --- 3D PROCEDURAL VOXEL SCENE (Pulled up to eliminate gap with heading) --- */}
+        {/* --- 3D PROCEDURAL VOXEL SCENE (Matching Reference Image Exactly) --- */}
         <motion.div
           initial={{ opacity: 0, scale: 0.98 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="relative w-full -mt-2 sm:-mt-4"
+          className="relative w-full mt-2 sm:mt-4"
         >
-          {/* Three.js Canvas with generous horizontal spacing & on-block Minecraft signs */}
+          {/* Three.js Canvas with the 5 islands: Browser, Researcher, Builder, Writer, Automator */}
           <VoxelBotsCanvas
             activeIndex={activeIndex}
             onSelectBot={setActiveIndex}
@@ -97,7 +96,7 @@ export function MinecraftBotsSection() {
           />
 
           {/* Mobile Quick Carousel Navigation (Hidden on Tablet & Desktop) */}
-          <div className="flex sm:hidden items-center justify-between w-full max-w-xs mx-auto -mt-4 px-4 relative z-10">
+          <div className="flex sm:hidden items-center justify-between w-full max-w-xs mx-auto -mt-6 px-4 relative z-10">
             <button
               onClick={handlePrev}
               type="button"
@@ -119,38 +118,6 @@ export function MinecraftBotsSection() {
             >
               <ChevronRight className="size-4" />
             </button>
-          </div>
-
-          {/* Bottom Dots Navigation & "SCROLL TO EXPLORE ∨" */}
-          <div className="mt-2 sm:mt-3 flex flex-col items-center gap-1.5">
-            {/* 5 Pagination Dots */}
-            <div className="flex items-center gap-2">
-              {BOT_NAMES.map((name, index) => {
-                const isActive = activeIndex === index;
-                return (
-                  <button
-                    key={name}
-                    onClick={() => setActiveIndex(index)}
-                    type="button"
-                    aria-label={`Select ${name}`}
-                    className={`size-2 rounded-full transition-all duration-300 cursor-pointer ${
-                      isActive
-                        ? "bg-[#84cc16] scale-125 ring-2 ring-lime-400/40"
-                        : "bg-neutral-300 hover:bg-neutral-400"
-                    }`}
-                  />
-                );
-              })}
-            </div>
-
-            {/* Scroll indicator button */}
-            <a
-              href="#computer-showcase"
-              className="inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-widest text-neutral-400 hover:text-neutral-800 transition-colors pt-1 group"
-            >
-              <span>scroll to explore</span>
-              <ChevronDown className="size-3 transition-transform group-hover:translate-y-0.5" />
-            </a>
           </div>
         </motion.div>
       </div>

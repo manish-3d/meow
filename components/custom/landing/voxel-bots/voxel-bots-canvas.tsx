@@ -6,13 +6,13 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { VoxelIsland } from "./voxel-island";
 import { VoxelCat } from "./voxel-cat";
 import {
+  BrowserProps,
   ResearcherProps,
   ResearcherGlasses,
-  BrowserProps,
   BuilderProps,
   BuilderHeadphones,
-  OperatorProps,
-  CreatorProps,
+  WriterProps,
+  AutomatorProps,
 } from "./bot-props";
 
 interface VoxelBotsCanvasProps {
@@ -22,7 +22,7 @@ interface VoxelBotsCanvasProps {
   onHoverBot: (index: number | null) => void;
 }
 
-// Generate a crystal-clear Minecraft-style block sign texture with anti-aliasing
+// Generate crisp Minecraft-style block sign texture matching reference image
 function useSignTexture(label: string, icon: string, isBuilder: boolean, isHighlighted: boolean) {
   return useMemo(() => {
     if (typeof document === "undefined") return null;
@@ -36,30 +36,30 @@ function useSignTexture(label: string, icon: string, isBuilder: boolean, isHighl
     ctx.clearRect(0, 0, 512, 128);
 
     // Pill block rounded rectangle
-    const r = 32;
+    const r = 36;
     ctx.beginPath();
-    ctx.roundRect(12, 12, 488, 104, r);
+    ctx.roundRect(10, 10, 492, 108, r);
 
     if (isBuilder) {
       ctx.fillStyle = "#bef264";
       ctx.fill();
-      ctx.lineWidth = 10;
+      ctx.lineWidth = 8;
       ctx.strokeStyle = "#84cc16";
       ctx.stroke();
     } else {
-      ctx.fillStyle = isHighlighted ? "#ffffff" : "#f8f8f8";
+      ctx.fillStyle = isHighlighted ? "#ffffff" : "#fbfbfb";
       ctx.fill();
-      ctx.lineWidth = 6;
-      ctx.strokeStyle = isHighlighted ? "rgba(0, 0, 0, 0.3)" : "rgba(0, 0, 0, 0.12)";
+      ctx.lineWidth = 5;
+      ctx.strokeStyle = isHighlighted ? "rgba(0, 0, 0, 0.28)" : "rgba(0, 0, 0, 0.15)";
       ctx.stroke();
     }
 
     // Text & Icon in Minecraft Monospace style
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `bold ${isBuilder ? "64px" : "60px"} monospace, system-ui, sans-serif`;
+    ctx.font = `bold ${isBuilder ? "54px" : "50px"} monospace, system-ui, sans-serif`;
     ctx.fillStyle = isBuilder ? "#09090b" : "#18181b";
-    ctx.fillText(`${icon}  ${label}`, 256, 64);
+    ctx.fillText(`${icon}  ${label}`, 256, 65);
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
@@ -151,8 +151,8 @@ function BotIslandAnchor({
       {children}
 
       {/* 3D Physical Voxel Sign Plate mounted directly on the front cliff face of the island block */}
-      <mesh position={[0, -0.34, 2.18]} castShadow receiveShadow>
-        <boxGeometry args={[2.55, 0.65, 0.08]} />
+      <mesh position={[0, -0.32, 2.18]} castShadow receiveShadow>
+        <boxGeometry args={[2.55, 0.64, 0.08]} />
         <meshStandardMaterial
           color={isBuilder ? "#bef264" : "#ffffff"}
           emissive={isBuilder ? "#a3e635" : "#000000"}
@@ -163,7 +163,7 @@ function BotIslandAnchor({
 
       {/* Minecraft-Style Sign Face mounted on the block */}
       {signTexture && (
-        <mesh position={[0, -0.34, 2.23]}>
+        <mesh position={[0, -0.32, 2.23]}>
           <planeGeometry args={[2.5, 0.62]} />
           <meshBasicMaterial
             map={signTexture}
@@ -174,7 +174,7 @@ function BotIslandAnchor({
       )}
 
       {/* Contact Shadow disc on bottom plane */}
-      <mesh position={[0, -2.8, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh position={[0, -2.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
         <circleGeometry args={[2.0 * scale, 32]} />
         <meshBasicMaterial
           color="#000000"
@@ -196,22 +196,22 @@ function ResponsiveCameraController({ activeIndex }: { activeIndex: number }) {
 
     if (isMobile) {
       // On mobile, focus camera on the active bot's X coordinate
-      const botXPositions = [-11.2, -5.6, 0, 5.6, 11.2];
+      const botXPositions = [-9.6, -4.8, 0, 4.8, 9.6];
       const targetX = botXPositions[activeIndex] || 0;
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, targetX, 0.08);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.6, 0.08);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.4, 0.08);
       camera.position.z = THREE.MathUtils.lerp(camera.position.z, 14.0, 0.08);
-      camera.lookAt(targetX, 0.8, 0);
+      camera.lookAt(targetX, 0.5, 0);
     } else if (isTablet) {
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.08);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 4.4, 0.08);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 23.0, 0.08);
-      camera.lookAt(0, 0.8, 0);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 4.0, 0.08);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 22.0, 0.08);
+      camera.lookAt(0, 0.5, 0);
     } else {
       camera.position.x = THREE.MathUtils.lerp(camera.position.x, 0, 0.08);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 4.2, 0.08);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 21.0, 0.08);
-      camera.lookAt(0, 0.85, 0);
+      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.8, 0.08);
+      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 20.2, 0.08);
+      camera.lookAt(0, 0.55, 0);
     }
   });
 
@@ -225,10 +225,10 @@ export function VoxelBotsCanvas({
   onHoverBot,
 }: VoxelBotsCanvasProps) {
   return (
-    <div className="relative w-full h-[360px] sm:h-[400px] lg:h-[440px] select-none">
+    <div className="relative w-full h-[400px] sm:h-[460px] lg:h-[500px] select-none">
       <Canvas
         shadows
-        camera={{ position: [0, 4.2, 21.0], fov: 38 }}
+        camera={{ position: [0, 3.8, 20.2], fov: 36 }}
         gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
         className="w-full h-full cursor-grab active:cursor-grabbing"
       >
@@ -258,7 +258,7 @@ export function VoxelBotsCanvas({
         <directionalLight position={[-16, 12, -8]} intensity={0.7} color="#d9f99d" />
         <directionalLight position={[0, -10, 10]} intensity={0.3} color="#ffffff" />
 
-        {/* --- FLOOR GRID PLANE (Soft grid as seen in Reference Image 1) --- */}
+        {/* --- FLOOR GRID PLANE (Soft grid as seen in Reference Image) --- */}
         <group position={[0, -2.6, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <gridHelper
             args={[44, 44, 0xe4e4e7, 0xf4f4f5]}
@@ -267,48 +267,48 @@ export function VoxelBotsCanvas({
           />
         </group>
 
-        {/* --- 1. RESEARCHER ISLAND (Far Left, Generously Spaced) --- */}
+        {/* --- 1. BROWSER ISLAND (Far Left: x = -9.6) --- */}
         <BotIslandAnchor
           index={0}
-          basePosition={[-11.2, 0.15, -0.8]}
-          scale={0.76}
-          label="Researcher"
-          icon="🔍"
+          basePosition={[-9.6, 0.05, -0.4]}
+          scale={0.78}
+          label="Browser"
+          icon="🌐"
           isSelected={activeIndex === 0}
           isHovered={hoveredIndex === 0}
           onSelect={() => onSelectBot(0)}
           onHover={(h) => onHoverBot(h ? 0 : null)}
         >
-          <VoxelCat
-            isHovered={hoveredIndex === 0 || activeIndex === 0}
-            customHeadGear={<ResearcherGlasses />}
-          >
-            <ResearcherProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
+          <VoxelCat isHovered={hoveredIndex === 0 || activeIndex === 0}>
+            <BrowserProps isHovered={hoveredIndex === 0 || activeIndex === 0} />
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 2. BROWSER ISLAND (Mid Left) --- */}
+        {/* --- 2. RESEARCHER ISLAND (Mid Left: x = -4.8) --- */}
         <BotIslandAnchor
           index={1}
-          basePosition={[-5.6, 0.4, 0.1]}
+          basePosition={[-4.8, 0.25, 0.0]}
           scale={0.78}
-          label="Browser"
-          icon="🌐"
+          label="Researcher"
+          icon="🔍"
           isSelected={activeIndex === 1}
           isHovered={hoveredIndex === 1}
           onSelect={() => onSelectBot(1)}
           onHover={(h) => onHoverBot(h ? 1 : null)}
         >
-          <VoxelCat isHovered={hoveredIndex === 1 || activeIndex === 1}>
-            <BrowserProps isHovered={hoveredIndex === 1 || activeIndex === 1} />
+          <VoxelCat
+            isHovered={hoveredIndex === 1 || activeIndex === 1}
+            customHeadGear={<ResearcherGlasses />}
+          >
+            <ResearcherProps isHovered={hoveredIndex === 1 || activeIndex === 1} />
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 3. BUILDER ISLAND (Centerpiece, Elevated, 0.95x Scale) --- */}
+        {/* --- 3. BUILDER ISLAND (Centerpiece Elevated: x = 0, y = 0.70, scale = 0.96) --- */}
         <BotIslandAnchor
           index={2}
-          basePosition={[0, 0.75, 0.8]}
-          scale={0.95}
+          basePosition={[0, 0.70, 0.6]}
+          scale={0.96}
           label="Builder"
           icon="</>"
           isBuilder
@@ -325,37 +325,37 @@ export function VoxelBotsCanvas({
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 4. OPERATOR ISLAND (Mid Right) --- */}
+        {/* --- 4. WRITER ISLAND (Mid Right: x = 4.8) --- */}
         <BotIslandAnchor
           index={3}
-          basePosition={[5.6, 0.4, 0.1]}
+          basePosition={[4.8, 0.25, 0.0]}
           scale={0.78}
-          label="Operator"
-          icon="📅"
+          label="Writer"
+          icon="📄"
           isSelected={activeIndex === 3}
           isHovered={hoveredIndex === 3}
           onSelect={() => onSelectBot(3)}
           onHover={(h) => onHoverBot(h ? 3 : null)}
         >
           <VoxelCat isHovered={hoveredIndex === 3 || activeIndex === 3}>
-            <OperatorProps isHovered={hoveredIndex === 3 || activeIndex === 3} />
+            <WriterProps isHovered={hoveredIndex === 3 || activeIndex === 3} />
           </VoxelCat>
         </BotIslandAnchor>
 
-        {/* --- 5. CREATOR ISLAND (Far Right, Generously Spaced) --- */}
+        {/* --- 5. AUTOMATOR ISLAND (Far Right: x = 9.6) --- */}
         <BotIslandAnchor
           index={4}
-          basePosition={[11.2, 0.15, -0.8]}
-          scale={0.76}
-          label="Creator"
-          icon="✨"
+          basePosition={[9.6, 0.05, -0.4]}
+          scale={0.78}
+          label="Automator"
+          icon="⚡"
           isSelected={activeIndex === 4}
           isHovered={hoveredIndex === 4}
           onSelect={() => onSelectBot(4)}
           onHover={(h) => onHoverBot(h ? 4 : null)}
         >
           <VoxelCat isHovered={hoveredIndex === 4 || activeIndex === 4}>
-            <CreatorProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
+            <AutomatorProps isHovered={hoveredIndex === 4 || activeIndex === 4} />
           </VoxelCat>
         </BotIslandAnchor>
       </Canvas>
