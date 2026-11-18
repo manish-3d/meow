@@ -171,3 +171,59 @@
 .animate-marquee:hover {
   animation-play-state: paused;
 }
+
+/* Living Pixel River Animations */
+@keyframes riverBob {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pawWave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-22deg); }
+}
+
+@keyframes driftCloud {
+  0% { transform: translateX(0vw); }
+  100% { transform: translateX(110vw); }
+}
+
+@keyframes shimmerSparkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50% { opacity: 0.95; transform: scale(1.3); }
+}
+
+@keyframes floatZzz {
+  0% { opacity: 0; transform: translate(0, 0) scale(0.6); }
+  40% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(8px, -14px) scale(1.1); }
+}
+
+@keyframes rippleExpand {
+  0% { transform: scale(0.3); opacity: 0.85; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@keyframes splashDropLeft {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  50% { transform: translate(-8px, -12px) scale(1); opacity: 0.9; }
+  100% { transform: translate(-14px, 4px) scale(0.5); opacity: 0; }
+}
+
+@keyframes splashDropCenter {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  50% { transform: translate(0, -18px) scale(1.2); opacity: 1; }
+  100% { transform: translate(0, 6px) scale(0.6); opacity: 0; }
+}
+
+@keyframes splashDropRight {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  50% { transform: translate(8px, -12px) scale(1); opacity: 0.9; }
+  100% { transform: translate(14px, 4px) scale(0.5); opacity: 0; }
+}
+
+@keyframes splashDropFarRight {
+  0% { transform: translate(0, 0) scale(0.3); opacity: 1; }
+  50% { transform: translate(12px, -8px) scale(0.9); opacity: 0.8; }
+  100% { transform: translate(18px, 6px) scale(0.4); opacity: 0; }
+}

@@ -2,33 +2,20 @@
 
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { CharacterFaceFollow } from "./character-face-follow";
 import { ChatGptLogo, ClaudeLogo, GeminiLogo, GrokLogo } from "./brand-logos";
+import { PixelRiverBackground } from "./pixel-river/pixel-river-background";
 
 export function HeroSection() {
   return (
-    <section className="relative isolate min-h-[92vh] sm:min-h-screen flex flex-col justify-center pt-24 pb-14 sm:pt-28 sm:pb-16 text-[#131316] overflow-hidden">
-      {/* Minecraft River & Landscape Background Image */}
-      <div 
-        className="pointer-events-none absolute inset-0 z-0 select-none bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: "url('/hero-minecraft-bg.jpg')" }}
-      >
-        <Image
-          src="/hero-minecraft-bg.jpg"
-          alt="Meow Bot Minecraft World"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center"
-        />
-        {/* Soft bottom edge transition to next section */}
-        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white via-white/50 to-transparent" />
-      </div>
+    <PixelRiverBackground>
+      <section className="relative pt-28 pb-14 sm:pt-36 sm:pb-20 text-[#131316] overflow-hidden">
+        {/* Background Subtle Ambience */}
+        <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(124,92,252,0.06),transparent_80%)]" />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center relative z-10">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center">
         {/* H1 Headline: "meet [CharacterFaceFollow] meow bot" */}
         <motion.h1
           initial={{ opacity: 0, y: 14 }}
@@ -57,7 +44,7 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.25 }}
-          className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-2.5 rounded-full bg-white/95 backdrop-blur-xs border border-neutral-200/90 shadow-2xs"
+          className="mt-6 inline-flex flex-wrap items-center justify-center gap-4 sm:gap-6 px-6 py-2.5 rounded-full bg-neutral-50/90 border border-neutral-200/90 shadow-2xs"
         >
           <div className="inline-flex items-center gap-2">
             <ChatGptLogo size={18} />
@@ -96,7 +83,7 @@ export function HeroSection() {
 
           <a
             href="#bots"
-            className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white/95 backdrop-blur-xs px-7 py-3.5 text-xs font-mono font-semibold uppercase tracking-wider text-neutral-800 hover:bg-neutral-50 transition-all active:scale-95 shadow-2xs"
+            className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white px-7 py-3.5 text-xs font-mono font-semibold uppercase tracking-wider text-neutral-800 hover:bg-neutral-50 transition-all active:scale-95 shadow-2xs"
           >
             <span>explore the bots</span>
           </a>
@@ -113,5 +100,6 @@ export function HeroSection() {
         </motion.p>
       </div>
     </section>
+    </PixelRiverBackground>
   );
 }
