@@ -2,6 +2,7 @@ import React from "react";
 import { LandingNavbar } from "@/components/custom/landing/landing-navbar";
 import { HeroSection } from "@/components/custom/landing/hero-section";
 import { MinecraftBotsSection } from "@/components/custom/landing/minecraft-bots-section";
+import { StageSimulationSection } from "@/components/custom/landing/stage-simulation/stage-simulation-section";
 import { IntegrationsCarousel } from "@/components/custom/landing/integrations-carousel";
 import { ComputerShowcase } from "@/components/custom/landing/computer-showcase";
 import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
@@ -24,7 +25,10 @@ export default function Home() {
         {/* 3. Different Bots. Different Superpowers. (Procedural 3D Minecraft Voxel Bots Section) */}
         <MinecraftBotsSection />
 
-        {/* 4. Cinematic 3D Lens Carousel: integration is simple (Connect with the AI models you already love) */}
+        {/* 4. Active Agent Stage-Show: Live Desktop & Multi-Agent Simulation */}
+        <StageSimulationSection />
+
+        {/* 5. Cinematic 3D Lens Carousel: integration is simple (Connect with the AI models you already love) */}
         <IntegrationsCarousel />
 
         {/* 5. Each bot gets its own computer (Live Cloud VM & Interactive Takeover) */}
