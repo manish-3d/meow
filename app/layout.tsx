@@ -1,11 +1,9 @@
-import { Figtree } from "next/font/google";
+import { figtree, instrumentSerif, playfair, plusJakarta } from "@/app/fonts";
 import { AuthProvider } from "@/components/session-provider";
 import { Toaster as BaseUiToaster } from "@/components/ui/toast";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import "./globals.css";
 import type { Metadata } from "next";
-
-const figtree = Figtree({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Meow Bot - AI Agent Platform",
@@ -24,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={figtree.className} style={{ margin: 0, padding: 0 }}>
+      <body
+        className={`${figtree.className} ${instrumentSerif.variable} ${playfair.variable} ${plusJakarta.variable}`}
+        style={{ margin: 0, padding: 0 }}
+      >
         <div data-vaul-drawer-wrapper="" className="min-h-screen bg-background">
           <AuthProvider>
             {children}

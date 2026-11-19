@@ -3,6 +3,7 @@
 import React, { useRef, useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Key, Sparkles, Cpu } from "lucide-react";
 import { useScroll, useSpring } from "motion/react";
+import { instrumentSerif, playfair, plusJakarta } from "@/app/fonts";
 import {
   ChatGptLogo,
   ClaudeLogo,
@@ -335,15 +336,15 @@ export function IntegrationsCarousel() {
       <div className="sticky top-0 h-screen w-full flex flex-col justify-between pt-24 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
         {/* ── 1. TOP HEADLINE & BRING-YOUR-OWN-AI BANNER ── */}
         <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-3 shadow-2xs">
+          <div className={`${plusJakarta.className} inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/95 border border-neutral-200/90 text-xs font-semibold text-neutral-800 mb-3.5 shadow-2xs`}>
             <Key className="size-3.5 text-neutral-800" />
             <span>bring the AI models you already pay for &middot; zero API markup</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-neutral-900 leading-none">
-            integration is simple.
+          <h2 className={`${instrumentSerif.className} text-5xl sm:text-7xl md:text-8xl font-normal tracking-tight text-neutral-900 leading-[0.96]`}>
+            integration is <span className="italic">simple.</span>
           </h2>
-          <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-neutral-500 font-normal">
+          <p className={`${plusJakarta.className} mt-3 sm:mt-4 text-sm sm:text-base text-neutral-600 font-medium tracking-tight`}>
             connect with the AI models you already love. swap models per bot anytime.
           </p>
         </div>
@@ -356,7 +357,7 @@ export function IntegrationsCarousel() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative w-full h-[400px] sm:h-[450px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
+          className="relative w-full h-[420px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
           style={{
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
@@ -366,7 +367,7 @@ export function IntegrationsCarousel() {
           <div className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center">
             <svg
               className="w-full h-full"
-              viewBox="0 0 1440 450"
+              viewBox="0 0 1440 470"
               preserveAspectRatio="none"
               fill="none"
             >
@@ -388,13 +389,13 @@ export function IntegrationsCarousel() {
 
               {/* Frosted Glass Lens Channel Body */}
               <path
-                d="M -40 46 Q 720 120 1480 46 L 1480 404 Q 720 330 -40 404 Z"
+                d="M -40 36 Q 720 96 1480 36 L 1480 424 Q 720 376 -40 424 Z"
                 fill="url(#lensChannelFill)"
               />
 
               {/* Upper Glassy Lens Rail - Outer Bevel */}
               <path
-                d="M -40 46 Q 720 120 1480 46"
+                d="M -40 36 Q 720 96 1480 36"
                 stroke="url(#lensRailGlow)"
                 strokeWidth="4.5"
                 fill="none"
@@ -402,7 +403,7 @@ export function IntegrationsCarousel() {
               />
               {/* Upper Glassy Lens Rail - Inner Highlight */}
               <path
-                d="M -40 54 Q 720 128 1480 54"
+                d="M -40 44 Q 720 104 1480 44"
                 stroke="#ffffff"
                 strokeWidth="2"
                 fill="none"
@@ -411,7 +412,7 @@ export function IntegrationsCarousel() {
 
               {/* Lower Glassy Lens Rail - Outer Bevel */}
               <path
-                d="M -40 404 Q 720 330 1480 404"
+                d="M -40 424 Q 720 376 1480 424"
                 stroke="url(#lensRailGlow)"
                 strokeWidth="4.5"
                 fill="none"
@@ -419,7 +420,7 @@ export function IntegrationsCarousel() {
               />
               {/* Lower Glassy Lens Rail - Inner Highlight */}
               <path
-                d="M -40 396 Q 720 322 1480 396"
+                d="M -40 416 Q 720 368 1480 416"
                 stroke="#ffffff"
                 strokeWidth="2"
                 fill="none"
@@ -461,7 +462,7 @@ export function IntegrationsCarousel() {
               const rotY = -Math.sign(u) * Math.min(30, Math.pow(absU, 1.1) * 26);
 
               // 4. Fisheye vertical arc curve
-              const yOffset = 18 * (u * u);
+              const yOffset = 14 * (u * u) - 10;
 
               // 5. NO BLUR: filter is strictly "none" as requested!
               // Opacity gently fades out only near the outer margins
@@ -501,10 +502,10 @@ export function IntegrationsCarousel() {
                   {/* Clean Brand Typography Below Logo */}
                   <div className="mt-4 text-center px-2">
                     <h3
-                      className={`font-sans tracking-tight transition-all duration-200 ${
+                      className={`${plusJakarta.className} tracking-tight transition-all duration-200 ${
                         isCenterActive
-                          ? "font-bold text-xl sm:text-2xl text-neutral-900"
-                          : "font-semibold text-base sm:text-lg text-neutral-600"
+                          ? "font-bold text-2xl sm:text-3xl text-neutral-900"
+                          : "font-semibold text-base sm:text-lg text-neutral-500"
                       }`}
                     >
                       {brand.name}
@@ -512,16 +513,16 @@ export function IntegrationsCarousel() {
 
                     {/* Active Center Model Badge Pill */}
                     {isCenterActive ? (
-                      <div className="mt-1 flex flex-col items-center gap-0.5 animate-fade-in">
+                      <div className={`${plusJakarta.className} mt-1.5 flex flex-col items-center gap-0.5 animate-fade-in`}>
                         <span className="font-mono text-[11px] font-semibold text-neutral-800 bg-neutral-100/95 px-2.5 py-0.5 rounded-full border border-neutral-300/60 shadow-2xs">
                           {brand.model}
                         </span>
-                        <span className="text-[10px] text-neutral-500 font-medium">
+                        <span className="text-[11px] text-neutral-500 font-medium">
                           {brand.company} &bull; {brand.tag}
                         </span>
                       </div>
                     ) : (
-                      <p className="text-xs text-neutral-400 font-normal mt-0.5">
+                      <p className={`${plusJakarta.className} text-xs text-neutral-400 font-normal mt-0.5`}>
                         {brand.company}
                       </p>
                     )}
@@ -533,9 +534,9 @@ export function IntegrationsCarousel() {
         </div>
 
         {/* ── 3. BOTTOM CONTROLS: MODEL STEP PILLS & ARROWS ── */}
-        <div className="shrink-0 flex flex-col items-center gap-3 z-10 px-4">
+        <div className={`shrink-0 flex flex-col items-center gap-3 z-10 px-4 ${plusJakarta.className}`}>
           {/* Interactive model dots/pills track */}
-          <div className="flex items-center gap-1.5 sm:gap-2 bg-neutral-100/90 p-1.5 rounded-full border border-neutral-200/80 shadow-2xs">
+          <div className="flex items-center gap-1.5 sm:gap-2 bg-neutral-100/95 p-1.5 rounded-full border border-neutral-200/90 shadow-2xs">
             {BRANDS.map((b, idx) => {
               const isSelected = idx === activeIntIndex;
               return (
