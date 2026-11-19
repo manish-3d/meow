@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { 
-  Plus, 
-  LayoutGrid, 
-  Bot, 
-  Store, 
+import {
+  Plus,
+  LayoutGrid,
+  Bot,
+  Store,
   ChevronRight,
   PanelLeftClose
 } from "lucide-react";
@@ -65,22 +65,22 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
 
         {/* ── 3. INTERACTIVE NAVIGATION LINKS ── */}
         <div className="space-y-1 pt-1">
-          {/* Workspace (Active state with soft green background and vertical green indicator bar on left) */}
-          <div className="relative flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-50/80 text-neutral-900 font-semibold text-xs border border-emerald-200/60 cursor-pointer shadow-2xs">
-            <div className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-emerald-500" />
+          {/* Workspace (Active state with light green background and vertical indicator bar) */}
+          <div className="relative flex items-center justify-between px-3 py-2 rounded-xl bg-[#f7fee7] text-neutral-900 font-semibold text-xs border border-[#d9f99d] cursor-pointer shadow-2xs">
+            <div className="absolute left-0 top-1.5 bottom-1.5 w-1 rounded-r-full bg-[#84cc16]" />
             <div className="flex items-center gap-2.5">
               <LayoutGrid className="size-3.5 text-neutral-800" />
               <span>Workspace</span>
             </div>
           </div>
 
-          {/* Agents (with green pill badge 3) */}
+          {/* Agents (with light green pill badge 3) */}
           <div className="flex items-center justify-between px-3 py-2 rounded-xl text-neutral-700 hover:bg-neutral-100/70 text-xs font-medium cursor-pointer transition-colors">
             <div className="flex items-center gap-2.5">
               <Bot className="size-3.5 text-neutral-500" />
               <span>Agents</span>
             </div>
-            <span className="text-[10px] font-mono font-bold bg-emerald-100/90 text-emerald-800 px-1.5 py-0.2 rounded-full border border-emerald-200">
+            <span className="text-[10px] font-mono font-bold bg-[#f7fee7] text-[#65a30d] px-1.5 py-0.2 rounded-full border border-[#d9f99d]">
               3
             </span>
           </div>
@@ -108,11 +108,10 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
                 <div
                   key={agent.id}
                   onClick={() => onSelectBot?.(agent.id)}
-                  className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs cursor-pointer transition-all ${
-                    isActive
-                      ? "bg-neutral-100/80 text-neutral-900 font-semibold"
-                      : "text-neutral-700 hover:bg-neutral-100/50 font-normal"
-                  }`}
+                  className={`flex items-center justify-between px-2.5 py-1.5 rounded-xl text-xs cursor-pointer transition-all ${isActive
+                    ? "bg-neutral-100/80 text-neutral-900 font-semibold"
+                    : "text-neutral-700 hover:bg-neutral-100/50 font-normal"
+                    }`}
                 >
                   <div className="flex items-center gap-2 truncate">
                     {/* Voxel Cat Face Avatar */}
@@ -122,7 +121,7 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
                     <span className="truncate">{agent.name}</span>
                   </div>
 
-                  <span className="size-1.5 rounded-full bg-emerald-500 shrink-0" />
+                  <span className="size-1.5 rounded-full bg-[#84cc16] shrink-0" />
                 </div>
               );
             })}
@@ -139,14 +138,14 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
               <GrassBlockIcon />
               <span className="font-bold text-neutral-900 text-[11px]">World Status</span>
             </div>
-            <span className="flex items-center gap-1 text-[10px] text-emerald-700 font-bold">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="flex items-center gap-1 text-[10px] text-[#65a30d] font-bold">
+              <span className="size-1.5 rounded-full bg-[#84cc16] animate-pulse" />
               <span>Online</span>
             </span>
           </div>
           <p className="text-[9.5px] text-neutral-500 leading-none">Workspace environment active</p>
           <div className="w-full h-1.5 rounded-full bg-neutral-200 overflow-hidden">
-            <div className="h-full rounded-full bg-emerald-500 w-full" />
+            <div className="h-full rounded-full bg-[#84cc16] w-full" />
           </div>
         </div>
 
@@ -160,7 +159,7 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
             <span className="text-[9px] font-mono text-neutral-500">12,430 / 25,000</span>
           </div>
           <div className="w-full h-1.5 rounded-full bg-neutral-200 overflow-hidden">
-            <div className="h-full rounded-full bg-emerald-500 w-1/2" />
+            <div className="h-full rounded-full bg-[#84cc16] w-1/2" />
           </div>
           <p className="text-[9.5px] text-neutral-400 font-mono">50% used</p>
         </div>

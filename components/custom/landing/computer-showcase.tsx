@@ -38,8 +38,8 @@ export function ComputerShowcase() {
               </div>
               <span className="font-mono text-xs font-semibold text-neutral-800 flex items-center gap-2">
                 <span>milo's computer</span>
-                <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] text-emerald-600 font-normal uppercase bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                <span className="size-2 rounded-full bg-[#84cc16] animate-pulse" />
+                <span className="text-[10px] text-[#65a30d] font-normal uppercase bg-[#f7fee7] px-1.5 py-0.5 rounded border border-[#d9f99d]">
                   live stream
                 </span>
               </span>
@@ -69,7 +69,7 @@ export function ComputerShowcase() {
             </div>
 
             <div className="flex-1 flex items-center gap-2 bg-white rounded-lg px-3 py-1 border border-black/8 font-mono text-[11px] text-neutral-700">
-              <Lock className="size-3 text-emerald-600" />
+              <Lock className="size-3 text-[#84cc16]" />
               <span>https://www.kayak.com/flights/SFO-NYC/2026-11-20</span>
             </div>
           </div>
@@ -87,13 +87,13 @@ export function ComputerShowcase() {
                     Friday, Nov 20 • Nonstop • 1 passenger (Aisle seat requested)
                   </p>
                 </div>
-                <span className="font-mono text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                <span className="font-mono text-xs font-bold text-[#65a30d] bg-[#f7fee7] px-2.5 py-1 rounded-lg border border-[#d9f99d]">
                   Best fare found
                 </span>
               </div>
 
               {/* Flight Result 1 */}
-              <div className="p-4 rounded-2xl border-2 border-emerald-500/50 bg-emerald-500/[0.03] flex items-center justify-between">
+              <div className="p-4 rounded-2xl border-2 border-[#84cc16]/40 bg-[#84cc16]/[0.04] flex items-center justify-between">
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-sm text-neutral-900">United Airlines 412</span>
@@ -105,7 +105,7 @@ export function ComputerShowcase() {
                 </div>
                 <div className="text-right">
                   <span className="text-lg font-bold font-mono text-neutral-900">$348</span>
-                  <span className="block text-[10px] text-emerald-600 font-mono">Held for 24h</span>
+                  <span className="block text-[10px] text-[#65a30d] font-mono">Held for 24h</span>
                 </div>
               </div>
 

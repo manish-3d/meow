@@ -68,12 +68,12 @@ export function Connecting3DCables({ active }: Connecting3DCablesProps) {
 
       {/* Cable 2 */}
       <mesh geometry={tubeGeo2}>
-        <meshBasicMaterial color="#6e9e35" transparent opacity={0.6} />
+        <meshBasicMaterial color="#a3e635" transparent opacity={0.6} />
       </mesh>
       {/* Pulse 2 */}
       <mesh ref={pulse2Ref}>
         <sphereGeometry args={[0.1, 12, 12]} />
-        <meshBasicMaterial color="#84cc16" />
+        <meshBasicMaterial color="#bef264" />
       </mesh>
     </group>
   );

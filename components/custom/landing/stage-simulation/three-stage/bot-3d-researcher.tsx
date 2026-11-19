@@ -22,7 +22,7 @@ function useMonitorTexture() {
     ctx.font = "bold 34px monospace, sans-serif";
     ctx.fillStyle = "#38bdf8";
     ctx.fillText("Browsing", 32, 70);
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#a3e635";
     ctx.fillText("AI trends >", 32, 115);
 
     // Scrolling data bars
@@ -33,7 +33,7 @@ function useMonitorTexture() {
 
     ctx.fillStyle = "#38bdf8";
     ctx.fillRect(32, 140, 260, 14);
-    ctx.fillStyle = "#4ade80";
+    ctx.fillStyle = "#bef264";
     ctx.fillRect(32, 168, 190, 14);
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -109,7 +109,7 @@ export function Bot3DResearcher({ isHovered = false }: { isHovered?: boolean }) 
       {/* Grass top plate */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[3.8, 0.4, 3.8]} />
-        <meshStandardMaterial color="#6ebb2f" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
       {/* Stepped dirt layer 1 */}
@@ -133,25 +133,25 @@ export function Bot3DResearcher({ isHovered = false }: { isHovered?: boolean }) 
       {/* Hanging Minecraft vines */}
       <mesh position={[-1.75, -0.35, 1.2]} castShadow>
         <boxGeometry args={[0.08, 0.55, 0.28]} />
-        <meshStandardMaterial color="#15803d" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
       <mesh position={[1.75, -0.4, -0.8]} castShadow>
         <boxGeometry args={[0.08, 0.65, 0.32]} />
-        <meshStandardMaterial color="#16a34a" roughness={0.7} />
+        <meshStandardMaterial color="#a3e635" roughness={0.7} />
       </mesh>
       <mesh position={[0.8, -0.38, 1.75]} castShadow>
         <boxGeometry args={[0.35, 0.5, 0.08]} />
-        <meshStandardMaterial color="#15803d" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
       {/* Tiny grass sprigs on top */}
       <mesh position={[-1.3, 0.28, 1.2]}>
         <boxGeometry args={[0.16, 0.2, 0.16]} />
-        <meshStandardMaterial color="#4d9419" />
+        <meshStandardMaterial color="#bef264" />
       </mesh>
       <mesh position={[1.4, 0.28, 1.1]}>
         <boxGeometry args={[0.18, 0.18, 0.18]} />
-        <meshStandardMaterial color="#4d9419" />
+        <meshStandardMaterial color="#bef264" />
       </mesh>
 
       {/* ── 2. VOXEL CALICO CAT WITH HEADPHONES ── */}

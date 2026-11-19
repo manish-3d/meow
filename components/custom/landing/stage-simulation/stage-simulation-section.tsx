@@ -132,8 +132,8 @@ export function StageSimulationSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         {/* ── 1. SECTION HEADER ── */}
         <div className="max-w-3xl mx-auto text-center mb-6 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ecefe8] border border-[#d5dfcc] text-xs font-mono font-medium text-[#6e9e35] mb-3.5 shadow-2xs">
-            <span className="size-2 rounded-full bg-[#6e9e35] animate-ping" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f7fee7] border border-[#d9f99d] text-xs font-mono font-medium text-[#65a30d] mb-3.5 shadow-2xs">
+            <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
             <span>three.js procedural 3d agent simulation &bull; gen-to-work 6-frame</span>
           </div>
 
@@ -149,7 +149,7 @@ export function StageSimulationSection() {
         <div className="relative w-full rounded-3xl border border-black/[0.1] bg-white shadow-2xl overflow-hidden flex flex-col">
           {/* Main App Body: Persistent Left Sidebar + The Simulation Workspace */}
           <div className="flex flex-col md:flex-row h-[630px] sm:h-[670px] w-full overflow-hidden relative">
-            {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup sage green #6e9e35) */}
+            {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup light green #84cc16) */}
             <StageLeftSidebar activeBotId={activeBotId} onSelectBot={setActiveBotId} />
 
             {/* 2. THE SIMULATION WORKSPACE (MainStage.tsx) */}
@@ -165,7 +165,7 @@ export function StageSimulationSection() {
                   <div className="flex items-center gap-1.5 px-2 py-0.8 rounded-md bg-white/90 border border-black/[0.06] shadow-2xs">
                     <Box className="size-3 text-neutral-700" />
                     <span>Simulation Workspace</span>
-                    <span className="size-1.5 rounded-full bg-[#6e9e35] animate-pulse ml-0.5" />
+                    <span className="size-1.5 rounded-full bg-[#84cc16] animate-pulse ml-0.5" />
                   </div>
                 </div>
 
@@ -186,7 +186,7 @@ export function StageSimulationSection() {
                   </div>
 
                   {/* Landscape User Avatar */}
-                  <div className="size-6 rounded-full bg-gradient-to-tr from-[#6e9e35] to-sky-500 border border-white shadow-xs" />
+                  <div className="size-6 rounded-full bg-gradient-to-tr from-[#84cc16] to-sky-400 border border-white shadow-xs" />
                 </div>
               </div>
 
@@ -272,7 +272,7 @@ export function StageSimulationSection() {
                       className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
                     >
                       <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-[#6e9e35] animate-ping" />
+                        <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
                         <span>Frame 5: Settle & Connect &bull; 3D Data Cables Synchronizing</span>
                       </div>
                     </motion.div>
@@ -281,7 +281,7 @@ export function StageSimulationSection() {
               </div>
 
               {/* ── FLAT GROUND GRASS BORDER STRIP (ACROSS VIEWPORT BOTTOM) ── */}
-              <div className="w-full h-2.5 bg-gradient-to-r from-[#6e9e35] via-[#84cc16] to-[#6e9e35] border-t border-[#5b842a] shrink-0 select-none pointer-events-none" />
+              <div className="w-full h-2 bg-gradient-to-r from-[#bef264] via-[#a3e635] to-[#84cc16] border-t border-[#a3e635]/30 shrink-0 select-none pointer-events-none" />
 
               {/* ── 3. BOTTOM TIMELINE SCRUBBER CONTROLLER ── */}
               <div className="w-full px-3.5 py-2 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono select-none">

@@ -17,7 +17,7 @@ export function Thanos3DParticles({ active }: Thanos3DParticlesProps) {
   // Generate particle physics attributes
   const particles = useMemo(() => {
     const data = [];
-    const colors = ["#a78bfa", "#fdba74", "#a3e635", "#6ebb2f", "#f97316", "#ffffff", "#38bdf8"];
+    const colors = ["#a78bfa", "#fdba74", "#a3e635", "#bef264", "#f97316", "#ffffff", "#38bdf8"];
     for (let i = 0; i < PARTICLE_COUNT; i++) {
       // Spawn within island cluster bounds
       const x = (Math.random() - 0.5) * 2.8;

@@ -100,7 +100,7 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
                   <Globe className="size-3 text-blue-500" />
                   <span className="truncate">arxiv.org/abs/2502.agentic-systems</span>
                 </div>
-                <span className="text-[9px] text-emerald-600 font-semibold bg-emerald-100/80 px-1 rounded">200 OK</span>
+                <span className="text-[9px] text-[#65a30d] font-semibold bg-[#f7fee7] border border-[#d9f99d] px-1 rounded">200 OK</span>
               </div>
 
               <div className="space-y-1">
@@ -115,7 +115,7 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
               <div className="flex items-center justify-between pt-1 text-[9px] font-mono text-neutral-400">
                 <span>Extracted: 18 key citations</span>
                 <span className="text-[#7C5CFC] font-semibold flex items-center gap-0.5">
-                  Summarized <CheckCircle2 className="size-2.5 text-emerald-500" />
+                  Summarized <CheckCircle2 className="size-2.5 text-[#84cc16]" />
                 </span>
               </div>
             </div>
@@ -183,8 +183,8 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
 
           <div className="mt-2 pt-2 border-t border-black/[0.05] flex items-center justify-between text-[10px] text-neutral-500">
             <span className="font-mono">Platform: X & LinkedIn</span>
-            <span className="text-emerald-600 font-semibold flex items-center gap-1">
-              <Check className="size-3" /> Auto-publish Armed
+            <span className="text-[#65a30d] font-semibold flex items-center gap-1">
+              <Check className="size-3 text-[#84cc16]" /> Auto-publish Armed
             </span>
           </div>
         </motion.div>
@@ -199,13 +199,13 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
           initial={{ scale: 0, opacity: 0, x: 30, y: -30, rotate: -2 }}
           animate={{ scale: 1, opacity: 1, x: 0, y: 0, rotate: 0 }}
           transition={{ type: "spring", stiffness: 240, damping: 20, delay: 0.1 }}
-          className="relative rounded-2xl bg-[#0f1117] text-neutral-200 border border-white/10 p-3 sm:p-3.5 shadow-md flex flex-col justify-between overflow-hidden group hover:border-emerald-500/40 transition-colors"
+          className="relative rounded-2xl bg-[#0f1117] text-neutral-200 border border-white/10 p-3 sm:p-3.5 shadow-md flex flex-col justify-between overflow-hidden group hover:border-[#84cc16]/40 transition-colors"
         >
           <div>
             <div className="flex items-center justify-between pb-2 border-b border-white/10">
               <div className="flex items-center gap-2">
-                <div className="size-6 rounded-lg bg-emerald-500 text-white flex items-center justify-center shadow-2xs">
-                  <Code2 className="size-3.5" />
+                <div className="size-6 rounded-lg bg-[#84cc16] text-white flex items-center justify-center shadow-2xs">
+                  <Code2 className="size-3.5 text-black" />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-white leading-none">coding bot</h4>
@@ -213,7 +213,7 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
                 </div>
               </div>
 
-              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-[9.5px] font-mono text-emerald-400 border border-emerald-500/30">
+              <span className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#84cc16]/10 text-[9.5px] font-mono text-[#a3e635] border border-[#84cc16]/30">
                 <GitPullRequest className="size-2.5" /> PR #42 Ready
               </span>
             </div>
@@ -224,10 +224,10 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
                 <span>agent-dispatcher.ts</span>
                 <span>TypeScript</span>
               </div>
-              <pre className="text-emerald-400 font-mono whitespace-pre-wrap select-none">
+              <pre className="text-[#bef264] font-mono whitespace-pre-wrap select-none">
                 <code>
                   {codeText}
-                  <span className="inline-block w-1.5 h-3 bg-emerald-400 ml-0.5 animate-pulse align-middle" />
+                  <span className="inline-block w-1.5 h-3 bg-[#bef264] ml-0.5 animate-pulse align-middle" />
                 </code>
               </pre>
             </div>
@@ -235,7 +235,7 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
 
           <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[10px] text-neutral-400">
             <span className="font-mono">Engine: DeepSeek R1</span>
-            <span className="text-emerald-400 font-semibold">Checks: 14 Passing</span>
+            <span className="text-[#bef264] font-semibold">Checks: 14 Passing</span>
           </div>
         </motion.div>
       )}
@@ -275,7 +275,7 @@ export function StageBotCardsGrid({ phase }: BotCardsGridProps) {
                   <p className="font-semibold text-neutral-800 truncate">Staff Frontend Engineer</p>
                   <p className="text-[9px] text-neutral-500">Stripe &bull; Remote ($240k - $290k)</p>
                 </div>
-                <span className="px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 font-mono text-[9px] font-semibold shrink-0">
+                <span className="px-1.5 py-0.5 rounded bg-[#f7fee7] border border-[#d9f99d] text-[#65a30d] font-mono text-[9px] font-semibold shrink-0">
                   Applied
                 </span>
               </div>

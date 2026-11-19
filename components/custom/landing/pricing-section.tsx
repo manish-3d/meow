@@ -90,19 +90,19 @@ export function PricingSection() {
               {/* Features List */}
               <div className="mt-6 pt-6 border-t border-black/6 flex flex-col gap-2.5 text-xs text-neutral-600 font-sans">
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Unlimited web agents in workspace</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Bring your own Gemini, Claude, or OpenAI keys</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Cloud VM browser automation</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Daily scheduled Inngest routines</span>
                 </div>
               </div>
@@ -154,19 +154,19 @@ export function PricingSection() {
               {/* Features List */}
               <div className="mt-6 pt-6 border-t border-black/6 flex flex-col gap-2.5 text-xs text-neutral-600 font-sans">
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>24/7 Always-awake cloud VM</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Morning briefs deliver before you wake up</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Automated Gmail & Calendar background actions</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Cloud persistent memory sync</span>
                 </div>
               </div>
@@ -217,19 +217,19 @@ export function PricingSection() {
               {/* Features List */}
               <div className="mt-6 pt-6 border-t border-black/6 flex flex-col gap-2.5 text-xs text-neutral-600 font-sans">
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Dedicated 4 vCPU, 8GB RAM sandbox</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Multi-bot group chat & autonomous handoffs</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Unlimited concurrent browser instances</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Check className="size-4 text-emerald-600 shrink-0" />
+                  <Check className="size-4 text-[#84cc16] shrink-0" />
                   <span>Anti-bot evasion & proxy rotation</span>
                 </div>
               </div>

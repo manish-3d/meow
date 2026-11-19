@@ -32,9 +32,9 @@ export function VoxelIsland({ isBuilder = false, isHovered = false, scale = 1 }:
     }
   });
 
-  // Color palette
-  const grassTopColor = isBuilder ? "#80d62c" : "#6ebb2f";
-  const grassSideColor = isBuilder ? "#6cb825" : "#5ea325";
+  // Color palette - vibrant light model green
+  const grassTopColor = isBuilder ? "#84cc16" : "#84cc16";
+  const grassSideColor = isBuilder ? "#65a30d" : "#72b81e";
   const dirtLight = "#87532a";
   const dirtMed = "#754522";
   const dirtDark = "#5e3619";
@@ -71,19 +71,19 @@ export function VoxelIsland({ isBuilder = false, isHovered = false, scale = 1 }:
       {/* Tiny grass sprout voxels on top */}
       <mesh position={[-1.4, 0.32, 1.3]} castShadow>
         <boxGeometry args={[0.18, 0.24, 0.18]} />
-        <meshStandardMaterial color="#4d9419" roughness={0.7} />
+        <meshStandardMaterial color="#bef264" roughness={0.7} />
       </mesh>
       <mesh position={[1.5, 0.32, -1.2]} castShadow>
         <boxGeometry args={[0.16, 0.22, 0.16]} />
-        <meshStandardMaterial color="#4d9419" roughness={0.7} />
+        <meshStandardMaterial color="#bef264" roughness={0.7} />
       </mesh>
       <mesh position={[1.6, 0.3, 1.1]} castShadow>
         <boxGeometry args={[0.18, 0.2, 0.18]} />
-        <meshStandardMaterial color="#4d9419" roughness={0.7} />
+        <meshStandardMaterial color="#a3e635" roughness={0.7} />
       </mesh>
       <mesh position={[-1.6, 0.3, -1.4]} castShadow>
         <boxGeometry args={[0.15, 0.2, 0.15]} />
-        <meshStandardMaterial color="#4d9419" roughness={0.7} />
+        <meshStandardMaterial color="#a3e635" roughness={0.7} />
       </mesh>
 
       {/* --- MIDDLE LAYER: DIRT FOUNDATION STEP 1 --- */}
@@ -179,8 +179,8 @@ export function VoxelIsland({ isBuilder = false, isHovered = false, scale = 1 }:
       <mesh ref={floatingBlock3} position={[-2.4, 0.2, -2.2]} castShadow>
         <boxGeometry args={[0.3, 0.3, 0.3]} />
         <meshStandardMaterial
-          color={isBuilder ? "#a3e635" : "#6ebb2f"}
-          emissive={isBuilder ? "#a3e635" : "#000000"}
+          color={isBuilder ? "#a3e635" : "#bef264"}
+          emissive={isBuilder ? "#a3e635" : "#84cc16"}
           emissiveIntensity={isBuilder ? 0.4 : 0}
           roughness={0.8}
         />

@@ -19,11 +19,11 @@ export function StageFlowLines({ active }: FlowLinesProps) {
         fill="none"
       >
         <defs>
-          {/* Flow Line Gradient: Violet to Cyan to Emerald */}
+          {/* Flow Line Gradient: Violet to Cyan to Light Lime Green */}
           <linearGradient id="flowPulseGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#7C5CFC" stopOpacity="0.8" />
             <stop offset="50%" stopColor="#38BDF8" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#10B981" stopOpacity="0.8" />
+            <stop offset="100%" stopColor="#84cc16" stopOpacity="0.8" />
           </linearGradient>
 
           <filter id="flowGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -74,7 +74,7 @@ export function StageFlowLines({ active }: FlowLinesProps) {
         {/* ── Path 4: Bottom Sync Bridge (Bottom Left to Bottom Right) ── */}
         <motion.path
           d="M 380 430 Q 500 480 620 430"
-          stroke="#10B981"
+          stroke="#84cc16"
           strokeWidth="1.8"
           strokeDasharray="4 4"
           fill="none"

@@ -35,7 +35,7 @@ export function HostingSection() {
                 <h3 className="text-xl font-bold font-sans text-neutral-900">
                   instant web workspace
                 </h3>
-                <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
+                <span className="font-mono text-[10px] text-[#65a30d] bg-[#f7fee7] border border-[#d9f99d] px-2 py-0.5 rounded-full font-bold">
                   zero install
                 </span>
               </div>
@@ -54,11 +54,11 @@ export function HostingSection() {
           <div className="rounded-3xl bg-white p-6 sm:p-7 border border-black/8 shadow-2xs flex flex-col justify-between overflow-hidden relative">
             <div>
               {/* Pixel Art Green Meadow Banner */}
-              <div className="h-16 w-full rounded-2xl bg-gradient-to-r from-emerald-300 to-teal-200 flex items-center justify-center mb-6 overflow-hidden">
+              <div className="h-16 w-full rounded-2xl bg-gradient-to-r from-lime-300 to-emerald-200 flex items-center justify-center mb-6 overflow-hidden">
                 <svg width="64" height="24" viewBox="0 0 32 12" style={{ shapeRendering: "crispEdges" }}>
-                  <rect x="0" y="6" width="32" height="6" fill="#10B981" />
-                  <rect x="6" y="2" width="6" height="4" fill="#059669" />
-                  <rect x="18" y="4" width="8" height="2" fill="#047857" />
+                  <rect x="0" y="6" width="32" height="6" fill="#84cc16" />
+                  <rect x="6" y="2" width="6" height="4" fill="#65a30d" />
+                  <rect x="18" y="4" width="8" height="2" fill="#4d7c0f" />
                 </svg>
               </div>
 
@@ -66,7 +66,7 @@ export function HostingSection() {
                 <h3 className="text-xl font-bold font-sans text-neutral-900">
                   always-on cloud engine
                 </h3>
-                <span className="font-mono text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold">
+                <span className="font-mono text-[10px] text-[#65a30d] bg-[#f7fee7] border border-[#d9f99d] px-2 py-0.5 rounded-full font-bold">
                   runs 24/7 ⚡
                 </span>
               </div>

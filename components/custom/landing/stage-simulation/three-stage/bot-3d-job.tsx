@@ -36,7 +36,7 @@ export function Bot3DJob() {
   const pulsePointRef = useRef<THREE.Mesh>(null);
 
   const searchText = useSignText("Search", "#dc2626");
-  const applyText = useSignText("Apply", "#16a34a");
+  const applyText = useSignText("Apply", "#84cc16");
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
@@ -148,7 +148,7 @@ export function Bot3DJob() {
         {/* Sign Block */}
         <mesh position={[0, 0.15, 0]} castShadow>
           <boxGeometry args={[1.05, 0.55, 0.22]} />
-          <meshStandardMaterial color="#16a34a" roughness={0.4} />
+          <meshStandardMaterial color="#84cc16" roughness={0.4} />
         </mesh>
         {/* Textured Sign Face */}
         <mesh position={[0, 0.15, 0.115]}>
@@ -156,7 +156,7 @@ export function Bot3DJob() {
           {applyText ? (
             <meshBasicMaterial map={applyText} />
           ) : (
-            <meshBasicMaterial color="#16a34a" />
+            <meshBasicMaterial color="#84cc16" />
           )}
         </mesh>
       </group>

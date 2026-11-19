@@ -56,12 +56,12 @@ export function StageVmPanel({ active }: VmPanelProps) {
       {/* 1. Header Diagnostics */}
       <div className="space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-white/10">
-          <div className="flex items-center gap-1.5 text-emerald-400">
+          <div className="flex items-center gap-1.5 text-[#a3e635]">
             <Terminal className="size-3.5" />
             <span className="font-bold text-[11px] tracking-tight uppercase">Live VM Telemetry</span>
           </div>
-          <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">
-            <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" />
+          <span className="flex items-center gap-1 text-[9px] text-[#bef264] bg-[#84cc16]/10 px-1.5 py-0.5 rounded border border-[#84cc16]/20">
+            <span className="size-1.5 rounded-full bg-[#84cc16] animate-ping" />
             <span>24/7 UP</span>
           </span>
         </div>
@@ -84,13 +84,13 @@ export function StageVmPanel({ active }: VmPanelProps) {
           <div className="p-1.5 rounded-lg bg-white/5 border border-white/5 space-y-0.5">
             <div className="flex items-center justify-between text-neutral-400">
               <span className="flex items-center gap-1">
-                <Activity className="size-2.5 text-emerald-400" />
+                <Activity className="size-2.5 text-[#bef264]" />
                 <span>RAM</span>
               </span>
               <span className="text-white font-bold">4.2GB</span>
             </div>
             <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-              <div className="w-[52%] h-full bg-emerald-500 rounded-full" />
+              <div className="w-[52%] h-full bg-[#84cc16] rounded-full" />
             </div>
           </div>
         </div>
@@ -107,7 +107,7 @@ export function StageVmPanel({ active }: VmPanelProps) {
           </div>
           <div className="flex items-center justify-between py-1 px-2 rounded bg-white/5 border border-white/5">
             <span className="text-neutral-400">Security Sandbox</span>
-            <span className="text-emerald-400 flex items-center gap-1">
+            <span className="text-[#bef264] flex items-center gap-1">
               <Shield className="size-2.5" /> Isolated
             </span>
           </div>
@@ -130,7 +130,7 @@ export function StageVmPanel({ active }: VmPanelProps) {
                   : log.includes("MODEL") || log.includes("INIT")
                   ? "text-purple-300"
                   : log.includes("AGENT") || log.includes("UP")
-                  ? "text-emerald-300"
+                  ? "text-[#bef264]"
                   : "text-neutral-300"
               }`}
             >
@@ -145,7 +145,7 @@ export function StageVmPanel({ active }: VmPanelProps) {
       <div className="pt-2 border-t border-white/10 space-y-1.5">
         <div className="flex items-center justify-between text-[9px] text-neutral-400">
           <span>PLUGINS ATTACHED</span>
-          <span className="text-emerald-400 font-bold">3 ACTIVE</span>
+          <span className="text-[#bef264] font-bold">3 ACTIVE</span>
         </div>
         <div className="flex flex-wrap gap-1">
           <span className="px-1.5 py-0.5 rounded bg-white/10 text-[9px] text-neutral-300 border border-white/10">

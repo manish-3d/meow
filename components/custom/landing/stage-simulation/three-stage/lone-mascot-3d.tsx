@@ -35,7 +35,7 @@ export function LoneMascot3D({ isHovered = false }: { isHovered?: boolean }) {
       {/* ── 1. VOXEL ISLAND BASE ── */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[3.2, 0.4, 3.2]} />
-        <meshStandardMaterial color="#6ebb2f" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
       {/* Stepped dirt layer 1 */}
@@ -53,11 +53,11 @@ export function LoneMascot3D({ isHovered = false }: { isHovered?: boolean }) {
       {/* Hanging vines */}
       <mesh position={[-1.4, -0.3, 0.9]} castShadow>
         <boxGeometry args={[0.08, 0.55, 0.28]} />
-        <meshStandardMaterial color="#15803d" />
+        <meshStandardMaterial color="#84cc16" />
       </mesh>
       <mesh position={[1.4, -0.35, -0.7]} castShadow>
         <boxGeometry args={[0.08, 0.6, 0.3]} />
-        <meshStandardMaterial color="#16a34a" />
+        <meshStandardMaterial color="#a3e635" />
       </mesh>
 
       {/* ── 2. 3D CALICO CAT MASCOT WITH HEADPHONES ── */}

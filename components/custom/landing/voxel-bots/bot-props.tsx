@@ -38,7 +38,7 @@ export function ResearcherProps({ isHovered = false }: { isHovered?: boolean }) 
         {/* Spine */}
         <mesh position={[0, -0.02, 0]}>
           <boxGeometry args={[0.06, 0.08, 0.52]} />
-          <meshStandardMaterial color="#1b4332" roughness={0.8} />
+          <meshStandardMaterial color="#65a30d" roughness={0.8} />
         </mesh>
         {/* Left Book Page Slab */}
         <mesh position={[-0.22, 0.02, 0]} rotation={[0, 0, 0.12]} castShadow>
@@ -48,7 +48,7 @@ export function ResearcherProps({ isHovered = false }: { isHovered?: boolean }) 
         {/* Left Cover Trim */}
         <mesh position={[-0.23, -0.02, 0]} rotation={[0, 0, 0.12]}>
           <boxGeometry args={[0.4, 0.02, 0.5]} />
-          <meshStandardMaterial color="#2d6a4f" roughness={0.8} />
+          <meshStandardMaterial color="#84cc16" roughness={0.8} />
         </mesh>
         {/* Right Book Page Slab */}
         <mesh position={[0.22, 0.02, 0]} rotation={[0, 0, -0.12]} castShadow>
@@ -58,7 +58,7 @@ export function ResearcherProps({ isHovered = false }: { isHovered?: boolean }) 
         {/* Right Cover Trim */}
         <mesh position={[0.23, -0.02, 0]} rotation={[0, 0, -0.12]}>
           <boxGeometry args={[0.4, 0.02, 0.5]} />
-          <meshStandardMaterial color="#2d6a4f" roughness={0.8} />
+          <meshStandardMaterial color="#84cc16" roughness={0.8} />
         </mesh>
         {/* Page text lines voxels */}
         <mesh position={[-0.22, 0.055, -0.08]}>
@@ -101,10 +101,10 @@ export function ResearcherProps({ isHovered = false }: { isHovered?: boolean }) 
           <meshStandardMaterial color="#fefae0" roughness={0.9} />
         </mesh>
 
-        {/* Top Book: Forest Gold */}
+        {/* Top Book: Lime */}
         <mesh position={[0.01, 0.24, -0.01]} rotation={[0, 0.2, 0]} castShadow>
           <boxGeometry args={[0.48, 0.08, 0.54]} />
-          <meshStandardMaterial color="#15803d" roughness={0.8} />
+          <meshStandardMaterial color="#84cc16" roughness={0.8} />
         </mesh>
         <mesh position={[0.02, 0.24, -0.01]} rotation={[0, 0.2, 0]}>
           <boxGeometry args={[0.44, 0.06, 0.5]} />
@@ -450,7 +450,7 @@ export function OperatorProps({ isHovered = false }: { isHovered?: boolean }) {
         {/* Checklist Rows with Green Checkmarks */}
         <mesh position={[-0.14, 0.16, 0.035]}>
           <boxGeometry args={[0.06, 0.06, 0.01]} />
-          <meshBasicMaterial color="#16a34a" />
+          <meshBasicMaterial color="#84cc16" />
         </mesh>
         <mesh position={[0.05, 0.16, 0.035]}>
           <boxGeometry args={[0.26, 0.02, 0.01]} />
@@ -459,7 +459,7 @@ export function OperatorProps({ isHovered = false }: { isHovered?: boolean }) {
 
         <mesh position={[-0.14, 0.02, 0.035]}>
           <boxGeometry args={[0.06, 0.06, 0.01]} />
-          <meshBasicMaterial color="#16a34a" />
+          <meshBasicMaterial color="#84cc16" />
         </mesh>
         <mesh position={[0.05, 0.02, 0.035]}>
           <boxGeometry args={[0.26, 0.02, 0.01]} />
@@ -468,7 +468,7 @@ export function OperatorProps({ isHovered = false }: { isHovered?: boolean }) {
 
         <mesh position={[-0.14, -0.12, 0.035]}>
           <boxGeometry args={[0.06, 0.06, 0.01]} />
-          <meshBasicMaterial color="#16a34a" />
+          <meshBasicMaterial color="#84cc16" />
         </mesh>
         <mesh position={[0.05, -0.12, 0.035]}>
           <boxGeometry args={[0.26, 0.02, 0.01]} />
@@ -486,7 +486,7 @@ export function OperatorProps({ isHovered = false }: { isHovered?: boolean }) {
         {/* Green Top Header */}
         <mesh position={[0, 0.26, 0.055]}>
           <boxGeometry args={[0.62, 0.16, 0.01]} />
-          <meshStandardMaterial color="#16a34a" roughness={0.6} />
+          <meshStandardMaterial color="#84cc16" roughness={0.6} />
         </mesh>
         {/* Metal Binder Rings */}
         <mesh position={[-0.18, 0.35, 0]}>
@@ -633,11 +633,11 @@ export function CreatorProps({ isHovered = false }: { isHovered?: boolean }) {
         {/* Green Mountain / Hill */}
         <mesh position={[-0.08, -0.05, 0.016]}>
           <boxGeometry args={[0.22, 0.1, 0.005]} />
-          <meshBasicMaterial color="#22c55e" />
+          <meshBasicMaterial color="#84cc16" />
         </mesh>
         <mesh position={[0.1, -0.06, 0.016]}>
           <boxGeometry args={[0.24, 0.08, 0.005]} />
-          <meshBasicMaterial color="#16a34a" />
+          <meshBasicMaterial color="#a3e635" />
         </mesh>
       </group>
     </>
@@ -665,7 +665,7 @@ export function WriterProps({ isHovered = false }: { isHovered?: boolean }) {
         {/* Green Accent Header / Bookmark Tab */}
         <mesh position={[0, 0.24, 0.032]}>
           <boxGeometry args={[0.46, 0.08, 0.01]} />
-          <meshStandardMaterial color="#22c55e" roughness={0.6} />
+          <meshStandardMaterial color="#84cc16" roughness={0.6} />
         </mesh>
         {/* Text Lines */}
         <mesh position={[0, 0.1, 0.032]}>

@@ -14,9 +14,9 @@ function IslandBaseDef() {
     <>
       <defs>
         <linearGradient id="grassTopGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#86efac" />
-          <stop offset="50%" stopColor="#4ade80" />
-          <stop offset="100%" stopColor="#22c55e" />
+          <stop offset="0%" stopColor="#bef264" />
+          <stop offset="50%" stopColor="#a3e635" />
+          <stop offset="100%" stopColor="#84cc16" />
         </linearGradient>
 
         <linearGradient id="dirtLeftGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -58,35 +58,35 @@ function IslandBaseDef() {
       {/* Grass Overhang Drops */}
       <path
         d="M 30 85 L 48 94 L 48 102 L 68 111 L 68 104 L 88 113 L 88 122 L 108 131 L 108 124 L 126 133 L 126 140 L 140 147 L 140 140 L 30 85 Z"
-        fill="#16a34a"
+        fill="#84cc16"
       />
       <path
         d="M 140 140 L 158 131 L 158 138 L 176 129 L 176 121 L 194 112 L 194 120 L 214 111 L 214 103 L 232 94 L 232 100 L 250 91 L 250 85 L 140 140 Z"
-        fill="#15803d"
+        fill="#72b81e"
       />
 
       {/* Grass Top Face */}
       <path d="M 140 30 L 250 85 L 140 140 L 30 85 Z" fill="url(#grassTopGrad)" />
 
       {/* Grass Isometric Texture Squares */}
-      <path d="M 140 30 L 175 47 L 140 65 L 105 47 Z" fill="#86efac" opacity="0.35" />
-      <path d="M 105 47 L 140 65 L 105 82 L 70 65 Z" fill="#4ade80" opacity="0.3" />
-      <path d="M 175 47 L 210 65 L 175 82 L 140 65 Z" fill="#22c55e" opacity="0.3" />
-      <path d="M 140 65 L 175 82 L 140 100 L 105 82 Z" fill="#86efac" opacity="0.4" />
-      <path d="M 70 65 L 105 82 L 70 100 L 30 85 Z" fill="#4ade80" opacity="0.25" />
-      <path d="M 105 82 L 140 100 L 105 118 L 70 100 Z" fill="#22c55e" opacity="0.35" />
-      <path d="M 175 82 L 210 100 L 175 118 L 140 100 Z" fill="#16a34a" opacity="0.3" />
-      <path d="M 210 65 L 250 85 L 210 100 L 175 82 Z" fill="#15803d" opacity="0.25" />
-      <path d="M 140 100 L 175 118 L 140 140 L 105 118 Z" fill="#86efac" opacity="0.3" />
+      <path d="M 140 30 L 175 47 L 140 65 L 105 47 Z" fill="#bef264" opacity="0.45" />
+      <path d="M 105 47 L 140 65 L 105 82 L 70 65 Z" fill="#a3e635" opacity="0.4" />
+      <path d="M 175 47 L 210 65 L 175 82 L 140 65 Z" fill="#84cc16" opacity="0.35" />
+      <path d="M 140 65 L 175 82 L 140 100 L 105 82 Z" fill="#bef264" opacity="0.5" />
+      <path d="M 70 65 L 105 82 L 70 100 L 30 85 Z" fill="#a3e635" opacity="0.35" />
+      <path d="M 105 82 L 140 100 L 105 118 L 70 100 Z" fill="#84cc16" opacity="0.4" />
+      <path d="M 175 82 L 210 100 L 175 118 L 140 100 Z" fill="#a3e635" opacity="0.35" />
+      <path d="M 210 65 L 250 85 L 210 100 L 175 82 Z" fill="#84cc16" opacity="0.3" />
+      <path d="M 140 100 L 175 118 L 140 140 L 105 118 Z" fill="#bef264" opacity="0.4" />
 
       {/* Hanging Minecraft Vines */}
-      <path d="M 50 100 L 50 120 L 55 120 L 55 103 Z" fill="#15803d" />
-      <rect x="48" y="114" width="4" height="4" fill="#16a34a" />
-      <path d="M 94 122 L 94 148 L 99 148 L 99 125 Z" fill="#15803d" />
-      <rect x="97" y="138" width="4" height="6" fill="#22c55e" />
-      <path d="M 185 126 L 185 152 L 190 152 L 190 130 Z" fill="#14532d" />
-      <rect x="183" y="140" width="4" height="6" fill="#16a34a" />
-      <path d="M 222 108 L 222 128 L 226 128 L 226 111 Z" fill="#14532d" />
+      <path d="M 50 100 L 50 120 L 55 120 L 55 103 Z" fill="#84cc16" />
+      <rect x="48" y="114" width="4" height="4" fill="#a3e635" />
+      <path d="M 94 122 L 94 148 L 99 148 L 99 125 Z" fill="#84cc16" />
+      <rect x="97" y="138" width="4" height="6" fill="#bef264" />
+      <path d="M 185 126 L 185 152 L 190 152 L 190 130 Z" fill="#65a30d" />
+      <rect x="183" y="140" width="4" height="6" fill="#a3e635" />
+      <path d="M 222 108 L 222 128 L 226 128 L 226 111 Z" fill="#65a30d" />
     </>
   );
 }
@@ -137,10 +137,10 @@ export function VoxelCatResearcher() {
           <path d="M 12 18 Q 12 2 30 2 Q 48 2 48 18" stroke="#18181b" strokeWidth="4" fill="none" strokeLinecap="round" />
           {/* Left Earcup */}
           <rect x="9" y="15" width="7" height="11" fill="#18181b" rx="2" />
-          <circle cx="12.5" cy="20.5" r="2" fill="#22c55e" />
+          <circle cx="12.5" cy="20.5" r="2" fill="#84cc16" />
           {/* Right Earcup */}
           <rect x="44" y="15" width="7" height="11" fill="#18181b" rx="2" />
-          <circle cx="47.5" cy="20.5" r="2" fill="#22c55e" />
+          <circle cx="47.5" cy="20.5" r="2" fill="#84cc16" />
 
           {/* Body */}
           <rect x="20" y="29" width="20" height="18" fill="#ffffff" rx="2" />
@@ -228,7 +228,7 @@ export function VoxelSocialStation() {
           <rect x="0" y="0" width="76" height="11" fill="#2563eb" rx="3" />
           <circle cx="7" cy="5.5" r="1.8" fill="#ef4444" />
           <circle cx="13" cy="5.5" r="1.8" fill="#f59e0b" />
-          <circle cx="19" cy="5.5" r="1.8" fill="#10b981" />
+          <circle cx="19" cy="5.5" r="1.8" fill="#84cc16" />
 
           {/* App Icons Grid */}
           <g transform="translate(7, 15)">
@@ -275,7 +275,7 @@ export function VoxelSocialStation() {
         <p className="font-bold text-neutral-800 text-[9.5px] mb-1">Drafting posts...</p>
         <div className="space-y-0.5">
           <div className="flex items-center gap-1.5 px-1.5 py-0.5 rounded bg-neutral-100 font-semibold text-neutral-900">
-            <span className="size-1.5 rounded-full bg-emerald-500" />
+            <span className="size-1.5 rounded-full bg-[#84cc16]" />
             <span>1 Starting</span>
           </div>
           <div className="px-1.5 py-0.5 text-neutral-500">2 Create posts...</div>
@@ -310,15 +310,15 @@ export function VoxelCodingStation() {
           {/* Screen */}
           <rect x="4.5" y="10.5" width="37" height="29" fill="#09090b" rx="2" />
           {/* Code Lines */}
-          <line x1="7" y1="15" x2="28" y2="15" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="7" y1="15" x2="28" y2="15" stroke="#bef264" strokeWidth="1.8" strokeLinecap="round" />
           <line x1="7" y1="19.5" x2="35" y2="19.5" stroke="#38bdf8" strokeWidth="1.8" strokeLinecap="round" />
           <line x1="11" y1="24" x2="25" y2="24" stroke="#f472b6" strokeWidth="1.8" strokeLinecap="round" />
           <line x1="11" y1="28.5" x2="33" y2="28.5" stroke="#fde047" strokeWidth="1.8" strokeLinecap="round" />
-          <line x1="7" y1="33" x2="18" y2="33" stroke="#4ade80" strokeWidth="1.8" strokeLinecap="round" />
+          <line x1="7" y1="33" x2="18" y2="33" stroke="#a3e635" strokeWidth="1.8" strokeLinecap="round" />
 
           {/* Floppy slot & LED */}
           <rect x="24" y="41" width="13" height="2" fill="#71717a" rx="0.5" />
-          <circle cx="39" cy="42" r="1.2" fill="#22c55e" />
+          <circle cx="39" cy="42" r="1.2" fill="#84cc16" />
 
           {/* Keyboard in front */}
           <g transform="translate(-3, 48)">
@@ -333,14 +333,14 @@ export function VoxelCodingStation() {
           {/* Rear terminal */}
           <rect x="0" y="0" width="30" height="23" fill="#18181b" stroke="#3f3f46" strokeWidth="1" rx="2" />
           <line x1="4" y1="6" x2="21" y2="6" stroke="#38bdf8" strokeWidth="1.2" strokeLinecap="round" />
-          <line x1="4" y1="11" x2="16" y2="11" stroke="#4ade80" strokeWidth="1.2" strokeLinecap="round" />
+          <line x1="4" y1="11" x2="16" y2="11" stroke="#bef264" strokeWidth="1.2" strokeLinecap="round" />
           <line x1="4" y1="16" x2="25" y2="16" stroke="#f472b6" strokeWidth="1.2" strokeLinecap="round" />
 
           {/* Front terminal with `>_` */}
           <g transform="translate(12, 14)">
-            <rect x="0" y="0" width="25" height="18" fill="#09090b" stroke="#22c55e" strokeWidth="1" rx="2" className="drop-shadow-sm" />
-            <text x="3.5" y="10" fill="#4ade80" fontSize="6.5" fontFamily="monospace" fontWeight="bold">&gt;_</text>
-            <rect x="12" y="6.5" width="3.5" height="5" fill="#4ade80" className="animate-pulse" />
+            <rect x="0" y="0" width="25" height="18" fill="#09090b" stroke="#84cc16" strokeWidth="1" rx="2" className="drop-shadow-sm" />
+            <text x="3.5" y="10" fill="#bef264" fontSize="6.5" fontFamily="monospace" fontWeight="bold">&gt;_</text>
+            <rect x="12" y="6.5" width="3.5" height="5" fill="#bef264" className="animate-pulse" />
           </g>
         </g>
 
@@ -408,8 +408,8 @@ export function VoxelJobStation() {
           {/* Post */}
           <rect x="14" y="26" width="3.5" height="20" fill="#78350f" />
           {/* Sign */}
-          <rect x="0" y="0" width="31" height="25" fill="#16a34a" rx="3.5" stroke="#14532d" strokeWidth="1.5" className="drop-shadow-md" />
-          <path d="M 0 3 L 3 0 L 31 0 L 31 22 L 28 25 L 0 25 Z" fill="#22c55e" opacity="0.3" />
+          <rect x="0" y="0" width="31" height="25" fill="#84cc16" rx="3.5" stroke="#65a30d" strokeWidth="1.5" className="drop-shadow-md" />
+          <path d="M 0 3 L 3 0 L 31 0 L 31 22 L 28 25 L 0 25 Z" fill="#bef264" opacity="0.4" />
           <text x="4.5" y="16" fill="#ffffff" fontSize="8" fontFamily="monospace" fontWeight="bold">
             Apply
           </text>
@@ -464,11 +464,11 @@ export function GrassBlockIcon() {
       <rect x="1" y="6" width="14" height="9" fill="#78350f" rx="1" />
       <rect x="4" y="9" width="3" height="3" fill="#a16207" />
       <rect x="10" y="11" width="3" height="2" fill="#522204" />
-      <rect x="1" y="2" width="14" height="5" fill="#22c55e" rx="1" />
-      <rect x="3" y="6" width="2" height="3" fill="#16a34a" />
-      <rect x="8" y="6" width="3" height="2" fill="#16a34a" />
-      <rect x="12" y="6" width="2" height="3" fill="#16a34a" />
-      <rect x="2" y="3" width="12" height="2" fill="#86efac" opacity="0.8" />
+      <rect x="1" y="2" width="14" height="5" fill="#84cc16" rx="1" />
+      <rect x="3" y="6" width="2" height="3" fill="#65a30d" />
+      <rect x="8" y="6" width="3" height="2" fill="#65a30d" />
+      <rect x="12" y="6" width="2" height="3" fill="#65a30d" />
+      <rect x="2" y="3" width="12" height="2" fill="#bef264" opacity="0.9" />
     </svg>
   );
 }
@@ -522,9 +522,9 @@ export function VoxelLoneMascot() {
         {/* Black Headphones with Neon Green Cat Logo Ring */}
         <path d="M 10 17 Q 10 2 27 2 Q 44 2 44 17" stroke="#18181b" strokeWidth="4" fill="none" strokeLinecap="round" />
         <rect x="8" y="14" width="6" height="10" fill="#18181b" rx="2" />
-        <circle cx="11" cy="19" r="1.8" fill="#22c55e" />
+        <circle cx="11" cy="19" r="1.8" fill="#84cc16" />
         <rect x="40" y="14" width="6" height="10" fill="#18181b" rx="2" />
-        <circle cx="43" cy="19" r="1.8" fill="#22c55e" />
+        <circle cx="43" cy="19" r="1.8" fill="#84cc16" />
 
         {/* Cat Body */}
         <rect x="18" y="28" width="18" height="16" fill="#ffffff" rx="2" />

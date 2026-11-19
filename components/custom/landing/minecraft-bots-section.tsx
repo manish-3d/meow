@@ -202,7 +202,7 @@ export function MinecraftBotsSection() {
                       {/* Top anchor point */}
                       <div
                         className={`size-1.5 rounded-full ${
-                          isBuilder ? "bg-lime-500" : "bg-emerald-400/80"
+                          isBuilder ? "bg-lime-500" : "bg-lime-400/80"
                         }`}
                       />
 
@@ -213,7 +213,7 @@ export function MinecraftBotsSection() {
                           opacity: lineOpacity,
                         }}
                         className={`w-[1.5px] relative flex items-center justify-center ${
-                          isBuilder ? "bg-lime-400" : "bg-emerald-300"
+                          isBuilder ? "bg-lime-400" : "bg-lime-300"
                         }`}
                       >
                         {/* Rounded square marker traveling along line */}
@@ -222,7 +222,7 @@ export function MinecraftBotsSection() {
                           className={`absolute left-1/2 -translate-x-1/2 size-[11px] rounded-[3px] transition-transform duration-200 ${
                             isBuilder
                               ? "bg-[#84cc16] border-[1.5px] border-[#65a30d] shadow-[0_0_8px_rgba(132,204,22,0.45)]"
-                              : "bg-white border-[1.5px] border-[#86efac] shadow-2xs"
+                              : "bg-white border-[1.5px] border-[#bef264] shadow-2xs"
                           }`}
                         />
                       </motion.div>
@@ -230,7 +230,7 @@ export function MinecraftBotsSection() {
                       {/* Bottom connection dot at description card */}
                       <div
                         className={`size-1.5 rounded-full ${
-                          isBuilder ? "bg-lime-500" : "bg-emerald-400/80"
+                          isBuilder ? "bg-lime-500" : "bg-lime-400/80"
                         }`}
                       />
                     </div>
@@ -261,25 +261,25 @@ export function MinecraftBotsSection() {
             <div className="relative flex flex-col items-center">
               <div
                 className={`size-1.5 rounded-full ${
-                  activeIndex === 2 ? "bg-lime-500" : "bg-emerald-400/80"
+                  activeIndex === 2 ? "bg-lime-500" : "bg-lime-400/80"
                 }`}
               />
               <div
                 className={`w-[1.5px] h-9 relative flex items-center justify-center ${
-                  activeIndex === 2 ? "bg-lime-400" : "bg-emerald-300"
+                  activeIndex === 2 ? "bg-lime-400" : "bg-lime-300"
                 }`}
               >
                 <div
                   className={`size-[11px] rounded-[3px] ${
                     activeIndex === 2
                       ? "bg-[#84cc16] border-[1.5px] border-[#65a30d]"
-                      : "bg-white border-[1.5px] border-[#86efac]"
+                      : "bg-white border-[1.5px] border-[#bef264]"
                   }`}
                 />
               </div>
               <div
                 className={`size-1.5 rounded-full ${
-                  activeIndex === 2 ? "bg-lime-500" : "bg-emerald-400/80"
+                  activeIndex === 2 ? "bg-lime-500" : "bg-lime-400/80"
                 }`}
               />
             </div>

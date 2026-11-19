@@ -20,7 +20,7 @@ function useTerminalTexture() {
 
     // Glowing green and cyan code lines
     ctx.font = "bold 26px monospace, sans-serif";
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#a3e635";
     ctx.fillText("> fn spawn_agent() -> Bot {", 24, 52);
 
     ctx.fillStyle = "#38bdf8";
@@ -31,16 +31,16 @@ function useTerminalTexture() {
     ctx.fillStyle = "#f59e0b";
     ctx.fillText("    crew.dispatch_all();", 24, 184);
 
-    ctx.fillStyle = "#4ade80";
+    ctx.fillStyle = "#bef264";
     ctx.fillText("    println!(\"✓ 30/30 ok\");", 24, 228);
 
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#a3e635";
     ctx.fillText("}", 24, 272);
 
     // Terminal command prompt at bottom
     ctx.fillStyle = "#38bdf8";
     ctx.fillText("$ git commit -m \"feat: 3d agent\"", 24, 324);
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#bef264";
     ctx.fillRect(490, 302, 14, 26); // Blinking cursor
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -63,7 +63,7 @@ function useMiniTerminalTexture() {
     ctx.fillStyle = "#090d16";
     ctx.fillRect(0, 0, 256, 180);
 
-    ctx.fillStyle = "#22c55e";
+    ctx.fillStyle = "#a3e635";
     ctx.font = "bold 20px monospace";
     ctx.fillText("> agent_space.ts", 16, 36);
     ctx.fillStyle = "#94a3b8";
@@ -109,7 +109,7 @@ export function Bot3DCoding() {
       {/* ── 1. VOXEL ISLAND BASE ── */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[3.8, 0.4, 3.8]} />
-        <meshStandardMaterial color="#6ebb2f" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
       {/* Stepped dirt layer 1 */}
@@ -133,7 +133,7 @@ export function Bot3DCoding() {
       {/* Hanging vines */}
       <mesh position={[-1.75, -0.35, 0.8]} castShadow>
         <boxGeometry args={[0.08, 0.6, 0.28]} />
-        <meshStandardMaterial color="#15803d" />
+        <meshStandardMaterial color="#84cc16" />
       </mesh>
 
       {/* ── 2. RETRO BEIGE CRT COMPUTER WORKSTATION ── */}

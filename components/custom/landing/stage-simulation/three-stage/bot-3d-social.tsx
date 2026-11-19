@@ -22,7 +22,7 @@ function useBillboardTexture() {
     ctx.beginPath(); ctx.arc(32, 27, 8, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#f59e0b";
     ctx.beginPath(); ctx.arc(58, 27, 8, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "#10b981";
+    ctx.fillStyle = "#84cc16";
     ctx.beginPath(); ctx.arc(84, 27, 8, 0, Math.PI * 2); ctx.fill();
 
     // Body area
@@ -112,7 +112,7 @@ export function Bot3DSocial() {
       {/* ── 1. VOXEL ISLAND BASE ── */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <boxGeometry args={[3.8, 0.4, 3.8]} />
-        <meshStandardMaterial color="#6ebb2f" roughness={0.7} />
+        <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
       {/* Stepped dirt layer 1 */}
@@ -136,11 +136,11 @@ export function Bot3DSocial() {
       {/* Hanging vines */}
       <mesh position={[1.75, -0.35, 1.0]} castShadow>
         <boxGeometry args={[0.08, 0.6, 0.3]} />
-        <meshStandardMaterial color="#15803d" />
+        <meshStandardMaterial color="#84cc16" />
       </mesh>
       <mesh position={[-1.75, -0.4, -0.6]} castShadow>
         <boxGeometry args={[0.08, 0.55, 0.28]} />
-        <meshStandardMaterial color="#16a34a" />
+        <meshStandardMaterial color="#a3e635" />
       </mesh>
 
       {/* ── 2. 3D SOCIAL MEDIA BILLBOARD ── */}
