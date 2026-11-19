@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { Key, Sparkles, Cpu } from "lucide-react";
-import { useScroll, useSpring } from "motion/react";
-import { instrumentSerif, playfair, plusJakarta } from "@/app/fonts";
+import { Key } from "lucide-react";
 import {
   ChatGptLogo,
   ClaudeLogo,
@@ -217,20 +215,24 @@ const BRANDS: BrandItem[] = [
   },
 ];
 
-// Generous desktop horizontal spacing so cards never overlap
-const DESKTOP_SPACING = 360;
+// Double list for 100% seamless, infinite wrapping across all screen resolutions
+const DISPLAY_BRANDS = [...BRANDS, ...BRANDS];
+
+// Generous desktop horizontal spacing
+const DESKTOP_SPACING = 340;
+
+// Calm, elegant auto-scroll speed (pixels per second)
+const AUTO_SCROLL_SPEED = 46;
 
 // =========================================================================
-// 2. SCROLL-DRIVEN 3D LENS CAROUSEL (ZERO BLUR, BIGGER MIDDLE FOCUS)
+// 2. AUTOMATIC INFINITE 3D LENS CAROUSEL (NO SCROLL-JACKING, ZERO BLUR)
 // =========================================================================
 
 export function IntegrationsCarousel() {
-  const sectionRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Responsive container width
   const [containerWidth, setContainerWidth] = useState(1440);
 
+  // Responsive container width tracking
   useEffect(() => {
     const updateWidth = () => {
       if (containerRef.current) {
@@ -242,99 +244,151 @@ export function IntegrationsCarousel() {
     return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
-  const cardSpacing = Math.min(DESKTOP_SPACING, Math.max(280, containerWidth * 0.32));
+  const cardSpacing = Math.min(DESKTOP_SPACING, Math.max(270, containerWidth * 0.28));
+  const totalTrackWidth = DISPLAY_BRANDS.length * cardSpacing;
 
-  // ── Scroll progress across pinned section ──
-  // Starts when section top reaches viewport top, ends when section bottom reaches viewport bottom
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
+  // ── Continuous animation state ──
+  const [offset, setOffset] = useState(0);
 
-  // Fluid spring physics for silky buttery movement without jank
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 24,
-    restDelta: 0.0005,
-  });
-
-  // Continuous active float index
-  const [currentActiveFloat, setCurrentActiveFloat] = useState(0);
-
-  useEffect(() => {
-    const unsubscribe = smoothProgress.on("change", (latest) => {
-      // Map scroll progress 0..1 to brand index 0..(BRANDS.length - 1)
-      const targetIndex = latest * (BRANDS.length - 1);
-      setCurrentActiveFloat(targetIndex);
-    });
-    return () => unsubscribe();
-  }, [smoothProgress]);
-
-  // Smooth programmatic scroll to a specific model index
-  const scrollToBrand = useCallback((index: number) => {
-    if (!sectionRef.current) return;
-    const rect = sectionRef.current.getBoundingClientRect();
-    const scrollTop = window.scrollY + rect.top;
-    const scrollableDistance = sectionRef.current.offsetHeight - window.innerHeight;
-    const targetScrollY = scrollTop + (index / (BRANDS.length - 1)) * scrollableDistance;
-    window.scrollTo({ top: targetScrollY, behavior: "smooth" });
-  }, []);
-
-  // Pointer drag support for horizontal swiping
+  const offsetRef = useRef(0);
+  const velocityRef = useRef(0);
+  const targetOffsetRef = useRef<number | null>(null);
+  const isHoveredRef = useRef(false);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
+  const dragLastXRef = useRef(0);
+  const dragLastTimeRef = useRef(0);
+  const hasDraggedRef = useRef(false);
 
+  // ── Continuous 60fps / 120fps requestAnimationFrame Loop ──
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastTime = performance.now();
+
+    const loop = (currentTime: number) => {
+      const dt = Math.min((currentTime - lastTime) / 1000, 0.08); // Protect against large jumps on tab switch
+      lastTime = currentTime;
+
+      if (targetOffsetRef.current !== null) {
+        // Smooth programmatic slide towards a target card (e.g. click to center)
+        const diff = targetOffsetRef.current - offsetRef.current;
+        if (Math.abs(diff) < 0.6) {
+          offsetRef.current = targetOffsetRef.current;
+          targetOffsetRef.current = null;
+        } else {
+          offsetRef.current += diff * Math.min(1, dt * 7.5);
+        }
+      } else if (!isDraggingRef.current) {
+        // Coasting with momentum inertia after release
+        if (Math.abs(velocityRef.current) > 1.2) {
+          offsetRef.current += velocityRef.current * dt;
+          velocityRef.current *= Math.pow(0.92, dt * 60);
+        } else {
+          velocityRef.current = 0;
+          // Constant elegant auto-advance when not hovered
+          if (!isHoveredRef.current) {
+            offsetRef.current += AUTO_SCROLL_SPEED * dt;
+          }
+        }
+      }
+
+      // Safe mathematical modulo wrapping within [0, totalTrackWidth)
+      const wrapped = ((offsetRef.current % totalTrackWidth) + totalTrackWidth) % totalTrackWidth;
+      offsetRef.current = wrapped;
+      setOffset(wrapped);
+
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    animationFrameId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [totalTrackWidth]);
+
+  // Click card to glide it directly into center spotlight
+  const handleClickCard = useCallback((cardXOffset: number) => {
+    if (hasDraggedRef.current) return;
+    targetOffsetRef.current = offsetRef.current + cardXOffset;
+  }, []);
+
+  // ── Pointer Drag & Swipe Interactivity ──
   const handlePointerDown = (e: React.PointerEvent) => {
     isDraggingRef.current = true;
+    hasDraggedRef.current = false;
     dragStartXRef.current = e.clientX;
+    dragLastXRef.current = e.clientX;
+    dragLastTimeRef.current = performance.now();
+    velocityRef.current = 0;
+    targetOffsetRef.current = null;
+    try {
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    } catch {
+      // Safe fallback
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     if (!isDraggingRef.current) return;
-    const dx = e.clientX - dragStartXRef.current;
-    if (Math.abs(dx) > 60) {
-      const currentInt = Math.round(currentActiveFloat);
-      if (dx > 0) {
-        scrollToBrand(Math.max(0, currentInt - 1));
-      } else {
-        scrollToBrand(Math.min(BRANDS.length - 1, currentInt + 1));
-      }
-      isDraggingRef.current = false;
+    const currentX = e.clientX;
+    const dx = currentX - dragLastXRef.current;
+    const now = performance.now();
+    const dt = (now - dragLastTimeRef.current) / 1000;
+
+    if (Math.abs(currentX - dragStartXRef.current) > 5) {
+      hasDraggedRef.current = true;
+    }
+
+    // Dragging right moves the track right (offset decreases)
+    offsetRef.current -= dx;
+
+    if (dt > 0.008) {
+      velocityRef.current = -dx / dt;
+      dragLastXRef.current = currentX;
+      dragLastTimeRef.current = now;
     }
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      // Safe fallback
+    }
+    // Clamp release velocity to prevent chaotic spins
+    velocityRef.current = Math.max(-1200, Math.min(1200, velocityRef.current));
+  };
+
+  const handleMouseEnter = () => {
+    isHoveredRef.current = true;
+  };
+
+  const handleMouseLeave = () => {
+    isHoveredRef.current = false;
   };
 
   return (
     <section
-      ref={sectionRef}
       id="integrations-carousel"
-      className="relative w-full bg-white text-[#131316] select-none"
-      style={{
-        // 320vh allows each model to slide into the center spotlight comfortably one by one as the user scrolls
-        height: "320vh",
-      }}
+      className="relative w-full overflow-hidden py-20 sm:py-28 bg-white text-[#131316] select-none"
     >
-      {/* ── STICKY VIEWPORT CONTAINER ── */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-center items-center pt-16 sm:pt-20 pb-10 sm:pb-14 overflow-hidden">
+      <div className="w-full flex flex-col justify-center items-center">
         {/* ── 1. TOP HEADLINE & BRING-YOUR-OWN-AI BANNER ── */}
-        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-3 sm:mb-5">
-          <div className={`${plusJakarta.className} inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/95 border border-neutral-200/90 text-xs font-semibold text-neutral-800 mb-3.5 shadow-2xs`}>
+        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-3 shadow-2xs">
             <Key className="size-3.5 text-neutral-800" />
             <span>bring the AI models you already pay for &middot; zero API markup</span>
           </div>
 
-          <h2 className={`${instrumentSerif.className} text-5xl sm:text-7xl md:text-8xl font-normal tracking-tight text-neutral-900 leading-[0.96]`}>
-            integration is <span className="italic">simple.</span>
+          <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-neutral-900 leading-none">
+            integration is simple.
           </h2>
-          <p className={`${plusJakarta.className} mt-3 sm:mt-4 text-sm sm:text-base text-neutral-600 font-medium tracking-tight`}>
+          <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-neutral-500 font-normal">
             connect with the AI models you already love. swap models per bot anytime.
           </p>
         </div>
 
-        {/* ── 2. THE 3D LENS CAROUSEL TARGET CONTAINER ── */}
+        {/* ── 2. THE 3D LENS CAROUSEL TARGET CONTAINER (AUTOMATIC INFINITE LOOP) ── */}
         <div
           id="webgl-container"
           ref={containerRef}
@@ -342,7 +396,9 @@ export function IntegrationsCarousel() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative w-full h-[420px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className="relative w-full h-[430px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
           style={{
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
@@ -374,13 +430,13 @@ export function IntegrationsCarousel() {
 
               {/* Frosted Glass Lens Channel Body */}
               <path
-                d="M -40 36 Q 720 96 1480 36 L 1480 424 Q 720 376 -40 424 Z"
+                d="M -40 46 Q 720 120 1480 46 L 1480 424 Q 720 350 -40 424 Z"
                 fill="url(#lensChannelFill)"
               />
 
               {/* Upper Glassy Lens Rail - Outer Bevel */}
               <path
-                d="M -40 36 Q 720 96 1480 36"
+                d="M -40 46 Q 720 120 1480 46"
                 stroke="url(#lensRailGlow)"
                 strokeWidth="4.5"
                 fill="none"
@@ -388,7 +444,7 @@ export function IntegrationsCarousel() {
               />
               {/* Upper Glassy Lens Rail - Inner Highlight */}
               <path
-                d="M -40 44 Q 720 104 1480 44"
+                d="M -40 54 Q 720 128 1480 54"
                 stroke="#ffffff"
                 strokeWidth="2"
                 fill="none"
@@ -397,7 +453,7 @@ export function IntegrationsCarousel() {
 
               {/* Lower Glassy Lens Rail - Outer Bevel */}
               <path
-                d="M -40 424 Q 720 376 1480 424"
+                d="M -40 424 Q 720 350 1480 424"
                 stroke="url(#lensRailGlow)"
                 strokeWidth="4.5"
                 fill="none"
@@ -405,7 +461,7 @@ export function IntegrationsCarousel() {
               />
               {/* Lower Glassy Lens Rail - Inner Highlight */}
               <path
-                d="M -40 416 Q 720 368 1480 416"
+                d="M -40 416 Q 720 342 1480 416"
                 stroke="#ffffff"
                 strokeWidth="2"
                 fill="none"
@@ -414,54 +470,55 @@ export function IntegrationsCarousel() {
             </svg>
           </div>
 
-          {/* ── 3D WARPING CAROUSEL TRACK (ZERO BLUR, SCROLL-SLIDING, BIGGER CENTER) ── */}
+          {/* ── 3D WARPING CAROUSEL TRACK (ZERO BLUR, CONTINUOUS INFINITE MOTION, BIGGER CENTER) ── */}
           <div
             className="relative w-full h-full flex items-center justify-center pointer-events-none"
             style={{ transformStyle: "preserve-3d" }}
           >
-            {BRANDS.map((brand, index) => {
-              // Exact relative distance from the focal center (0.0 when dead center)
-              const diff = index - currentActiveFloat;
-              const absDiff = Math.abs(diff);
+            {DISPLAY_BRANDS.map((brand, index) => {
+              // Raw distance along the continuous infinite loop
+              const raw = (index * cardSpacing - offset) % totalTrackWidth;
+              let xOffset = ((raw % totalTrackWidth) + totalTrackWidth) % totalTrackWidth;
+              if (xOffset > totalTrackWidth / 2) {
+                xOffset -= totalTrackWidth;
+              }
 
-              // Horizontal screen translation
-              const xOffset = diff * cardSpacing;
+              // Distance from focal center in card spacing units
+              const absDiff = Math.abs(xOffset / cardSpacing);
 
               // Normalized distance ratio (-1.0 at left rail, +1.0 at right rail)
-              const halfW = containerWidth / 2;
+              const halfW = (containerWidth || 1440) / 2;
               const u = xOffset / (halfW * 0.85);
               const absU = Math.abs(u);
 
-              // ── SCROLL & LENS WARPING FORMULAS ──
-              // 1. MIDDLE ONE IS PROMINENTLY BIGGER IN SIZE:
-              // Smooth cubic easing: center blooms to ~1.38x, side cards rest cleanly at ~0.76x
+              // ── 3D LENS WARPING & PROMINENT CENTER MAGNIFICATION ──
+              // 1. Center card blooms to ~1.38x, side cards rest cleanly at ~0.76x
               const centerProximity = Math.max(0, 1 - Math.min(1, absDiff));
               const smoothProximity =
                 centerProximity * centerProximity * (3 - 2 * centerProximity);
-              const scale = 0.76 + smoothProximity * 0.62; // 0.76 at sides, 1.38 at center!
+              const scale = 0.76 + smoothProximity * 0.62;
 
-              // 2. Parabolic 3D Depth curve (curves backward into distance as cards move away from center)
+              // 2. Parabolic 3D Depth curve (curves backward into distance along glassy track)
               const zDepth = -280 * (u * u) + smoothProximity * 80;
 
               // 3. 3D inward rotation along Y-axis (physical bowed lens curvature)
-              const rotY = -Math.sign(u) * Math.min(30, Math.pow(absU, 1.1) * 26);
+              const rotY = -Math.sign(u) * Math.min(28, Math.pow(absU, 1.1) * 24);
 
               // 4. Fisheye vertical arc curve
-              const yOffset = 14 * (u * u) - 10;
+              const yOffset = 18 * (u * u);
 
-              // 5. NO BLUR: filter is strictly "none" as requested!
-              // Opacity gently fades out only near the outer margins
+              // 5. Strictly ZERO BLUR (filter: "none"). Opacity gently fades only near outer boundaries
               const opacity = Math.max(0, Math.min(1, 1 - Math.pow(absU, 1.8) * 0.65));
 
-              // Don't render cards far off-screen
+              // Cull off-screen cards outside the visible lens arc
               if (absU > 1.7) return null;
 
               const isCenterActive = absDiff < 0.45;
 
               return (
                 <div
-                  key={brand.id}
-                  onClick={() => scrollToBrand(index)}
+                  key={`${brand.id}-${index}`}
+                  onClick={() => handleClickCard(xOffset)}
                   className="absolute flex flex-col items-center justify-center select-none pointer-events-auto cursor-pointer"
                   style={{
                     width: "220px",
@@ -487,10 +544,10 @@ export function IntegrationsCarousel() {
                   {/* Clean Brand Typography Below Logo */}
                   <div className="mt-4 text-center px-2">
                     <h3
-                      className={`${plusJakarta.className} tracking-tight transition-all duration-200 ${
+                      className={`font-sans tracking-tight transition-all duration-200 ${
                         isCenterActive
-                          ? "font-bold text-2xl sm:text-3xl text-neutral-900"
-                          : "font-semibold text-base sm:text-lg text-neutral-500"
+                          ? "font-bold text-xl sm:text-2xl text-neutral-900"
+                          : "font-semibold text-base sm:text-lg text-neutral-600"
                       }`}
                     >
                       {brand.name}
@@ -498,16 +555,16 @@ export function IntegrationsCarousel() {
 
                     {/* Active Center Model Badge Pill */}
                     {isCenterActive ? (
-                      <div className={`${plusJakarta.className} mt-1.5 flex flex-col items-center gap-0.5 animate-fade-in`}>
+                      <div className="mt-1 flex flex-col items-center gap-0.5 animate-fade-in">
                         <span className="font-mono text-[11px] font-semibold text-neutral-800 bg-neutral-100/95 px-2.5 py-0.5 rounded-full border border-neutral-300/60 shadow-2xs">
                           {brand.model}
                         </span>
-                        <span className="text-[11px] text-neutral-500 font-medium">
+                        <span className="text-[10px] text-neutral-500 font-medium whitespace-nowrap">
                           {brand.company} &bull; {brand.tag}
                         </span>
                       </div>
                     ) : (
-                      <p className={`${plusJakarta.className} text-xs text-neutral-400 font-normal mt-0.5`}>
+                      <p className="text-xs text-neutral-400 font-normal mt-0.5">
                         {brand.company}
                       </p>
                     )}
@@ -517,8 +574,6 @@ export function IntegrationsCarousel() {
             })}
           </div>
         </div>
-
-
       </div>
     </section>
   );
