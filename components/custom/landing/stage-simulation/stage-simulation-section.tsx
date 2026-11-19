@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
 import { 
   PanelLeft, 
@@ -11,49 +12,56 @@ import {
   Play, 
   Pause,
   Box,
-  ArrowRight
+  ArrowRight,
+  Sparkles,
+  LayoutGrid
 } from "lucide-react";
 import Link from "next/link";
 import { StageLeftSidebar } from "./stage-left-sidebar";
 import { ThanosParticleCanvas } from "./thanos-particle-canvas";
-import {
-  VoxelLoneMascot,
-  VoxelCatResearcher,
-  VoxelSocialStation,
-  VoxelCodingStation,
-  VoxelJobStation,
-  VoxelClouds,
-} from "./voxel-assets";
+import { VoxelClouds } from "./voxel-assets";
 
 export type SimPhase = 1 | 2 | 3 | 4 | 5 | 6;
 
 export function StageSimulationSection() {
-  const [phase, setPhase] = useState<SimPhase>(1);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [phase, setPhase] = useState<SimPhase>(6); // Default to Frame 6 (Live Simulation / Cooking)
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showStoryboardGrid, setShowStoryboardGrid] = useState(false);
+  const [activeDraftStep, setActiveDraftStep] = useState(1);
+  const [secondsCounter, setSecondsCounter] = useState(12);
   const timelineRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Live ticking seconds counter for Frame 6
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsCounter((s) => (s >= 59 ? 12 : s + 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   // ── 6-Frame Animation Sequencer ──
   // Frame 1: Base Start (0ms - 1800ms)
-  // Frame 2: Thanos Dissolve (1800ms - 2600ms)
-  // Frame 3: Pop-Out Genesis (2600ms - 3300ms)
-  // Frame 4: Outward Flight (3300ms - 4100ms)
-  // Frame 5: Settle & Connect (4100ms - 4900ms)
-  // Frame 6: Live Simulation / Cooking (4900ms onward)
+  // Frame 2: Thanos Dissolve (1800ms - 2700ms)
+  // Frame 3: Pop-Out Genesis (2700ms - 3500ms)
+  // Frame 4: Outward Flight (3500ms - 4300ms)
+  // Frame 5: Settle & Connect (4300ms - 5200ms)
+  // Frame 6: Live Simulation / Cooking (5200ms onward)
   const runSequence = useCallback(() => {
     if (timelineRef.current) clearTimeout(timelineRef.current);
+    setShowStoryboardGrid(false);
     setPhase(1);
 
     const t2 = setTimeout(() => setPhase(2), 1800);
-    const t3 = setTimeout(() => setPhase(3), 2600);
-    const t4 = setTimeout(() => setPhase(4), 3300);
-    const t5 = setTimeout(() => setPhase(5), 4100);
+    const t3 = setTimeout(() => setPhase(3), 2700);
+    const t4 = setTimeout(() => setPhase(4), 3500);
+    const t5 = setTimeout(() => setPhase(5), 4300);
     const t6 = setTimeout(() => {
       setPhase(6);
-      // Hold on Frame 6 for 14s, then loop seamlessly
+      // Stay on Frame 6 for 12 seconds, then loop
       timelineRef.current = setTimeout(() => {
         if (isPlaying) runSequence();
-      }, 14000);
-    }, 4900);
+      }, 12000);
+    }, 5200);
 
     return () => {
       clearTimeout(t2);
@@ -74,7 +82,15 @@ export function StageSimulationSection() {
     return () => cleanup?.();
   }, [isPlaying, runSequence]);
 
-  const handleTogglePlay = () => setIsPlaying((p) => !p);
+  const handleTogglePlay = () => {
+    if (!isPlaying && phase === 6) {
+      // Starting play from Frame 6 runs from Frame 1
+      setIsPlaying(true);
+      runSequence();
+    } else {
+      setIsPlaying((p) => !p);
+    }
+  };
 
   const handleRestart = () => {
     setIsPlaying(true);
@@ -84,16 +100,17 @@ export function StageSimulationSection() {
   const handleSelectPhase = (p: SimPhase) => {
     setIsPlaying(false);
     if (timelineRef.current) clearTimeout(timelineRef.current);
+    setShowStoryboardGrid(false);
     setPhase(p);
   };
 
-  const frameLabels: { phase: SimPhase; name: string; time: string }[] = [
-    { phase: 1, name: "Frame 1: Base Start", time: "0s" },
-    { phase: 2, name: "Frame 2: Thanos-Style Dissolve", time: "1.8s" },
-    { phase: 3, name: "Frame 3: Pop-Out Genesis", time: "2.6s" },
-    { phase: 4, name: "Frame 4: Outward Flight", time: "3.3s" },
-    { phase: 5, name: "Frame 5: Settle & Connect", time: "4.1s" },
-    { phase: 6, name: "Frame 6: Live Simulation (\"Cooking\")", time: "4.9s+" },
+  const frameLabels: { phase: SimPhase; name: string; tag: string }[] = [
+    { phase: 1, name: "Frame 1: Base Start", tag: "F1 Base Start" },
+    { phase: 2, name: "Frame 2: Thanos-Style Dissolve", tag: "F2 Thanos Dissolve" },
+    { phase: 3, name: "Frame 3: Pop-Out Genesis", tag: "F3 Pop-Out Genesis" },
+    { phase: 4, name: "Frame 4: Outward Flight", tag: "F4 Outward Flight" },
+    { phase: 5, name: "Frame 5: Settle & Connect", tag: "F5 Settle & Connect" },
+    { phase: 6, name: "Frame 6: Live Simulation (\"Cooking\")", tag: "F6 Live Simulation (\"Cooking\")" },
   ];
 
   return (
@@ -104,8 +121,8 @@ export function StageSimulationSection() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
         {/* ── 1. SECTION HEADER ── */}
         <div className="max-w-3xl mx-auto text-center mb-6 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-mono font-medium text-neutral-700 mb-3.5 shadow-2xs">
-            <span className="size-2 rounded-full bg-emerald-500 animate-ping" />
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#ecefe8] border border-[#d5dfcc] text-xs font-mono font-medium text-[#6e9e35] mb-3.5 shadow-2xs">
+            <span className="size-2 rounded-full bg-[#6e9e35] animate-ping" />
             <span>isometric agent workspace &bull; gen-to-work 6-frame simulation</span>
           </div>
 
@@ -117,11 +134,11 @@ export function StageSimulationSection() {
           </p>
         </div>
 
-        {/* ── 2. THE MAIN DESKTOP SHELL CONTAINER ── */}
+        {/* ── 2. THE MAIN DESKTOP SHELL CONTAINER (MATCHING EXACT MOCKUP) ── */}
         <div className="relative w-full rounded-3xl border border-black/[0.1] bg-white shadow-2xl overflow-hidden flex flex-col">
           {/* Main App Body: Persistent Left Sidebar + The Simulation Workspace */}
-          <div className="flex flex-col md:flex-row h-[610px] sm:h-[650px] w-full overflow-hidden relative">
-            {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup) */}
+          <div className="flex flex-col md:flex-row h-[620px] sm:h-[660px] w-full overflow-hidden relative">
+            {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup sage colors) */}
             <StageLeftSidebar />
 
             {/* 2. THE SIMULATION WORKSPACE (MainStage.tsx) */}
@@ -129,301 +146,393 @@ export function StageSimulationSection() {
               {/* Volumetric Minecraft Clouds in Sky */}
               <VoxelClouds />
 
-              {/* ── TOP BAR (MATCHING MOCKUP IN IMAGE 1) ── */}
-              <div className="relative z-20 h-12 px-4 border-b border-black/[0.06] bg-white/70 backdrop-blur-md flex items-center justify-between gap-3 select-none">
+              {/* ── TOP BAR (MATCHING MOCKUP DOWN TO THE PIXEL) ── */}
+              <div className="relative z-20 h-11 px-4 border-b border-black/[0.06] bg-white/75 backdrop-blur-md flex items-center justify-between gap-3 select-none">
                 {/* Left Title: [|] + 📦 Simulation Workspace ● */}
                 <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
-                  <PanelLeft className="size-4 text-neutral-500 cursor-pointer" />
-                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-white/80 border border-black/[0.06] shadow-2xs">
-                    <Box className="size-3.5 text-neutral-700" />
+                  <PanelLeft className="size-3.5 text-neutral-500 cursor-pointer hover:text-neutral-900" />
+                  <div className="flex items-center gap-1.5 px-2 py-0.8 rounded-md bg-white/90 border border-black/[0.06] shadow-2xs">
+                    <Box className="size-3 text-neutral-700" />
                     <span>Simulation Workspace</span>
-                    <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse ml-0.5" />
+                    <span className="size-1.5 rounded-full bg-[#6e9e35] animate-pulse ml-0.5" />
                   </div>
                 </div>
 
                 {/* Right Utilities: Search, Bell, Hide Config, User */}
                 <div className="flex items-center gap-2">
-                  <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/80 border border-black/[0.06] text-neutral-400 text-[11px] font-mono shadow-2xs">
-                    <SearchIcon className="size-3" />
+                  <div className="hidden sm:flex items-center gap-1 px-2 py-0.8 rounded-md bg-white/80 border border-black/[0.06] text-neutral-400 text-[10px] font-mono shadow-2xs">
+                    <SearchIcon className="size-2.5" />
                     <span>⌘ K</span>
                   </div>
 
-                  <button type="button" className="p-1.5 rounded-lg text-neutral-500 hover:bg-neutral-100 transition-colors">
+                  <button type="button" className="p-1 rounded-md text-neutral-500 hover:bg-neutral-100 transition-colors">
                     <Bell className="size-3.5" />
                   </button>
 
                   <button
                     type="button"
-                    className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/90 border border-black/[0.08] text-[11px] font-medium text-neutral-700 shadow-2xs hover:bg-neutral-50 transition-colors"
+                    onClick={() => setShowStoryboardGrid((v) => !v)}
+                    className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/90 border border-black/[0.08] text-[10.5px] font-medium text-neutral-700 shadow-2xs hover:bg-neutral-50 transition-colors"
                   >
                     <Sliders className="size-3 text-neutral-500" />
-                    <span>Hide Config</span>
+                    <span>{showStoryboardGrid ? "Show Live Cooking" : "View Storyboard"}</span>
                   </button>
 
                   {/* Landscape User Avatar */}
-                  <div className="size-7 rounded-full bg-gradient-to-tr from-emerald-400 to-sky-500 border border-white shadow-xs" />
+                  <div className="size-6 rounded-full bg-gradient-to-tr from-[#6e9e35] to-sky-500 border border-white shadow-xs" />
                 </div>
               </div>
 
               {/* ── THE 6-FRAME CANVAS VIEWPORT ── */}
-              <div className="relative flex-1 w-full h-full flex items-center justify-center p-3 sm:p-5 overflow-hidden">
-                {/* ── FRAME 1: BASE START (LONE CAT ON FLOATING ISLAND) ── */}
-                <AnimatePresence>
-                  {phase === 1 && (
-                    <motion.div
-                      key="frame1-lone-cat"
-                      initial={{ scale: 0.9, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      exit={{ scale: 1.05, opacity: 0 }}
-                      transition={{ duration: 0.4 }}
-                      className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
-                    >
-                      {/* Floating Sway [-4px to 4px] */}
-                      <motion.div
-                        animate={{ y: [-4, 4, -4] }}
-                        transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
-                        className="relative flex flex-col items-center justify-center"
+              <div className="relative flex-1 w-full h-full flex items-center justify-center p-2.5 sm:p-4 overflow-hidden">
+                {/* ── VIEW MODE 1: FULL 6-FRAME STORYBOARD OVERVIEW (TOGGLED) ── */}
+                {showStoryboardGrid ? (
+                  <motion.div
+                    key="storyboard-overview"
+                    initial={{ opacity: 0, scale: 0.96 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="relative w-full h-full rounded-2xl overflow-hidden shadow-sm border border-black/[0.08] bg-white flex flex-col"
+                  >
+                    <div className="p-2 border-b border-black/[0.06] bg-neutral-50/90 flex items-center justify-between">
+                      <span className="text-xs font-bold text-neutral-900">
+                        TRANSITION STORYBOARD: Agent Workspace Setup Process (6 Frames)
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowStoryboardGrid(false)}
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-neutral-900 text-white"
                       >
-                        <VoxelLoneMascot />
-                      </motion.div>
-
-                      {/* Status indicator pill */}
-                      <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
-                        <span className="size-1.5 rounded-full bg-[#7C5CFC] animate-ping" />
-                        <span>Mascot Idle &bull; Ready to Initialize Crew</span>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                {/* ── FRAME 2: THANOS-STYLE DISSOLVE PARTICLE EXPLOSION ── */}
-                <ThanosParticleCanvas active={phase === 2} />
-
-                {/* ── FRAME 3: POP-OUT GENESIS (BURSTING OUTWARD FROM CENTER) ── */}
-                {phase === 3 && (
-                  <div className="absolute inset-0 flex items-center justify-center z-15 pointer-events-none">
-                    {/* Center Light Burst Rays */}
-                    <motion.div
-                      initial={{ scale: 0, opacity: 1 }}
-                      animate={{ scale: 2.2, opacity: 0 }}
-                      transition={{ duration: 0.7, ease: "easeOut" }}
-                      className="size-36 rounded-full bg-gradient-to-tr from-yellow-300 via-white to-sky-400 blur-lg"
-                    />
-
-                    {/* 4 Floating Islands Bursting Outward */}
-                    <div className="w-full h-full grid grid-cols-2 gap-6 p-6">
-                      <motion.div
-                        initial={{ scale: 0, x: 120, y: 100 }}
-                        animate={{ scale: 1, x: 0, y: 0 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 20 }}
-                        className="flex items-center justify-center"
-                      >
-                        <VoxelCatResearcher />
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ scale: 0, x: -120, y: 100 }}
-                        animate={{ scale: 1, x: 0, y: 0 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 20, delay: 0.04 }}
-                        className="flex items-center justify-center"
-                      >
-                        <VoxelSocialStation />
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ scale: 0, x: 120, y: -100 }}
-                        animate={{ scale: 1, x: 0, y: 0 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 20, delay: 0.08 }}
-                        className="flex items-center justify-center"
-                      >
-                        <VoxelCodingStation />
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ scale: 0, x: -120, y: -100 }}
-                        animate={{ scale: 1, x: 0, y: 0 }}
-                        transition={{ type: "spring", stiffness: 280, damping: 20, delay: 0.12 }}
-                        className="flex items-center justify-center"
-                      >
-                        <VoxelJobStation />
-                      </motion.div>
+                        Back to Live Simulation
+                      </button>
                     </div>
-                  </div>
-                )}
-
-                {/* ── FRAME 5 & 6: SYMMETRICAL SVG CONNECTORS & DATA DOTS ── */}
-                {phase >= 5 && (
-                  <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden">
-                    <svg className="w-full h-full" viewBox="0 0 800 500" fill="none">
-                      <defs>
-                        <linearGradient id="cableGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#38bdf8" />
-                          <stop offset="50%" stopColor="#818cf8" />
-                          <stop offset="100%" stopColor="#34d399" />
-                        </linearGradient>
-                      </defs>
-
-                      {/* Cable 1: Top-Left to Bottom-Right */}
-                      <motion.path
-                        d="M 220 180 C 350 180, 450 320, 580 320"
-                        stroke="url(#cableGrad)"
-                        strokeWidth="2"
-                        strokeDasharray="6 6"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.8 }}
-                        opacity="0.6"
+                    <div className="relative flex-1 w-full h-full">
+                      <Image
+                        src="/simulation/storyboard_full.jpg"
+                        alt="Transition Storyboard"
+                        fill
+                        className="object-contain"
+                        priority
                       />
+                    </div>
+                  </motion.div>
+                ) : (
+                  <>
+                    {/* ── FRAME 1: BASE START (LONE CAT ON FLOATING ISLAND) ── */}
+                    <AnimatePresence>
+                      {phase === 1 && (
+                        <motion.div
+                          key="frame1-lone-cat"
+                          initial={{ scale: 0.9, opacity: 0 }}
+                          animate={{ scale: 1, opacity: 1 }}
+                          exit={{ scale: 1.05, opacity: 0 }}
+                          transition={{ duration: 0.4 }}
+                          className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
+                        >
+                          <motion.div
+                            animate={{ y: [-5, 5, -5] }}
+                            transition={{ duration: 2.8, repeat: Infinity, ease: "easeInOut" }}
+                            className="relative w-[340px] sm:w-[420px] aspect-[1.4/1] rounded-2xl overflow-hidden shadow-xl border border-white/60"
+                          >
+                            <Image
+                              src="/simulation/storyboard_f1.jpg"
+                              alt="Frame 1: Base Start"
+                              fill
+                              className="object-cover"
+                              priority
+                            />
+                          </motion.div>
 
-                      {/* Cable 2: Top-Right to Bottom-Left */}
-                      <motion.path
-                        d="M 580 180 C 450 180, 350 320, 220 320"
-                        stroke="url(#cableGrad)"
-                        strokeWidth="2"
-                        strokeDasharray="6 6"
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.8, delay: 0.1 }}
-                        opacity="0.6"
-                      />
+                          <div className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
+                            <span className="size-1.5 rounded-full bg-[#7C5CFC] animate-ping" />
+                            <span>Frame 1: Base Start &bull; Mascot Perched in Isolation</span>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
 
-                      {/* Flowing Data Particle Dots */}
-                      <circle cx="400" cy="250" r="3.5" fill="#38bdf8" className="animate-ping" />
-                    </svg>
-                  </div>
-                )}
+                    {/* ── FRAME 2: THANOS-STYLE DISSOLVE PARTICLE EXPLOSION ── */}
+                    {phase === 2 && (
+                      <motion.div
+                        key="frame2-dissolve"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
+                      >
+                        <div className="relative w-[340px] sm:w-[420px] aspect-[1.4/1] rounded-2xl overflow-hidden shadow-xl border border-white/60">
+                          <Image
+                            src="/simulation/storyboard_f2.jpg"
+                            alt="Frame 2: Thanos Dissolve"
+                            fill
+                            className="object-cover"
+                            priority
+                          />
+                        </div>
 
-                {/* ── FRAME 4, 5, 6: THE 4 RICH VOXEL BOT WORKSPACE CARDS (MATCHING IMAGE 1) ── */}
-                {phase >= 4 && (
-                  <div className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-3.5 overflow-hidden">
-                    {/* ────────────────────────────────────────────────────────── */}
-                    {/* 1. TOP-LEFT: RESEARCH BOT                                  */}
-                    {/* ────────────────────────────────────────────────────────── */}
-                    <motion.div
-                      initial={{ scale: 0.85, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
-                      className="relative rounded-2xl bg-white/98 border border-black/[0.08] p-3 shadow-sm flex flex-col justify-between overflow-hidden"
-                    >
-                      {/* Card Header (Matching Mockup) */}
-                      <div className="flex items-center justify-between z-20 pb-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="size-5 rounded-md bg-neutral-100 flex items-center justify-center text-xs">
-                            🐱
-                          </span>
-                          <div>
-                            <h4 className="text-xs font-bold text-neutral-900 leading-none">Research Bot</h4>
-                            <p className="text-[10px] text-neutral-400 font-mono mt-0.5">Live &bull; Active 12m</p>
+                        {/* Interactive Thanos Particle Canvas */}
+                        <ThanosParticleCanvas active={phase === 2} />
+
+                        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
+                          <span className="size-1.5 rounded-full bg-orange-500 animate-ping" />
+                          <span>Frame 2: Thanos-Style Dissolve &bull; 150 Particle Genesis Burst</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── FRAME 3: POP-OUT GENESIS ── */}
+                    {phase === 3 && (
+                      <motion.div
+                        key="frame3-genesis"
+                        initial={{ scale: 0.85, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 260, damping: 20 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
+                      >
+                        <div className="relative w-[340px] sm:w-[420px] aspect-[1.4/1] rounded-2xl overflow-hidden shadow-xl border border-white/60">
+                          <Image
+                            src="/simulation/storyboard_f3.jpg"
+                            alt="Frame 3: Pop-Out Genesis"
+                            fill
+                            className="object-cover"
+                            priority
+                          />
+                        </div>
+
+                        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
+                          <span className="size-1.5 rounded-full bg-amber-500 animate-ping" />
+                          <span>Frame 3: Pop-Out Genesis &bull; Quad Island Outward Burst</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── FRAME 4: OUTWARD FLIGHT ── */}
+                    {phase === 4 && (
+                      <motion.div
+                        key="frame4-flight"
+                        initial={{ scale: 0.9, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
+                      >
+                        <div className="relative w-[340px] sm:w-[420px] aspect-[1.4/1] rounded-2xl overflow-hidden shadow-xl border border-white/60">
+                          <Image
+                            src="/simulation/storyboard_f4.jpg"
+                            alt="Frame 4: Outward Flight"
+                            fill
+                            className="object-cover"
+                            priority
+                          />
+                        </div>
+
+                        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
+                          <span className="size-1.5 rounded-full bg-sky-500 animate-ping" />
+                          <span>Frame 4: Outward Flight &bull; Expanding to Quadrant Resting Points</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── FRAME 5: SETTLE & CONNECT ── */}
+                    {phase === 5 && (
+                      <motion.div
+                        key="frame5-connect"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 flex flex-col items-center justify-center z-20 pointer-events-none"
+                      >
+                        <div className="relative w-[340px] sm:w-[420px] aspect-[1.4/1] rounded-2xl overflow-hidden shadow-xl border border-white/60">
+                          <Image
+                            src="/simulation/storyboard_f5.jpg"
+                            alt="Frame 5: Settle & Connect"
+                            fill
+                            className="object-cover"
+                            priority
+                          />
+                        </div>
+
+                        {/* Animated Glowing Cable Path */}
+                        <div className="absolute inset-0 pointer-events-none z-30">
+                          <svg className="w-full h-full" viewBox="0 0 600 400" fill="none">
+                            <motion.path
+                              d="M 150 140 C 250 140, 350 260, 450 260"
+                              stroke="#6e9e35"
+                              strokeWidth="2.5"
+                              strokeDasharray="6 6"
+                              initial={{ strokeDashoffset: 50 }}
+                              animate={{ strokeDashoffset: 0 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            <circle cx="300" cy="200" r="4" fill="#6e9e35" className="animate-ping" />
+                          </svg>
+                        </div>
+
+                        <div className="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 border border-black/[0.08] text-[11px] font-mono text-neutral-700 shadow-sm">
+                          <span className="size-1.5 rounded-full bg-[#6e9e35] animate-ping" />
+                          <span>Frame 5: Settle & Connect &bull; Drawing Synchronized Data Cables</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* ── FRAME 6: LIVE SIMULATION ("COOKING") ── */}
+                    {/* (THE 4 RICH 3D VOXEL CARDS FROM MOCKUP WITH REAL DOM INTERACTIVITY) */}
+                    {phase === 6 && (
+                      <motion.div
+                        key="frame6-simulation"
+                        initial={{ opacity: 0, scale: 0.98 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.4 }}
+                        className="relative z-10 w-full h-full grid grid-cols-1 md:grid-cols-2 gap-2.5 sm:gap-3.5 overflow-hidden"
+                      >
+                        {/* ────────────────────────────────────────────────────────── */}
+                        {/* 1. TOP-LEFT: RESEARCH BOT (3D VOXEL CAT WITH HEADPHONES)   */}
+                        {/* ────────────────────────────────────────────────────────── */}
+                        <div className="relative rounded-2xl bg-white border border-black/[0.08] shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all duration-300">
+                          <div className="relative w-full h-full min-h-[170px] sm:min-h-[190px]">
+                            <Image
+                              src="/simulation/card_3d_research.jpg"
+                              alt="Research Bot 3D Voxel Scene"
+                              fill
+                              className="object-cover select-none"
+                              priority
+                            />
+
+                            {/* Live Interactive Overlaid Badge (Pulsing Sage Green) */}
+                            <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-0.8 rounded-full bg-white/90 backdrop-blur-xs border border-[#d5dfcc] shadow-2xs text-[10px] font-mono text-[#6e9e35] font-semibold">
+                              <span className="size-1.5 rounded-full bg-[#6e9e35] animate-ping" />
+                              <span>Live &bull; Active {secondsCounter}m</span>
+                            </div>
+
+                            {/* Live Active Browsing Telemetry Prompt */}
+                            <div className="absolute bottom-2.5 left-3 z-20 hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[9.5px] font-mono text-emerald-300">
+                              <Sparkles className="size-2.5 text-yellow-300" />
+                              <span>arXiv:2611.089 &bull; Multi-Agent Consensus</span>
+                            </div>
                           </div>
                         </div>
 
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-mono text-emerald-700 border border-emerald-200">
-                          <span className="size-1.5 rounded-full bg-emerald-500 animate-ping" />
-                          <span>Live &bull; Active 12m</span>
-                        </span>
-                      </div>
+                        {/* ────────────────────────────────────────────────────────── */}
+                        {/* 2. TOP-RIGHT: SOCIAL MEDIA BOT (3D APP BILLBOARD)          */}
+                        {/* ────────────────────────────────────────────────────────── */}
+                        <div className="relative rounded-2xl bg-white border border-black/[0.08] shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all duration-300">
+                          <div className="relative w-full h-full min-h-[170px] sm:min-h-[190px]">
+                            <Image
+                              src="/simulation/card_3d_social.jpg"
+                              alt="Social Media Bot 3D Voxel Scene"
+                              fill
+                              className="object-cover select-none"
+                              priority
+                            />
 
-                      {/* 3D Voxel Cat with Headphones, Laptop, Monitor on Island */}
-                      <VoxelCatResearcher />
-                    </motion.div>
+                            {/* Live Interactive Overlaid Badge */}
+                            <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-0.8 rounded-full bg-white/90 backdrop-blur-xs border border-neutral-200 shadow-2xs text-[10px] font-mono text-neutral-700">
+                              <span className="size-1.5 rounded-full bg-sky-500 animate-pulse" />
+                              <span>Queue active 3s</span>
+                            </div>
 
-                    {/* ────────────────────────────────────────────────────────── */}
-                    {/* 2. TOP-RIGHT: SOCIAL MEDIA BOT                             */}
-                    {/* ────────────────────────────────────────────────────────── */}
-                    <motion.div
-                      initial={{ scale: 0.85, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
-                      className="relative rounded-2xl bg-white/98 border border-black/[0.08] p-3 shadow-sm flex flex-col justify-between overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between z-20 pb-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="size-5 rounded-md bg-neutral-100 flex items-center justify-center text-xs">
-                            🐱
-                          </span>
-                          <div>
-                            <h4 className="text-xs font-bold text-neutral-900 leading-none">Social Media Bot</h4>
-                            <p className="text-[10px] text-neutral-400 font-mono mt-0.5">Automated &bull; Queue active 3s</p>
+                            {/* Interactive Drafting Dropdown Overlay on right */}
+                            <div className="absolute top-8 right-3 z-25 w-28 sm:w-32 rounded-xl bg-white/95 border border-black/[0.1] shadow-lg p-1.5 text-[9px] font-mono space-y-0.5">
+                              <p className="text-[9px] font-bold text-neutral-800 px-1 pb-0.5 border-b border-black/[0.05]">
+                                Drafting posts...
+                              </p>
+                              {[
+                                { num: 1, label: "Starting" },
+                                { num: 2, label: "Create posts..." },
+                                { num: 3, label: "Drafting posts..." },
+                                { num: 4, label: "Create link..." },
+                              ].map((step) => (
+                                <button
+                                  key={step.num}
+                                  type="button"
+                                  onClick={() => setActiveDraftStep(step.num)}
+                                  className={`w-full text-left px-1.5 py-0.5 rounded transition-colors flex items-center justify-between ${
+                                    activeDraftStep === step.num
+                                      ? "bg-[#ecefe8] text-[#6e9e35] font-bold"
+                                      : "text-neutral-600 hover:bg-neutral-100"
+                                  }`}
+                                >
+                                  <span>{step.num} {step.label}</span>
+                                  {activeDraftStep === step.num && (
+                                    <span className="size-1 rounded-full bg-[#6e9e35]" />
+                                  )}
+                                </button>
+                              ))}
+                            </div>
                           </div>
                         </div>
 
-                        <span className="px-2 py-0.5 rounded-full bg-neutral-100 text-[10px] font-mono text-neutral-600 border border-neutral-200">
-                          &bull; Automated &bull; Queue ac: 3s
-                        </span>
-                      </div>
+                        {/* ────────────────────────────────────────────────────────── */}
+                        {/* 3. BOTTOM-LEFT: CODING BOT (3D RETRO CRT WORKSTATION)      */}
+                        {/* ────────────────────────────────────────────────────────── */}
+                        <div className="relative rounded-2xl bg-white border border-black/[0.08] shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all duration-300">
+                          <div className="relative w-full h-full min-h-[170px] sm:min-h-[190px]">
+                            <Image
+                              src="/simulation/card_3d_coding.jpg"
+                              alt="Coding Bot 3D Voxel Scene"
+                              fill
+                              className="object-cover select-none"
+                              priority
+                            />
 
-                      {/* 3D Voxel Billboard Station + Drafting Popover on Island */}
-                      <VoxelSocialStation />
-                    </motion.div>
+                            {/* Live Interactive Overlaid Badge */}
+                            <div className="absolute top-2.5 right-2.5 z-20 flex items-center gap-1.5 px-2 py-0.8 rounded-full bg-white/90 backdrop-blur-xs border border-[#d5dfcc] shadow-2xs text-[10px] font-mono text-[#6e9e35] font-semibold">
+                              <span className="size-1.5 rounded-full bg-[#6e9e35] animate-pulse" />
+                              <span>Active compiling...</span>
+                            </div>
 
-                    {/* ────────────────────────────────────────────────────────── */}
-                    {/* 3. BOTTOM-LEFT: CODING BOT                                 */}
-                    {/* ────────────────────────────────────────────────────────── */}
-                    <motion.div
-                      initial={{ scale: 0.85, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-                      className="relative rounded-2xl bg-white/98 border border-black/[0.08] p-3 shadow-sm flex flex-col justify-between overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between z-20 pb-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="size-5 rounded-md bg-neutral-100 flex items-center justify-center text-xs">
-                            🐱
-                          </span>
-                          <div>
-                            <h4 className="text-xs font-bold text-neutral-900 leading-none">Coding Bot</h4>
-                            <p className="text-[10px] text-neutral-400 font-mono mt-0.5">Code Branch &bull; Compiling...</p>
+                            {/* Live Typewriter Code Overlay near screen */}
+                            <div className="absolute bottom-2.5 left-3 z-20 hidden sm:flex flex-col gap-0.5 px-2 py-1 rounded bg-black/75 backdrop-blur-sm text-[8.5px] font-mono text-emerald-400 max-w-[210px] shadow-sm">
+                              <div className="flex items-center gap-1 text-neutral-400">
+                                <span>main.rs</span>
+                                <span>&bull;</span>
+                                <span className="text-[#6e9e35]">30/30 ok</span>
+                              </div>
+                              <span className="truncate">$ cargo run --release --agent</span>
+                            </div>
                           </div>
                         </div>
 
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 text-[10px] font-mono text-emerald-700 border border-emerald-200">
-                          <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                          <span>Active compiling...</span>
-                        </span>
-                      </div>
+                        {/* ────────────────────────────────────────────────────────── */}
+                        {/* 4. BOTTOM-RIGHT: JOB BOT (3D DIRT PATHWAY & SIGNS)         */}
+                        {/* ────────────────────────────────────────────────────────── */}
+                        <div className="relative rounded-2xl bg-white border border-black/[0.08] shadow-sm overflow-hidden flex flex-col justify-between group hover:shadow-md transition-all duration-300">
+                          <div className="relative w-full h-full min-h-[170px] sm:min-h-[190px]">
+                            <Image
+                              src="/simulation/card_3d_job.jpg"
+                              alt="Job Bot 3D Voxel Scene"
+                              fill
+                              className="object-cover select-none"
+                              priority
+                            />
 
-                      {/* 3D Voxel Retro Computer + Terminals + GitHub Blocks on Island */}
-                      <VoxelCodingStation />
-                    </motion.div>
+                            {/* Sage Green Progress Bar */}
+                            <div className="absolute top-3 right-3 z-20 w-24 sm:w-28 flex flex-col items-end gap-1">
+                              <div className="w-full h-1.5 rounded-full bg-neutral-200 overflow-hidden shadow-2xs">
+                                <div className="h-full rounded-full bg-[#6e9e35] w-3/4 animate-pulse" />
+                              </div>
+                              <span className="text-[9px] font-mono text-neutral-500 font-medium">
+                                12 Matches
+                              </span>
+                            </div>
 
-                    {/* ────────────────────────────────────────────────────────── */}
-                    {/* 4. BOTTOM-RIGHT: JOB BOT                                   */}
-                    {/* ────────────────────────────────────────────────────────── */}
-                    <motion.div
-                      initial={{ scale: 0.85, opacity: 0 }}
-                      animate={{ scale: 1, opacity: 1 }}
-                      transition={{ duration: 0.5, ease: "easeOut", delay: 0.15 }}
-                      className="relative rounded-2xl bg-white/98 border border-black/[0.08] p-3 shadow-sm flex flex-col justify-between overflow-hidden"
-                    >
-                      <div className="flex items-center justify-between z-20 pb-0.5">
-                        <div className="flex items-center gap-2">
-                          <span className="size-5 rounded-md bg-neutral-100 flex items-center justify-center text-xs">
-                            🐱
-                          </span>
-                          <div>
-                            <h4 className="text-xs font-bold text-neutral-900 leading-none">Job Bot</h4>
-                            <p className="text-[10px] text-neutral-400 font-mono mt-0.5">Active pipeline &bull; 12 Matches</p>
+                            {/* Live Telemetry Ticker */}
+                            <div className="absolute bottom-2.5 left-3 z-20 hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-black/60 backdrop-blur-sm text-[9.5px] font-mono text-amber-300">
+                              <span>Auto-Applied: 3 Roles &bull; 2 Interviews Booked</span>
+                            </div>
                           </div>
                         </div>
-
-                        {/* Green Progress Bar */}
-                        <div className="w-24 h-1.5 rounded-full bg-neutral-200 overflow-hidden">
-                          <div className="h-full rounded-full bg-emerald-500 w-3/4" />
-                        </div>
-                      </div>
-
-                      {/* 3D Voxel Dirt Pathway + Search/Apply Heart Signs on Island */}
-                      <VoxelJobStation />
-                    </motion.div>
-                  </div>
+                      </motion.div>
+                    )}
+                  </>
                 )}
               </div>
 
               {/* ── FLAT GROUND GRASS BORDER STRIP (ACROSS VIEWPORT BOTTOM) ── */}
-              <div className="w-full h-2.5 bg-gradient-to-r from-emerald-500 via-green-500 to-emerald-600 border-t border-emerald-600 shrink-0 select-none pointer-events-none" />
+              <div className="w-full h-2.5 bg-gradient-to-r from-[#6e9e35] via-[#84cc16] to-[#6e9e35] border-t border-[#5b842a] shrink-0 select-none pointer-events-none" />
 
               {/* ── 3. BOTTOM TIMELINE SCRUBBER CONTROLLER ── */}
-              <div className="w-full px-4 py-2 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono select-none">
+              <div className="w-full px-3.5 py-2 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono select-none">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
@@ -431,7 +540,7 @@ export function StageSimulationSection() {
                     className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 text-white hover:bg-black transition-all active:scale-95 shadow-2xs font-semibold text-[11px]"
                   >
                     {isPlaying ? <Pause className="size-3" /> : <Play className="size-3" />}
-                    <span>{isPlaying ? "Pause" : "Play"}</span>
+                    <span>{isPlaying ? "Pause" : "Play Sequence"}</span>
                   </button>
 
                   <button
@@ -443,7 +552,7 @@ export function StageSimulationSection() {
                     <RotateCcw className="size-3.5" />
                   </button>
 
-                  <span className="text-[10px] text-neutral-400 hidden sm:inline">
+                  <span className="text-[10.5px] text-neutral-500 hidden sm:inline">
                     Phase {phase}/6 &bull; {phase === 6 ? "Always Cooking" : "Transitioning..."}
                   </span>
                 </div>
@@ -451,19 +560,19 @@ export function StageSimulationSection() {
                 {/* Frame Pills (F1 to F6) */}
                 <div className="flex items-center gap-1 overflow-x-auto py-0.5">
                   {frameLabels.map((f) => {
-                    const isActive = phase === f.phase;
+                    const isActive = phase === f.phase && !showStoryboardGrid;
                     return (
                       <button
                         key={f.phase}
                         type="button"
                         onClick={() => handleSelectPhase(f.phase)}
-                        className={`px-2 py-0.5 rounded-md text-[10px] transition-all whitespace-nowrap ${
+                        className={`px-2 py-0.8 rounded-md text-[10px] transition-all whitespace-nowrap ${
                           isActive
                             ? "bg-neutral-900 text-white font-bold shadow-2xs scale-105"
                             : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                         }`}
                       >
-                        {f.name.replace("Frame ", "F")}
+                        {f.tag}
                       </button>
                     );
                   })}
