@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef, useState, useEffect, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Key, Sparkles, Cpu } from "lucide-react";
+import { Key, Sparkles, Cpu } from "lucide-react";
 import { useScroll, useSpring } from "motion/react";
 import { instrumentSerif, playfair, plusJakarta } from "@/app/fonts";
 import {
@@ -270,12 +270,6 @@ export function IntegrationsCarousel() {
     return () => unsubscribe();
   }, [smoothProgress]);
 
-  // Round active integer index for pill indicator and stepper
-  const activeIntIndex = Math.min(
-    BRANDS.length - 1,
-    Math.max(0, Math.round(currentActiveFloat))
-  );
-
   // Smooth programmatic scroll to a specific model index
   const scrollToBrand = useCallback((index: number) => {
     if (!sectionRef.current) return;
@@ -285,16 +279,6 @@ export function IntegrationsCarousel() {
     const targetScrollY = scrollTop + (index / (BRANDS.length - 1)) * scrollableDistance;
     window.scrollTo({ top: targetScrollY, behavior: "smooth" });
   }, []);
-
-  const handlePrev = useCallback(() => {
-    const nextIdx = Math.max(0, activeIntIndex - 1);
-    scrollToBrand(nextIdx);
-  }, [activeIntIndex, scrollToBrand]);
-
-  const handleNext = useCallback(() => {
-    const nextIdx = Math.min(BRANDS.length - 1, activeIntIndex + 1);
-    scrollToBrand(nextIdx);
-  }, [activeIntIndex, scrollToBrand]);
 
   // Pointer drag support for horizontal swiping
   const isDraggingRef = useRef(false);
@@ -309,10 +293,11 @@ export function IntegrationsCarousel() {
     if (!isDraggingRef.current) return;
     const dx = e.clientX - dragStartXRef.current;
     if (Math.abs(dx) > 60) {
+      const currentInt = Math.round(currentActiveFloat);
       if (dx > 0) {
-        handlePrev();
+        scrollToBrand(Math.max(0, currentInt - 1));
       } else {
-        handleNext();
+        scrollToBrand(Math.min(BRANDS.length - 1, currentInt + 1));
       }
       isDraggingRef.current = false;
     }
@@ -333,9 +318,9 @@ export function IntegrationsCarousel() {
       }}
     >
       {/* ── STICKY VIEWPORT CONTAINER ── */}
-      <div className="sticky top-0 h-screen w-full flex flex-col justify-between pt-24 pb-8 sm:pt-28 sm:pb-12 overflow-hidden">
+      <div className="sticky top-0 h-screen w-full flex flex-col justify-center items-center pt-16 sm:pt-20 pb-10 sm:pb-14 overflow-hidden">
         {/* ── 1. TOP HEADLINE & BRING-YOUR-OWN-AI BANNER ── */}
-        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0">
+        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-3 sm:mb-5">
           <div className={`${plusJakarta.className} inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-neutral-100/95 border border-neutral-200/90 text-xs font-semibold text-neutral-800 mb-3.5 shadow-2xs`}>
             <Key className="size-3.5 text-neutral-800" />
             <span>bring the AI models you already pay for &middot; zero API markup</span>
@@ -533,70 +518,7 @@ export function IntegrationsCarousel() {
           </div>
         </div>
 
-        {/* ── 3. BOTTOM CONTROLS: MODEL STEP PILLS & ARROWS ── */}
-        <div className={`shrink-0 flex flex-col items-center gap-3 z-10 px-4 ${plusJakarta.className}`}>
-          {/* Interactive model dots/pills track */}
-          <div className="flex items-center gap-1.5 sm:gap-2 bg-neutral-100/95 p-1.5 rounded-full border border-neutral-200/90 shadow-2xs">
-            {BRANDS.map((b, idx) => {
-              const isSelected = idx === activeIntIndex;
-              return (
-                <button
-                  key={b.id}
-                  type="button"
-                  onClick={() => scrollToBrand(idx)}
-                  className={`relative flex items-center justify-center transition-all duration-300 rounded-full cursor-pointer ${
-                    isSelected
-                      ? "px-3 py-1 bg-white text-neutral-900 shadow-xs font-semibold text-xs border border-black/5"
-                      : "size-2.5 sm:size-3 bg-neutral-300 hover:bg-neutral-400"
-                  }`}
-                  aria-label={`Jump to ${b.name}`}
-                  title={`${b.name} (${b.company})`}
-                >
-                  {isSelected ? (
-                    <span className="truncate max-w-[90px]">{b.name}</span>
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
 
-          {/* Minimalist Navigation Buttons & Step Indicator */}
-          <div className="navigation flex items-center justify-center gap-4">
-            <button
-              id="prev"
-              type="button"
-              onClick={handlePrev}
-              disabled={activeIntIndex === 0}
-              className="size-8 sm:size-9 rounded-lg border border-black/10 bg-white hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed text-neutral-700 hover:text-black flex items-center justify-center text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
-              aria-label="Previous Brand"
-              title="Previous Model"
-            >
-              <ChevronLeft className="size-4 stroke-[2]" />
-            </button>
-
-            <span className="font-mono text-xs text-neutral-500 font-medium">
-              {String(activeIntIndex + 1).padStart(2, "0")} / {String(BRANDS.length).padStart(2, "0")}
-            </span>
-
-            <button
-              id="next"
-              type="button"
-              onClick={handleNext}
-              disabled={activeIntIndex === BRANDS.length - 1}
-              className="size-8 sm:size-9 rounded-lg border border-black/10 bg-white hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed text-neutral-700 hover:text-black flex items-center justify-center text-xs transition-all active:scale-95 shadow-2xs cursor-pointer"
-              aria-label="Next Brand"
-              title="Next Model"
-            >
-              <ChevronRight className="size-4 stroke-[2]" />
-            </button>
-          </div>
-
-          <p className="text-[11px] text-neutral-400 tracking-wide font-normal flex items-center gap-1.5">
-            <span>scroll down to slide</span>
-            <span className="opacity-50">&bull;</span>
-            <span>drag or click arrows to explore</span>
-          </p>
-        </div>
       </div>
     </section>
   );
