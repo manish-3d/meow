@@ -3,13 +3,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "motion/react";
-import { 
-  PanelLeft, 
-  Search as SearchIcon, 
-  Bell, 
-  Sliders, 
-  RotateCcw, 
-  Play, 
+import {
+  PanelLeft,
+  Search as SearchIcon,
+  Bell,
+  Sliders,
+  RotateCcw,
+  Play,
   Pause,
   Box,
   ArrowRight,
