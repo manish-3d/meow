@@ -6,11 +6,11 @@ import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { CharacterFaceFollow } from "./character-face-follow";
 import { ChatGptLogo, ClaudeLogo, GeminiLogo, GrokLogo } from "./brand-logos";
-import { RiverScene } from "./river/RiverScene";
+import { PixelRiverBackground } from "./pixel-river/pixel-river-background";
 
 export function HeroSection() {
   return (
-    <RiverScene>
+    <PixelRiverBackground>
       <section className="relative pt-28 pb-16 sm:pt-36 sm:pb-24 min-h-[680px] sm:min-h-[780px] lg:min-h-[860px] flex flex-col justify-center text-[#131316] overflow-hidden">
         {/* Background Subtle Ambience */}
         <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_50%_at_50%_-10%,rgba(124,92,252,0.04),transparent_80%)]" />
@@ -100,6 +100,6 @@ export function HeroSection() {
         </motion.p>
       </div>
     </section>
-    </RiverScene>
+    </PixelRiverBackground>
   );
 }

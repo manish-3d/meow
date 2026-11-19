@@ -2,8 +2,8 @@ import React from "react";
 import { LandingNavbar } from "@/components/custom/landing/landing-navbar";
 import { HeroSection } from "@/components/custom/landing/hero-section";
 import { MinecraftBotsSection } from "@/components/custom/landing/minecraft-bots-section";
+import { IntegrationsCarousel } from "@/components/custom/landing/integrations-carousel";
 import { ComputerShowcase } from "@/components/custom/landing/computer-showcase";
-import { MultiKeySection } from "@/components/custom/landing/multi-key-section";
 import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
 import { HostingSection } from "@/components/custom/landing/hosting-section";
 import { PricingSection } from "@/components/custom/landing/pricing-section";
@@ -18,17 +18,17 @@ export default function Home() {
       <LandingNavbar />
 
       <main>
-        {/* 2. Hero Section (Reference Image 2 Restructure: meet [Character with Laptop] meow bot, 4-provider pill, dual CTAs) */}
+        {/* 2. Hero Section */}
         <HeroSection />
 
         {/* 3. Different Bots. Different Superpowers. (Procedural 3D Minecraft Voxel Bots Section) */}
         <MinecraftBotsSection />
 
-        {/* 4. Each bot gets its own computer (Live Cloud VM & Interactive Takeover) */}
-        <ComputerShowcase />
+        {/* 4. Cinematic 3D Lens Carousel: integration is simple (Connect with the AI models you already love) */}
+        <IntegrationsCarousel />
 
-        {/* 5. Bring your own keys (BYOK Multi-Model: Gemini, Claude, OpenAI, DeepSeek, Ollama) */}
-        <MultiKeySection />
+        {/* 5. Each bot gets its own computer (Live Cloud VM & Interactive Takeover) */}
+        <ComputerShowcase />
 
         {/* 6. Plugs into 60+ existing apps (Gmail, Slack, Calendar, Spotify, WhatsApp, GitHub) */}
         <IntegrationsStrip />
