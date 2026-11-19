@@ -221,11 +221,11 @@ const DISPLAY_BRANDS = [...BRANDS, ...BRANDS];
 // Generous desktop horizontal spacing
 const DESKTOP_SPACING = 340;
 
-// Calm, elegant auto-scroll speed (pixels per second)
-const AUTO_SCROLL_SPEED = 46;
+// Brisk, energetic auto-scroll speed (pixels per second)
+const AUTO_SCROLL_SPEED = 86;
 
 // =========================================================================
-// 2. AUTOMATIC INFINITE 3D LENS CAROUSEL (NO SCROLL-JACKING, ZERO BLUR)
+// 2. AUTOMATIC INFINITE 3D LENS CAROUSEL (ZERO BLUR, CONTINUOUS MOTION)
 // =========================================================================
 
 export function IntegrationsCarousel() {
@@ -253,7 +253,6 @@ export function IntegrationsCarousel() {
   const offsetRef = useRef(0);
   const velocityRef = useRef(0);
   const targetOffsetRef = useRef<number | null>(null);
-  const isHoveredRef = useRef(false);
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
   const dragLastXRef = useRef(0);
@@ -261,6 +260,7 @@ export function IntegrationsCarousel() {
   const hasDraggedRef = useRef(false);
 
   // ── Continuous 60fps / 120fps requestAnimationFrame Loop ──
+  // Keeps running constantly without stopping on hover!
   useEffect(() => {
     let animationFrameId: number;
     let lastTime = performance.now();
@@ -285,10 +285,8 @@ export function IntegrationsCarousel() {
           velocityRef.current *= Math.pow(0.92, dt * 60);
         } else {
           velocityRef.current = 0;
-          // Constant elegant auto-advance when not hovered
-          if (!isHoveredRef.current) {
-            offsetRef.current += AUTO_SCROLL_SPEED * dt;
-          }
+          // Constant brisk auto-advance — keeps running all the time, never stops on hover!
+          offsetRef.current += AUTO_SCROLL_SPEED * dt;
         }
       }
 
@@ -359,14 +357,6 @@ export function IntegrationsCarousel() {
     velocityRef.current = Math.max(-1200, Math.min(1200, velocityRef.current));
   };
 
-  const handleMouseEnter = () => {
-    isHoveredRef.current = true;
-  };
-
-  const handleMouseLeave = () => {
-    isHoveredRef.current = false;
-  };
-
   return (
     <section
       id="integrations-carousel"
@@ -388,7 +378,7 @@ export function IntegrationsCarousel() {
           </p>
         </div>
 
-        {/* ── 2. THE 3D LENS CAROUSEL TARGET CONTAINER (AUTOMATIC INFINITE LOOP) ── */}
+        {/* ── 2. THE 3D LENS CAROUSEL TARGET CONTAINER (AUTOMATIC INFINITE LOOP - NO HOVER STOP) ── */}
         <div
           id="webgl-container"
           ref={containerRef}
@@ -396,8 +386,6 @@ export function IntegrationsCarousel() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
           className="relative w-full h-[430px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
           style={{
             perspective: "1200px",
@@ -470,7 +458,7 @@ export function IntegrationsCarousel() {
             </svg>
           </div>
 
-          {/* ── 3D WARPING CAROUSEL TRACK (ZERO BLUR, CONTINUOUS INFINITE MOTION, BIGGER CENTER) ── */}
+          {/* ── 3D WARPING CAROUSEL TRACK (STRICTLY ZERO BLUR, CONTINUOUS MOTION, PROMINENT CENTER) ── */}
           <div
             className="relative w-full h-full flex items-center justify-center pointer-events-none"
             style={{ transformStyle: "preserve-3d" }}
@@ -492,26 +480,27 @@ export function IntegrationsCarousel() {
               const absU = Math.abs(u);
 
               // ── 3D LENS WARPING & PROMINENT CENTER MAGNIFICATION ──
-              // 1. Center card blooms to ~1.38x, side cards rest cleanly at ~0.76x
+              // 1. Center card blooms to ~1.38x, side cards rest cleanly at ~0.78x
               const centerProximity = Math.max(0, 1 - Math.min(1, absDiff));
               const smoothProximity =
                 centerProximity * centerProximity * (3 - 2 * centerProximity);
-              const scale = 0.76 + smoothProximity * 0.62;
+              const scale = 0.78 + smoothProximity * 0.60;
 
-              // 2. Parabolic 3D Depth curve (curves backward into distance along glassy track)
-              const zDepth = -280 * (u * u) + smoothProximity * 80;
+              // 2. Parabolic 3D Depth curve (crisp and clear, shallow depth to eliminate mipmap softness)
+              const zDepth = -120 * (u * u) + smoothProximity * 50;
 
               // 3. 3D inward rotation along Y-axis (physical bowed lens curvature)
-              const rotY = -Math.sign(u) * Math.min(28, Math.pow(absU, 1.1) * 24);
+              const rotY = -Math.sign(u) * Math.min(26, Math.pow(absU, 1.1) * 22);
 
               // 4. Fisheye vertical arc curve
               const yOffset = 18 * (u * u);
 
-              // 5. Strictly ZERO BLUR (filter: "none"). Opacity gently fades only near outer boundaries
-              const opacity = Math.max(0, Math.min(1, 1 - Math.pow(absU, 1.8) * 0.65));
+              // 5. SOLID, CRISP VISIBILITY — ZERO BLUR, NO WASHED OUT OPACITY
+              // Every visible card on screen is 100% full opacity (opacity: 1)
+              const opacity = absU > 1.35 ? Math.max(0, 1 - (absU - 1.35) / 0.25) : 1;
 
               // Cull off-screen cards outside the visible lens arc
-              if (absU > 1.7) return null;
+              if (absU > 1.65) return null;
 
               const isCenterActive = absDiff < 0.45;
 
@@ -523,10 +512,12 @@ export function IntegrationsCarousel() {
                   style={{
                     width: "220px",
                     transform: `translate3d(${xOffset}px, ${yOffset}px, ${zDepth}px) rotateY(${rotY}deg) scale(${scale})`,
-                    filter: "none", // NO BLUR AS REQUESTED!
+                    filter: "none", // STRICTLY ZERO BLUR
                     opacity: opacity,
                     transformStyle: "preserve-3d",
-                    willChange: "transform, opacity",
+                    backfaceVisibility: "hidden",
+                    WebkitFontSmoothing: "antialiased",
+                    willChange: "transform",
                     zIndex: Math.round(200 - absDiff * 40 + (isCenterActive ? 60 : 0)),
                   }}
                 >
@@ -547,7 +538,7 @@ export function IntegrationsCarousel() {
                       className={`font-sans tracking-tight transition-all duration-200 ${
                         isCenterActive
                           ? "font-bold text-xl sm:text-2xl text-neutral-900"
-                          : "font-semibold text-base sm:text-lg text-neutral-600"
+                          : "font-semibold text-base sm:text-lg text-neutral-800"
                       }`}
                     >
                       {brand.name}
@@ -564,7 +555,7 @@ export function IntegrationsCarousel() {
                         </span>
                       </div>
                     ) : (
-                      <p className="text-xs text-neutral-400 font-normal mt-0.5">
+                      <p className="text-xs text-neutral-500 font-medium mt-0.5">
                         {brand.company}
                       </p>
                     )}
