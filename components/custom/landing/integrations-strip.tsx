@@ -198,9 +198,9 @@ interface OrbitConfig {
 }
 
 const ORBITS: OrbitConfig[] = [
-  { r: 0.23, tilt: 62, roll: -12, speed: 0.015, count: 6 },
-  { r: 0.35, tilt: 58, roll: 10, speed: -0.011, count: 8 },
-  { r: 0.46, tilt: 64, roll: -4, speed: 0.008, count: 10 },
+  { r: 0.22, tilt: 62, roll: -12, speed: 0.015, count: 6 },
+  { r: 0.33, tilt: 58, roll: 10, speed: -0.011, count: 8 },
+  { r: 0.44, tilt: 64, roll: -4, speed: 0.008, count: 10 },
 ];
 
 export function IntegrationsStrip() {
@@ -213,6 +213,9 @@ export function IntegrationsStrip() {
     const rings = ringsRef.current;
     const mascot = mascotRef.current;
     if (!stage || !rings || !mascot) return;
+
+    // Clean up any stale or leftover dynamic elements
+    stage.querySelectorAll(".icon, .tail").forEach((el) => el.remove());
 
     /* Render Pixel Cat Mascot */
     const map = [
@@ -336,7 +339,7 @@ export function IntegrationsStrip() {
       H = stage!.clientHeight;
       CX = W / 2;
       CY = H / 2;
-      U = Math.min(W * 0.72, H * 0.9, 740);
+      U = Math.min(W * 0.62, H * 0.82, 650);
       half = W < 640 ? 17 : 21;
 
       rings!.setAttribute("viewBox", `0 0 ${W} ${H}`);
@@ -490,7 +493,7 @@ export function IntegrationsStrip() {
     <section
       id="integrations"
       ref={stageRef}
-      className="orbit-section relative w-full h-[75vh] min-h-[540px] max-h-[720px] overflow-hidden select-none"
+      className="orbit-section relative w-full h-[68vh] min-h-[480px] max-h-[640px] overflow-hidden select-none"
       aria-labelledby="connect-title"
     >
       <style jsx>{`
