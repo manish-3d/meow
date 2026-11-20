@@ -2,34 +2,34 @@
 
 import React from "react";
 
-// Pixel chevron arrow pointing right (3 chevrons marching)
+// Pixel chevron arrow pointing right (3 chevrons marching >>>)
 export function PixelMarchingArrow({ className = "" }: { className?: string }) {
   return (
     <div className={`flex items-center gap-1 select-none pointer-events-none ${className}`}>
       <svg width="36" height="24" viewBox="0 0 36 24" fill="none" className="drop-shadow-sm">
         {/* Chevron 1 */}
         <g className="animate-[pulse_1.2s_ease-in-out_infinite]">
-          <rect x="2" y="8" width="3" height="3" fill="#38bdf8" />
+          <rect x="8" y="8" width="3" height="3" fill="#38bdf8" />
           <rect x="5" y="5" width="3" height="3" fill="#38bdf8" />
-          <rect x="8" y="2" width="3" height="3" fill="#38bdf8" />
+          <rect x="2" y="2" width="3" height="3" fill="#38bdf8" />
           <rect x="5" y="11" width="3" height="3" fill="#38bdf8" />
-          <rect x="8" y="14" width="3" height="3" fill="#38bdf8" />
+          <rect x="2" y="14" width="3" height="3" fill="#38bdf8" />
         </g>
         {/* Chevron 2 */}
         <g className="animate-[pulse_1.2s_ease-in-out_infinite_0.2s]">
-          <rect x="13" y="8" width="3" height="3" fill="#0ea5e9" />
+          <rect x="19" y="8" width="3" height="3" fill="#0ea5e9" />
           <rect x="16" y="5" width="3" height="3" fill="#0ea5e9" />
-          <rect x="19" y="2" width="3" height="3" fill="#0ea5e9" />
+          <rect x="13" y="2" width="3" height="3" fill="#0ea5e9" />
           <rect x="16" y="11" width="3" height="3" fill="#0ea5e9" />
-          <rect x="19" y="14" width="3" height="3" fill="#0ea5e9" />
+          <rect x="13" y="14" width="3" height="3" fill="#0ea5e9" />
         </g>
         {/* Chevron 3 */}
         <g className="animate-[pulse_1.2s_ease-in-out_infinite_0.4s]">
-          <rect x="24" y="8" width="3" height="3" fill="#38bdf8" />
+          <rect x="30" y="8" width="3" height="3" fill="#38bdf8" />
           <rect x="27" y="5" width="3" height="3" fill="#38bdf8" />
-          <rect x="30" y="2" width="3" height="3" fill="#38bdf8" />
+          <rect x="24" y="2" width="3" height="3" fill="#38bdf8" />
           <rect x="27" y="11" width="3" height="3" fill="#38bdf8" />
-          <rect x="30" y="14" width="3" height="3" fill="#38bdf8" />
+          <rect x="24" y="14" width="3" height="3" fill="#38bdf8" />
         </g>
       </svg>
     </div>

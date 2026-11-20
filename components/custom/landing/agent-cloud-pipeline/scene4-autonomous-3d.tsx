@@ -365,35 +365,41 @@ function FloatingStars() {
 
 function Scene4Mesh() {
   return (
-    <group position={[0, -0.35, 0]} rotation={[0.22, 0.42, 0]}>
+    <group position={[0, -0.25, 0]} rotation={[0.08, 0.44, 0]}>
       {/* ── 1. LARGE LUSH ISOMETRIC ISLAND BASE ── */}
       {/* Main Grass Slab */}
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
-        <boxGeometry args={[4.2, 0.45, 4.2]} />
+        <boxGeometry args={[3.8, 0.38, 3.8]} />
+        <meshStandardMaterial color="#6ebb2f" roughness={0.7} />
+      </mesh>
+
+      {/* Stepped Grass Plateau */}
+      <mesh position={[0.7, 0.14, -0.6]} castShadow receiveShadow>
+        <boxGeometry args={[1.5, 0.22, 1.5]} />
         <meshStandardMaterial color="#84cc16" roughness={0.7} />
       </mesh>
 
-      {/* Stepped Grass Fringe Overhang */}
-      <mesh position={[0, -0.28, 2.12]} castShadow receiveShadow>
-        <boxGeometry args={[3.4, 0.22, 0.12]} />
-        <meshStandardMaterial color="#72b81e" roughness={0.8} />
+      {/* Hanging Vines */}
+      <mesh position={[-1.75, -0.32, 0.7]} castShadow>
+        <boxGeometry args={[0.08, 0.55, 0.28]} />
+        <meshStandardMaterial color="#15803d" />
       </mesh>
-      <mesh position={[2.12, -0.28, 0]} castShadow receiveShadow>
-        <boxGeometry args={[0.12, 0.22, 3.4]} />
-        <meshStandardMaterial color="#72b81e" roughness={0.8} />
+      <mesh position={[1.75, -0.36, -0.5]} castShadow>
+        <boxGeometry args={[0.08, 0.6, 0.3]} />
+        <meshStandardMaterial color="#65a30d" />
       </mesh>
 
       {/* Stepped Dirt Layers */}
-      <mesh position={[0, -0.44, 0]} castShadow receiveShadow>
-        <boxGeometry args={[3.9, 0.42, 3.9]} />
+      <mesh position={[0, -0.34, 0]} castShadow receiveShadow>
+        <boxGeometry args={[3.5, 0.36, 3.5]} />
         <meshStandardMaterial color="#87532a" roughness={0.9} />
       </mesh>
-      <mesh position={[0, -0.82, 0]} castShadow receiveShadow>
-        <boxGeometry args={[3.2, 0.38, 3.2]} />
+      <mesh position={[0, -0.68, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.9, 0.34, 2.9]} />
         <meshStandardMaterial color="#754522" roughness={0.9} />
       </mesh>
-      <mesh position={[0, -1.16, 0]} castShadow receiveShadow>
-        <boxGeometry args={[2.3, 0.32, 2.3]} />
+      <mesh position={[0, -0.98, 0]} castShadow receiveShadow>
+        <boxGeometry args={[2.0, 0.28, 2.0]} />
         <meshStandardMaterial color="#5e3619" roughness={0.95} />
       </mesh>
 
@@ -422,7 +428,7 @@ export function Scene4Autonomous3D() {
       <Canvas
         shadows
         dpr={[1, 1.5]}
-        camera={{ position: [5.6, 4.6, 6.2], fov: 42 }}
+        camera={{ position: [4.8, 3.2, 5.2], fov: 42 }}
         gl={{ antialias: true, alpha: true }}
       >
         <ambientLight intensity={1.1} color="#f0fdf4" />

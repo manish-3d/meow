@@ -19,15 +19,15 @@ import Link from "next/link";
 import { StageLeftSidebar } from "./stage-left-sidebar";
 import { VoxelClouds } from "./voxel-assets";
 
-// Dynamically import the real procedural Three.js Canvas with ssr: false
-const SimulationR3FCanvas = dynamic(
-  () => import("./three-stage/simulation-r3f-canvas").then((mod) => mod.SimulationR3FCanvas),
+// Dynamically import the real procedural Three.js 4-Card Stage with ssr: false
+const StageQuadCards = dynamic(
+  () => import("./stage-quad-cards").then((mod) => mod.StageQuadCards),
   {
     ssr: false,
     loading: () => (
       <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-b from-[#e0f2fe]/50 via-[#eef2ff]/50 to-[#f8fafc]/50">
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 border border-black/[0.08] text-neutral-600 font-mono text-xs shadow-sm">
-          <span className="size-2 rounded-full bg-[#6e9e35] animate-ping" />
+          <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
           <span>Loading procedural 3D multi-agent engine...</span>
         </div>
       </div>
@@ -148,7 +148,7 @@ export function StageSimulationSection() {
         {/* ── 2. THE MAIN DESKTOP SHELL CONTAINER (MATCHING MOCKUP) ── */}
         <div className="relative w-full rounded-3xl border border-black/[0.1] bg-white shadow-2xl overflow-hidden flex flex-col">
           {/* Main App Body: Persistent Left Sidebar + The Simulation Workspace */}
-          <div className="flex flex-col md:flex-row h-[630px] sm:h-[670px] w-full overflow-hidden relative">
+          <div className="flex flex-col md:flex-row h-[590px] sm:h-[640px] w-full overflow-hidden relative">
             {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup light green #84cc16) */}
             <StageLeftSidebar activeBotId={activeBotId} onSelectBot={setActiveBotId} />
 
@@ -190,94 +190,13 @@ export function StageSimulationSection() {
                 </div>
               </div>
 
-              {/* ── THE REAL PROCEDURAL THREE.JS 3D VIEWPORT ── */}
+              {/* ── THE REAL PROCEDURAL THREE.JS 3D VIEWPORT (4 QUADRANT CARDS MATCHING REFERENCE MOCKUP) ── */}
               <div className="relative flex-1 w-full h-full overflow-hidden">
-                {/* 1. Real Three.js Canvas running 3D procedural voxel models */}
-                <div className="absolute inset-0 z-10">
-                  <SimulationR3FCanvas
-                    phase={phase}
-                    activeBotId={activeBotId}
-                    onSelectBot={setActiveBotId}
-                  />
-                </div>
-
-                {/* 2. Interactive Phase Overlay Status Badges (Frames 1-5) */}
-                <AnimatePresence>
-                  {phase === 1 && (
-                    <motion.div
-                      key="badge-f1"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-[#7C5CFC] animate-ping" />
-                        <span>Frame 1: Base Start &bull; Lone 3D Mascot Cat Floating in Sky</span>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {phase === 2 && (
-                    <motion.div
-                      key="badge-f2"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-orange-500 animate-ping" />
-                        <span>Frame 2: Thanos Dissolve &bull; 160 Real 3D Particles Dispersing</span>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {phase === 3 && (
-                    <motion.div
-                      key="badge-f3"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-amber-500 animate-ping" />
-                        <span>Frame 3: Pop-Out Genesis &bull; 4 Specialized 3D Islands Spawning</span>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {phase === 4 && (
-                    <motion.div
-                      key="badge-f4"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-sky-500 animate-ping" />
-                        <span>Frame 4: Outward Flight &bull; Islands Navigating to 4 Quadrants</span>
-                      </div>
-                    </motion.div>
-                  )}
-
-                  {phase === 5 && (
-                    <motion.div
-                      key="badge-f5"
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 pointer-events-none"
-                    >
-                      <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/95 border border-black/[0.08] text-xs font-mono text-neutral-800 shadow-md">
-                        <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
-                        <span>Frame 5: Settle & Connect &bull; 3D Data Cables Synchronizing</span>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <StageQuadCards
+                  phase={phase}
+                  activeBotId={activeBotId}
+                  onSelectBot={setActiveBotId}
+                />
               </div>
 
               {/* ── FLAT GROUND GRASS BORDER STRIP (ACROSS VIEWPORT BOTTOM) ── */}
