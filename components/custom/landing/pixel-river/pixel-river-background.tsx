@@ -61,7 +61,7 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
         }}
       >
         <img
-          src="/meow-bot-river-shape.svg"
+          src="/meow-bot-river-shape.svg?v=3"
           alt="Meow Bot Pixel River Landscape"
           className="absolute inset-0 size-full object-cover object-bottom select-none pointer-events-none"
         />
