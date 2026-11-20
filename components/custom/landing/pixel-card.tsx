@@ -118,6 +118,8 @@ export interface PixelCardProps {
   noFocus?: boolean;
   theme?: 'dark' | 'light';
   radius?: number;
+  transparent?: boolean;
+  cursorRadius?: number;
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
@@ -144,6 +146,8 @@ export function PixelCard({
   noFocus,
   theme = 'dark',
   radius = 24,
+  transparent = false,
+  cursorRadius = 0,
   className = '',
   style,
   children
@@ -175,7 +179,8 @@ export function PixelCard({
     trigger: (TRIGGERS as readonly string[]).includes(trigger) ? trigger : 'hover',
     clickPulse,
     intro,
-    introDelay: Math.max(0, introDelay)
+    introDelay: Math.max(0, introDelay),
+    cursorRadius: Math.max(0, Number(cursorRadius) || 0)
   };
 
   useEffect(() => {
@@ -342,18 +347,24 @@ export function PixelCard({
       }
       const presenceAvg = state.count ? presenceSum / state.count : 0;
 
-      if (s.glow > 0 && presenceAvg > 0.001) {
+      if (s.glow > 0 && (presenceAvg > 0.001 || (s.cursorRadius > 0 && state.spotPower > 0.01))) {
         const [r, g, b] = s.glowColor;
         const cx = state.spotPower > 0.01 ? state.spotX : state.originX;
         const cy = state.spotPower > 0.01 ? state.spotY : state.originY;
-        const reach = Math.max(width, height) * 0.85;
+        const reach = s.cursorRadius > 0 ? s.cursorRadius * 1.2 : Math.max(width, height) * 0.85;
         const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, reach);
-        const strength = s.glow * s.opacity * 0.32 * Math.min(1, presenceAvg * 1.4);
+        const strength = s.glow * s.opacity * 0.32 * (s.cursorRadius > 0 ? state.spotPower : Math.min(1, presenceAvg * 1.4));
         gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${strength})`);
         gradient.addColorStop(0.45, `rgba(${r}, ${g}, ${b}, ${strength * 0.35})`);
         gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0)`);
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
+        if (s.cursorRadius > 0) {
+          ctx.beginPath();
+          ctx.arc(cx, cy, reach, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(0, 0, width, height);
+        }
       }
 
       const spotRadius = Math.min(width, height) * 0.38 + 30;
@@ -366,10 +377,37 @@ export function PixelCard({
         ctx.fillStyle = s.colors[color];
         for (let i = 0; i < state.count; i++) {
           if (state.tint[i] !== color) continue;
-          const presence = state.presence[i];
-          if (presence <= 0.002) continue;
           const x = state.x[i];
           const y = state.y[i];
+
+          // If cursorRadius is set, strictly confine pixel visibility to limited radius around cursor
+          if (s.cursorRadius > 0) {
+            if (state.spotPower <= 0.005) continue;
+            const dist = Math.hypot(x - state.spotX, y - state.spotY);
+            if (dist > s.cursorRadius) continue;
+
+            const radial = smoothstep(s.cursorRadius, s.cursorRadius * 0.15, dist);
+            if (radial <= 0.005) continue;
+
+            let size = state.size[i] * (0.75 + 1.25 * radial);
+            let alpha = radial * (0.35 + 0.65 * radial) * state.spotPower * s.opacity;
+
+            if (twinkle) {
+              const wave = Math.sin(state.phase[i] + state.time * frequency * state.rate[i]);
+              size *= 0.75 + 0.25 * wave;
+              alpha += 0.15 * wave;
+            }
+
+            alpha = Math.min(1, Math.max(0, alpha));
+            if (alpha <= 0.004) continue;
+
+            ctx.globalAlpha = alpha;
+            ctx.fillRect(x - size * 0.5, y - size * 0.5, size, size);
+            continue;
+          }
+
+          const presence = state.presence[i];
+          if (presence <= 0.002) continue;
           let size = state.size[i];
           let alpha = 0.5 + presence * 0.38;
           if (twinkle) {
@@ -626,6 +664,7 @@ export function PixelCard({
       className={`pixel-card ${className}`.trim()}
       data-theme={tone}
       data-active={active || undefined}
+      data-transparent={transparent || undefined}
       style={{ '--pixel-card-radius': `${radius}px`, ...style } as React.CSSProperties}
       onFocus={focusOff ? undefined : event => engineRef.current?.onFocus(event)}
       onBlur={focusOff ? undefined : event => engineRef.current?.onBlur(event)}

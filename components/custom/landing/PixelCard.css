@@ -33,6 +33,21 @@
   --pixel-card-shadow: 0 24px 48px -26px rgba(24, 24, 27, 0.18), 0 8px 18px -12px rgba(24, 24, 27, 0.10);
 }
 
+.pixel-card[data-transparent="true"] {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  transform: none !important;
+}
+
+.pixel-card[data-transparent="true"]:hover {
+  transform: none !important;
+}
+
+.pixel-card[data-transparent="true"]::after {
+  display: none !important;
+}
+
 .pixel-card::after {
   content: '';
   position: absolute;
