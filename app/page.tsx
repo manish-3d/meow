@@ -6,7 +6,7 @@ import { StageSimulationSection } from "@/components/custom/landing/stage-simula
 import { IntegrationsCarousel } from "@/components/custom/landing/integrations-carousel";
 import { ComputerShowcase } from "@/components/custom/landing/computer-showcase";
 import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
-import { HostingSection } from "@/components/custom/landing/hosting-section";
+import { AgentCloudPipelineSection } from "@/components/custom/landing/agent-cloud-pipeline/agent-cloud-pipeline-section";
 import { PricingSection } from "@/components/custom/landing/pricing-section";
 import { OnboardingSteps } from "@/components/custom/landing/onboarding-steps";
 import { LandingFaq } from "@/components/custom/landing/landing-faq";
@@ -37,8 +37,8 @@ export default function Home() {
         {/* 6. Plugs into 60+ existing apps (Gmail, Slack, Calendar, Spotify, WhatsApp, GitHub) */}
         <IntegrationsStrip />
 
-        {/* 7. Where your bots live (Your computer vs. Meow Cloud 24/7) */}
-        <HostingSection />
+        {/* 7. How each agent gets its own cloud (1-Click Spawn -> Provisioning -> Deploy Bot -> Autonomous Work) */}
+        <AgentCloudPipelineSection />
 
         {/* 8. Pricing with the Sleeping Pixel Cat Mascot ($0 Free, Plus, Pro) */}
         <PricingSection />
