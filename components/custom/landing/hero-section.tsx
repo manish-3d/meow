@@ -13,18 +13,15 @@ export function HeroSection() {
   return (
     <PixelRiverBackground>
       <PixelCard
-        variant="river"
-        colors={["#0284c7", "#0ea5e9", "#38bdf8", "#46cbec", "#7dd3fc"]}
+        variant="blue"
+        colors={["#0284c7", "#0ea5e9", "#38bdf8", "#7dd3fc", "#bae6fd"]}
         glowColor="#38bdf8"
         theme="light"
         trigger="hover"
         origin="pointer"
         clickPulse
-        spotlight={0.75}
-        glow={0.5}
-        gap={8}
-        pixelSize={2.2}
-        cursorRadius={200}
+        spotlight={0.7}
+        glow={0.55}
         transparent
         className="w-full h-full"
       >

@@ -153,7 +153,6 @@ export function CharacterWithLaptop({ className = "" }: CharacterWithLaptopProps
       onClick={handleClick}
       style={{ perspective: 900 }}
       className={`relative inline-flex items-end justify-center shrink-0 align-middle select-none cursor-pointer group ${className}`}
-      title="Meow Bot character working on laptop • Click to wink!"
     >
       {/* Container maintains natural proportion */}
       <span className="relative w-full aspect-[140/170] flex items-end justify-center">

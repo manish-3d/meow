@@ -154,7 +154,6 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
       onClick={handleClick}
       style={{ perspective: 900 }}
       className={`relative inline-flex items-center justify-center shrink-0 align-middle select-none cursor-pointer group ${className}`}
-      title="Man face tracks your cursor everywhere • Click to wink!"
     >
       {/* 3D Transform Head Mesh */}
       <span
