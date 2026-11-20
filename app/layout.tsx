@@ -21,12 +21,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="overflow-x-hidden max-w-full">
       <body
-        className={`${figtree.className} ${instrumentSerif.variable} ${playfair.variable} ${plusJakarta.variable}`}
+        className={`${figtree.className} ${instrumentSerif.variable} ${playfair.variable} ${plusJakarta.variable} overflow-x-hidden max-w-full`}
         style={{ margin: 0, padding: 0 }}
       >
-        <div data-vaul-drawer-wrapper="" className="min-h-screen bg-background">
+        <div data-vaul-drawer-wrapper="" className="min-h-screen bg-background overflow-x-hidden max-w-full">
           <AuthProvider>
             {children}
             <BaseUiToaster />

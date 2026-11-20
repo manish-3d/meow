@@ -360,9 +360,10 @@ export function IntegrationsCarousel() {
   return (
     <section
       id="integrations-carousel"
-      className="relative w-full overflow-hidden py-20 sm:py-28 bg-white text-[#131316] select-none"
+      className="relative w-full max-w-full overflow-hidden overflow-x-clip py-20 sm:py-28 bg-white text-[#131316] select-none"
+      style={{ contain: "paint" }}
     >
-      <div className="w-full flex flex-col justify-center items-center">
+      <div className="w-full max-w-full flex flex-col justify-center items-center overflow-hidden">
         {/* ── 1. TOP HEADLINE & BRING-YOUR-OWN-AI BANNER ── */}
         <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-4 sm:mb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-3 shadow-2xs">
@@ -386,16 +387,17 @@ export function IntegrationsCarousel() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative w-full h-[430px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden my-auto"
+          className="relative w-full max-w-full h-[430px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden overflow-x-clip my-auto"
           style={{
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
+            contain: "paint",
           }}
         >
           {/* ── PHYSICAL GLASSY LENS TRACK OVERLAY (SCULPTED DOUBLE-LINED TRANSLUCENT RAILS) ── */}
-          <div className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center">
+          <div className="absolute inset-0 pointer-events-none select-none z-0 flex items-center justify-center overflow-hidden">
             <svg
-              className="w-full h-full"
+              className="w-full h-full overflow-hidden"
               viewBox="0 0 1440 470"
               preserveAspectRatio="none"
               fill="none"
@@ -496,11 +498,11 @@ export function IntegrationsCarousel() {
               const yOffset = 18 * (u * u);
 
               // 5. SOLID, CRISP VISIBILITY — ZERO BLUR, NO WASHED OUT OPACITY
-              // Every visible card on screen is 100% full opacity (opacity: 1)
-              const opacity = absU > 1.35 ? Math.max(0, 1 - (absU - 1.35) / 0.25) : 1;
+              // Fade smoothly at the very edges of the container
+              const opacity = absU > 1.05 ? Math.max(0, 1 - (absU - 1.05) / 0.18) : 1;
 
-              // Cull off-screen cards outside the visible lens arc
-              if (absU > 1.65) return null;
+              // Strictly cull off-screen cards beyond the viewport edges to prevent any DOM overflow
+              if (absU > 1.22) return null;
 
               const isCenterActive = absDiff < 0.45;
 
