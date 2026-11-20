@@ -13,7 +13,9 @@ export function HeroSection() {
   return (
     <PixelRiverBackground>
       <PixelCard
-        variant="green"
+        variant="river"
+        colors={["#0284c7", "#0ea5e9", "#38bdf8", "#46cbec", "#7dd3fc"]}
+        glowColor="#38bdf8"
         theme="light"
         trigger="hover"
         origin="pointer"

@@ -47,6 +47,16 @@ const VARIANTS: Record<string, VariantConfig> = {
     glow: { dark: '#84cc16', light: '#65a30d' },
     noFocus: false
   },
+  river: {
+    gap: 8,
+    speed: 25,
+    colors: {
+      dark: ['#e0f2fe', '#7dd3fc', '#38bdf8'],
+      light: ['#0284c7', '#0ea5e9', '#38bdf8', '#46cbec', '#7dd3fc']
+    },
+    glow: { dark: '#38bdf8', light: '#0ea5e9' },
+    noFocus: false
+  },
   purple: {
     gap: 8,
     speed: 30,
