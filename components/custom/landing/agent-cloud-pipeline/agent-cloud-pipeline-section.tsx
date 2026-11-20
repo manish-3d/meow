@@ -91,7 +91,7 @@ export function AgentCloudPipelineSection() {
   return (
     <section
       id="cloud-architecture"
-      className="pt-0 pb-10 sm:pb-16 bg-white text-[#131316] relative overflow-hidden select-none"
+      className="pt-10 sm:pt-16 pb-10 sm:pb-16 bg-white text-[#131316] relative overflow-hidden select-none"
     >
       {/* Background Subtle Gradient Ambience */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(56,189,248,0.06),transparent_75%)]" />

@@ -360,7 +360,7 @@ export function IntegrationsCarousel() {
   return (
     <section
       id="integrations-carousel"
-      className="relative w-full max-w-full overflow-hidden overflow-x-clip pt-10 sm:pt-14 pb-0 bg-white text-[#131316] select-none"
+      className="relative w-full max-w-full overflow-hidden overflow-x-clip pt-10 sm:pt-14 pb-8 sm:pb-14 bg-white text-[#131316] select-none"
       style={{ contain: "paint" }}
     >
       <div className="w-full max-w-full flex flex-col justify-center items-center overflow-hidden">
