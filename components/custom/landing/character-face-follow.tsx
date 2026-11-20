@@ -23,7 +23,7 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
 
   const animFrameRef = useRef<number | null>(null);
 
-  // 60 FPS RAF loop for organic physics
+  // 60 FPS RAF loop for organic physics (strictly horizontal left/right, no up/down interference)
   useEffect(() => {
     const lerp = (start: number, end: number, factor: number) => start + (end - start) * factor;
 
@@ -31,14 +31,14 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
       const curT = currentTransform.current;
       const tarT = targetTransform.current;
 
-      curT.rotX = lerp(curT.rotX, tarT.rotX, 0.14);
+      curT.rotX = 0;
       curT.rotY = lerp(curT.rotY, tarT.rotY, 0.14);
-      curT.rotZ = lerp(curT.rotZ, tarT.rotZ, 0.14);
+      curT.rotZ = 0;
       curT.transX = lerp(curT.transX, tarT.transX, 0.14);
-      curT.transY = lerp(curT.transY, tarT.transY, 0.14);
+      curT.transY = 0;
 
       if (headMeshRef.current) {
-        headMeshRef.current.style.transform = `rotateX(${curT.rotX.toFixed(2)}deg) rotateY(${curT.rotY.toFixed(2)}deg) rotateZ(${curT.rotZ.toFixed(2)}deg) translate3d(${curT.transX.toFixed(1)}px, ${curT.transY.toFixed(1)}px, 0)`;
+        headMeshRef.current.style.transform = `rotateY(${curT.rotY.toFixed(2)}deg) translate3d(${curT.transX.toFixed(1)}px, 0, 0)`;
       }
 
       animFrameRef.current = requestAnimationFrame(tick);
@@ -51,28 +51,25 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
     };
   }, []);
 
-  // Long-range high-accuracy viewport tracking across the entire screen
+  // Long-range high-accuracy horizontal viewport tracking across the entire screen
   useEffect(() => {
-    const handlePointerMove = (clientX: number, clientY: number) => {
+    const handlePointerMove = (clientX: number) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
 
       const dx = clientX - centerX;
-      const dy = clientY - centerY;
 
-      // Normalized coordinates from -1 to 1 across full viewport
+      // Normalized coordinates from -1 to 1 across full viewport (horizontal only)
       const normX = Math.max(-1, Math.min(1, dx / (window.innerWidth / 2)));
-      const normY = Math.max(-1, Math.min(1, dy / (window.innerHeight / 2)));
 
-      // 3D Head rotation (high range: ±26° up/down, ±30° left/right, compound organic roll)
+      // 3D Head rotation: strictly left and right, zero up/down tilt or pitch
       targetTransform.current = {
-        rotX: normY * -26,
-        rotY: normX * 30,
-        rotZ: normX * normY * 6,
+        rotX: 0,
+        rotY: normX * 28,
+        rotZ: 0,
         transX: normX * 8,
-        transY: normY * 6,
+        transY: 0,
       };
 
       // Clean pose switching with hysteresis (no flickering, no double-glasses)
@@ -93,12 +90,12 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
     };
 
     const onMouseMove = (e: MouseEvent) => {
-      handlePointerMove(e.clientX, e.clientY);
+      handlePointerMove(e.clientX);
     };
 
     const onTouchMove = (e: TouchEvent) => {
       if (e.touches.length > 0) {
-        handlePointerMove(e.touches[0].clientX, e.touches[0].clientY);
+        handlePointerMove(e.touches[0].clientX);
       }
     };
 
@@ -151,6 +148,8 @@ export function CharacterFaceFollow({ className = "" }: CharacterFaceFollowProps
   return (
     <span
       ref={containerRef}
+      id="hero-face-origin"
+      data-face-origin="true"
       onClick={handleClick}
       style={{ perspective: 900 }}
       className={`relative inline-flex items-center justify-center shrink-0 align-middle select-none cursor-pointer group ${className}`}

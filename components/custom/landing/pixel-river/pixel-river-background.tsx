@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { WaterEffects } from "./water-effects";
 import { PixelCatBot } from "./pixel-cat-bot";
 
@@ -19,14 +18,34 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
   // Subtle cursor parallax offsets
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
-  // Handle subtle cursor movement and left/right zone detection
+  // Cached face origin center X
+  const originXRef = useRef<number | null>(null);
+
+  const updateOriginX = useCallback(() => {
+    const faceEl =
+      document.getElementById("hero-face-origin") ||
+      document.querySelector("[data-face-origin='true']");
+    if (faceEl) {
+      const faceRect = faceEl.getBoundingClientRect();
+      originXRef.current = faceRect.left + faceRect.width / 2;
+    } else if (containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
+      originXRef.current = rect.left + rect.width / 2;
+    } else if (typeof window !== "undefined") {
+      originXRef.current = window.innerWidth / 2;
+    }
+  }, []);
+
+  // Handle subtle cursor movement and left/right zone detection based on Face origin
   useEffect(() => {
+    updateOriginX();
+
     const handlePointerMove = (e: PointerEvent | MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
 
-      // Only track when cursor is within hero vertical bounds
-      if (e.clientY < rect.top || e.clientY > rect.bottom) {
+      // Only track when cursor is within hero vertical bounds (with generous buffer)
+      if (e.clientY < rect.top - 60 || e.clientY > rect.bottom + 60) {
         setLeftActive(false);
         setRightActive(false);
         setOffset({ x: 0, y: 0 });
@@ -41,17 +60,37 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
         y: normY * 3,
       });
 
-      // River zone detection
-      const percentX = (e.clientX - rect.left) / rect.width;
-      if (percentX >= 0 && percentX < 0.34) {
+      // Compute Origin X from the Face in "meet [face] meow bot"
+      const faceEl =
+        document.getElementById("hero-face-origin") ||
+        document.querySelector("[data-face-origin='true']");
+      let originX = originXRef.current;
+      if (faceEl) {
+        const faceRect = faceEl.getBoundingClientRect();
+        originX = faceRect.left + faceRect.width / 2;
+        originXRef.current = originX;
+      } else if (!originX) {
+        originX = rect.left + rect.width / 2;
+      }
+
+      const dx = e.clientX - originX;
+
+      // When cursor is on left side from origin -> left river bots emerge from river
+      // When cursor is on right side from origin -> right river bots emerge from river
+      // Deadband hysteresis of ±16px around origin prevents flickering
+      if (dx < -16) {
         setLeftActive(true);
         setRightActive(false);
-      } else if (percentX > 0.66 && percentX <= 1) {
+      } else if (dx > 16) {
         setRightActive(true);
         setLeftActive(false);
-      } else {
-        setLeftActive(false);
-        setRightActive(false);
+      }
+    };
+
+    const handleTouch = (e: TouchEvent) => {
+      if (e.touches && e.touches.length > 0) {
+        const t = e.touches[0];
+        handlePointerMove({ clientX: t.clientX, clientY: t.clientY } as PointerEvent);
       }
     };
 
@@ -62,13 +101,23 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
     };
 
     window.addEventListener("pointermove", handlePointerMove, { passive: true });
+    window.addEventListener("mousemove", handlePointerMove, { passive: true });
+    window.addEventListener("touchstart", handleTouch, { passive: true });
+    window.addEventListener("touchmove", handleTouch, { passive: true });
     window.addEventListener("mouseleave", handlePointerLeave);
+    window.addEventListener("resize", updateOriginX);
+    window.addEventListener("scroll", updateOriginX, { passive: true });
 
     return () => {
       window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("touchstart", handleTouch);
+      window.removeEventListener("touchmove", handleTouch);
       window.removeEventListener("mouseleave", handlePointerLeave);
+      window.removeEventListener("resize", updateOriginX);
+      window.removeEventListener("scroll", updateOriginX);
     };
-  }, []);
+  }, [updateOriginX]);
 
   return (
     <div
@@ -94,7 +143,7 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
         {/* --- 3. LEFT RIVER CAT BOTS (Pop up along left pixel water) --- */}
         <PixelCatBot
           personality="curious"
-          isEmerged={true}
+          isEmerged={leftActive}
           x={3.5}
           y={44}
           scale={1.05}
@@ -102,33 +151,33 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
         />
         <PixelCatBot
           personality="swimmer"
-          isEmerged={true}
+          isEmerged={leftActive}
           x={7.5}
           y={56}
           scale={0.95}
-          staggerMs={120}
+          staggerMs={100}
         />
         <PixelCatBot
           personality="happy"
-          isEmerged={true}
+          isEmerged={leftActive}
           x={15.5}
           y={80}
           scale={1.0}
-          staggerMs={240}
+          staggerMs={200}
         />
         <PixelCatBot
           personality="researcher"
-          isEmerged={true}
+          isEmerged={leftActive}
           x={25}
           y={88}
           scale={1.05}
-          staggerMs={360}
+          staggerMs={300}
         />
 
         {/* --- 4. RIGHT RIVER CAT BOTS (Pop up along right pixel water) --- */}
         <PixelCatBot
           personality="builder"
-          isEmerged={true}
+          isEmerged={rightActive}
           x={95}
           y={48}
           scale={1.05}
@@ -136,48 +185,31 @@ export function PixelRiverBackground({ children }: PixelRiverBackgroundProps) {
         />
         <PixelCatBot
           personality="sleepy"
-          isEmerged={true}
+          isEmerged={rightActive}
           x={91.5}
           y={62}
           scale={1.0}
-          staggerMs={140}
+          staggerMs={100}
         />
         <PixelCatBot
           personality="happy"
-          isEmerged={true}
+          isEmerged={rightActive}
           x={85}
           y={76}
           scale={1.05}
-          staggerMs={260}
+          staggerMs={200}
         />
         <PixelCatBot
           personality="curious"
-          isEmerged={true}
+          isEmerged={rightActive}
           x={76}
           y={88}
           scale={0.95}
-          staggerMs={380}
+          staggerMs={300}
         />
       </div>
 
-      {/* --- 5. TOUCH & HOVER INTERACTION ZONES (Transparent overlays) --- */}
-      {/* Left River Interactive Zone */}
-      <div
-        className="absolute top-0 left-0 w-[35%] h-full z-20 cursor-pointer"
-        onMouseEnter={() => setLeftActive(true)}
-        onTouchStart={() => setLeftActive((prev) => !prev)}
-        aria-label="Interact with left river bots"
-      />
-
-      {/* Right River Interactive Zone */}
-      <div
-        className="absolute top-0 right-0 w-[35%] h-full z-20 cursor-pointer"
-        onMouseEnter={() => setRightActive(true)}
-        onTouchStart={() => setRightActive((prev) => !prev)}
-        aria-label="Interact with right river bots"
-      />
-
-      {/* --- 6. HERO CONTENT (Sitting in the clean center clearing) --- */}
+      {/* --- 5. HERO CONTENT (Sitting in the clean center clearing) --- */}
       <div className="relative z-30 pointer-events-auto">
         {children}
       </div>

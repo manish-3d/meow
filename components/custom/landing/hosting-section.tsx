@@ -1178,8 +1178,8 @@ export function HostingSection() {
                       isTakeover
                         ? { left: `${takeoverPos.x}px`, top: `${takeoverPos.y}px` }
                         : postPhase === "typing"
-                        ? { left: "48%", top: "42%" }
-                        : { left: "82%", top: "66%" }
+                          ? { left: "48%", top: "42%" }
+                          : { left: "82%", top: "66%" }
                     }
                   >
                     <svg
