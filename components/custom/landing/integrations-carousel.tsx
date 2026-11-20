@@ -1,19 +1,18 @@
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Key } from "lucide-react";
 
 /* =====================================================================
-   CONFIG
+   CONFIG — tweak these
    ===================================================================== */
-const LOOP_SECONDS = 35; // one full loop of all 7 brands
-const CELL = 230; // px per brand slot
-const ICON = 28; // logo height in px (max 28)
-const LABEL = 12; // brand-name font size
-const BAND_H = 160; // height of the track band
-const RIM = 64; // half-height of the glass rails
-const LOOK = "bulge"; // 'bulge' = rails pinch in at center and flare out at edges
-const MAX_ANGLE = 0.85; // how far the cylinder bends at screen edges (radians)
+const LOOP_SECONDS = 30; // one full loop of all 7 brands
+const CELL = 180; // px per brand slot (at the centre)
+const ICON = 40; // logo height in px at the centre
+const LABEL = 15; // brand-name font size at the centre
+const BAND_H = 170; // height of the track band
+const RIM = 64; // half-height of the glass rails (at the centre)
+const EDGE_GAIN = 1.4; // size = 1 + EDGE_GAIN * (distance from centre / half width). 1.4 -> 2.4x bigger at the very edge
+const THEME = "light"; // 'light' | 'dark' | 'auto'
 const RIPPLE_PX = 9; // ripple strength
 
 /* =====================================================================
@@ -32,7 +31,7 @@ const P = {
   kimi: "M21.765.351C22.998.351 24 1.353 24 2.586S22.998 4.82 21.765 4.82h-1.974c-.15 0-.26-.12-.26-.26V2.586A2.237 2.237 0 0 1 21.765.35M9.41 13.388l8.447-8.377c.16-.16.07-.471-.14-.471h-4.55s-.1.02-.14.06l-9.099 9.029c-.14.14-.35.02-.35-.21V4.81c0-.15-.1-.27-.221-.27H.22c-.12 0-.22.12-.22.27v18.57c0 .15.1.27.22.27h3.137c.12 0 .22-.12.22-.27v-3.79c0-.08.03-.16.08-.21l2.826-2.796c.07-.07.16-.08.241-.03l7.546 5.551a8.9 8.9 0 0 0 4.018 1.493c.12.01.23-.11.23-.27V19.76c0-.14-.08-.25-.19-.26a5.8 5.8 0 0 1-2.355-.942l-6.533-4.73c-.14-.09-.15-.32-.03-.441",
 };
 
-/* Canvas 2D draw utilities */
+/* Each brand draws itself into a size×size box with a 2D context */
 type GradientStop = [number, string];
 const grad = (
   x: CanvasRenderingContext2D,
@@ -48,10 +47,26 @@ const grad = (
   return g;
 };
 
-const tile = (x: CanvasRenderingContext2D, s: number, fill: string | CanvasGradient) => {
+const tile = (
+  x: CanvasRenderingContext2D,
+  s: number,
+  fill: string | CanvasGradient
+) => {
   x.beginPath();
-  if (typeof (x as unknown as { roundRect?: unknown }).roundRect === "function") {
-    (x as unknown as { roundRect: (a: number, b: number, c: number, d: number, r: number) => void }).roundRect(0, 0, s, s, s * 0.25);
+  if (
+    typeof (x as unknown as { roundRect?: unknown }).roundRect === "function"
+  ) {
+    (
+      x as unknown as {
+        roundRect: (
+          a: number,
+          b: number,
+          c: number,
+          d: number,
+          r: number
+        ) => void;
+      }
+    ).roundRect(0, 0, s, s, s * 0.25);
   } else {
     x.rect(0, 0, s, s);
   }
@@ -90,7 +105,7 @@ const BRANDS: BrandDef[] = [
   },
   {
     name: "Claude",
-    draw: (x, s) => path(x, s, P.anthropic, "#D97757"),
+    draw: (x, s) => path(x, s, P.anthropic, "#C4552F"),
   },
   {
     name: "Gemini",
@@ -99,17 +114,20 @@ const BRANDS: BrandDef[] = [
         x,
         s,
         P.gemini,
-        grad(x, s, [[0, "#4A8CFF"], [0.55, "#9B72E8"], [1, "#E0679A"]])
+        grad(x, s, [[0, "#2F6BFF"], [0.55, "#8A55E8"], [1, "#E0457F"]])
       ),
   },
   {
     name: "Grok",
-    draw: (x, s) => {
-      tile(x, s, grad(x, s, [[0, "#f6f7f9"], [1, "#b9bdc4"]]));
-      x.strokeStyle = "rgba(0,0,0,.12)";
-      x.lineWidth = 1;
-      x.stroke();
-      path(x, s, P.x, "#0b0b0c", 0.4);
+    draw: (x, s, dark) => {
+      tile(
+        x,
+        s,
+        dark
+          ? grad(x, s, [[0, "#ffffff"], [1, "#d4d4d8"]])
+          : grad(x, s, [[0, "#26262b"], [1, "#000000"]])
+      );
+      path(x, s, P.x, dark ? "#0b0b0c" : "#ffffff", 0.42);
     },
   },
   {
@@ -118,7 +136,7 @@ const BRANDS: BrandDef[] = [
   },
   {
     name: "Kimi",
-    draw: (x, s, dark) => path(x, s, P.kimi, dark ? "#f4f4f5" : "#15171c"),
+    draw: (x, s, dark) => path(x, s, P.kimi, dark ? "#f4f4f5" : "#0a0a0c"),
   },
   {
     name: "Copilot",
@@ -135,15 +153,15 @@ const BRANDS: BrandDef[] = [
         [1, "#FF9A3C"],
       ] as GradientStop[]).forEach(([o, c]) => g.addColorStop(o, c));
       x.strokeStyle = g;
-      x.lineWidth = 5.2;
+      x.lineWidth = 5.8;
       x.beginPath();
       x.moveTo(5.5, 19);
       x.bezierCurveTo(5.5, 9, 7.5, 4.8, 11.2, 4.8);
       x.bezierCurveTo(14.6, 4.8, 14.4, 9, 15.6, 13.2);
       x.bezierCurveTo(16.4, 16, 17.4, 19.2, 19, 19.2);
       x.stroke();
-      x.globalAlpha = 0.55;
-      x.lineWidth = 2.2;
+      x.globalAlpha = 0.4;
+      x.lineWidth = 2;
       x.strokeStyle = "#fff";
       x.beginPath();
       x.moveTo(8.4, 15);
@@ -156,7 +174,7 @@ const BRANDS: BrandDef[] = [
 const N = BRANDS.length;
 
 /* =====================================================================
-   SHADERS — cylinder curve + liquid ripple + per-card wobble + glass rails
+   SHADERS — linear edge gain + liquid ripple + per-card wobble + glass rails
    ===================================================================== */
 const VS = `#version 300 es
 void main(){
@@ -167,7 +185,7 @@ void main(){
 const FS = `#version 300 es
 precision highp float;
 uniform vec2 uSize, uMouse;
-uniform float uDpr, uT, uOff, uHT, uK, uR, uDark, uRipple;
+uniform float uDpr, uT, uOff, uHT, uA, uDark, uRipple;
 uniform float uHov[${N}];
 uniform sampler2D uTex;
 out vec4 o;
@@ -177,17 +195,17 @@ const float BH = ${BAND_H}.0;
 const float RIM = ${RIM}.0;
 void main(){
   vec2 p = gl_FragCoord.xy / uDpr - uSize * 0.5;
+  float hw = uSize.x * 0.5;
   /* liquid ripple around the cursor */
   vec2 d = p - uMouse;
   float dist = length(d) + 0.001;
   float wave = sin(dist * 0.05 - uT * 5.0) * exp(-dist / 170.0) * uHT;
   p += d / dist * wave * uRipple + vec2(sin(p.y * 0.03 + uT * 2.0), cos(p.x * 0.025 + uT * 1.7)) * 1.6 * uHT * exp(-dist / 260.0);
-  /* cylinder: screen x -> angle -> arc length; perspective scale per angle */
-  float th = asin(clamp(p.x / uR, -0.999, 0.999));
-  float s = 1.0 / (1.0 + uK * (1.0 - cos(th)));
-  float tx = uR * th + uOff;
+  /* size grows LINEARLY with distance from the centre: s = 1 + A*u */
+  float u = abs(p.x) / hw;
+  float s = 1.0 + uA * u;
+  float tx = (uA > 0.0001) ? sign(p.x) * (hw / uA) * log(1.0 + uA * u) + uOff : p.x + uOff;
   float ty = p.y / s;
-  /* which brand slot + spring-driven per-card liquid wobble */
   float cf = floor(tx / CELL);
   int ci = int(clamp(mod(cf, N), 0.0, N - 1.0));
   vec2 loc = vec2(tx - (cf + 0.5) * CELL, ty);
@@ -196,16 +214,15 @@ void main(){
   loc /= 1.0 + 0.16 * h;
   vec2 uv = vec2(((float(ci) + 0.5) * CELL + loc.x) / (N * CELL), 0.5 - loc.y / BH);
   vec4 lg = texture(uTex, uv);
-  lg *= mix(1.0, 0.8, pow(abs(th) / ${MAX_ANGLE.toFixed(2)}, 2.0));
-  /* glass rails */
+  /* bold glass rails */
   float ay = abs(ty);
-  float m1 = 1.0 - smoothstep(1.0, 2.4, abs(ay - RIM) * s);
-  float m2 = (1.0 - smoothstep(0.5, 1.5, abs(ay - (RIM - 9.0)) * s)) * 0.55;
-  float m3 = (1.0 - smoothstep(0.5, 1.5, abs(ay - (RIM + 7.0)) * s)) * 0.3;
-  float a = clamp(m1 * 0.95 + m2 + m3, 0.0, 1.0);
+  float m1 = 1.0 - smoothstep(2.2, 4.4, abs(ay - RIM) * s);
+  float m2 = (1.0 - smoothstep(1.2, 2.6, abs(ay - (RIM - 10.0)) * s)) * 0.8;
+  float m3 = (1.0 - smoothstep(1.0, 2.2, abs(ay - (RIM + 8.0)) * s)) * 0.5;
+  float a = clamp(m1 + m2 + m3, 0.0, 1.0);
   float shine = 0.5 + 0.5 * sin(p.x * 0.006 + ty * 0.02);
-  vec3 rc = uDark > 0.5 ? mix(vec3(0.38), vec3(0.92), shine) : mix(vec3(0.62, 0.64, 0.67), vec3(0.98), shine);
-  float ga = smoothstep(RIM - 42.0, RIM, ay) * step(ay, RIM) * 0.07;
+  vec3 rc = uDark > 0.5 ? mix(vec3(0.55), vec3(1.0), shine) : mix(vec3(0.10), vec3(0.48), shine);
+  float ga = smoothstep(RIM - 42.0, RIM, ay) * step(ay, RIM) * 0.09;
   vec3 gc = vec3(uDark);
   vec4 under = vec4(rc * a + gc * ga * (1.0 - a), a + ga * (1.0 - a));
   o = lg + under * (1.0 - lg.a);
@@ -266,8 +283,7 @@ export function IntegrationsCarousel() {
       "uT",
       "uOff",
       "uHT",
-      "uK",
-      "uR",
+      "uA",
       "uDark",
       "uRipple",
       "uHov",
@@ -281,31 +297,48 @@ export function IntegrationsCarousel() {
       window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
     const darkMQ = window.matchMedia?.("(prefers-color-scheme: dark)");
 
+    function detectDark() {
+      if (THEME === "light") return false;
+      if (THEME === "dark") return true;
+      for (
+        let el: HTMLElement | null = stage;
+        el;
+        el = el.parentElement
+      ) {
+        const m = getComputedStyle(el).backgroundColor.match(/[\d.]+/g);
+        if (m && m.length >= 3 && (m.length < 4 || +m[3] > 0.5)) {
+          return (0.299 * +m[0] + 0.587 * +m[1] + 0.114 * +m[2]) / 255 < 0.5;
+        }
+      }
+      return false;
+    }
+
     let DPR = Math.min(window.devicePixelRatio || 1, 2);
     let W = 0;
     let H = 0;
-    let R = 1;
-    let dark =
-      (darkMQ?.matches ?? false) &&
-      document.documentElement.dataset.theme !== "light";
-    const K = LOOK === "bulge" ? -1.0 : 1.2;
+    let dark = detectDark();
 
     function buildAtlas() {
       if (!gl) return;
-      const tw = Math.round(N * CELL * DPR);
-      const th = Math.round(BAND_H * DPR);
+      const AS = Math.min(
+        Math.max(DPR, 1) * (1 + EDGE_GAIN),
+        Math.floor(gl.getParameter(gl.MAX_TEXTURE_SIZE) / (N * CELL)),
+        4
+      );
+      const tw = Math.round(N * CELL * AS);
+      const th = Math.round(BAND_H * AS);
       const c = document.createElement("canvas");
       c.width = tw;
       c.height = th;
       const x = c.getContext("2d");
       if (!x) return;
 
-      const S = ICON * DPR;
-      const font = `500 ${LABEL * DPR}px Inter, system-ui, sans-serif`;
+      const S = ICON * AS;
+      const font = `700 ${LABEL * AS}px Inter, system-ui, sans-serif`;
 
       BRANDS.forEach((b, i) => {
-        const cx = (i + 0.5) * CELL * DPR;
-        const iconTop = th / 2 - S / 2 - 12 * DPR;
+        const cx = (i + 0.5) * CELL * AS;
+        const iconTop = th / 2 - S / 2 - 14 * AS;
         x.save();
         x.translate(cx - S / 2, iconTop);
         b.draw(x, S, dark);
@@ -313,14 +346,19 @@ export function IntegrationsCarousel() {
         x.font = font;
         x.textAlign = "center";
         x.textBaseline = "alphabetic";
-        x.fillStyle = dark ? "#a1a1aa" : "#52525b";
-        x.fillText(b.name, cx, iconTop + S + 18 * DPR);
+        x.fillStyle = dark ? "#f4f4f5" : "#0a0a0a";
+        x.fillText(b.name, cx, iconTop + S + 21 * AS);
       });
 
       gl.bindTexture(gl.TEXTURE_2D, tex);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, c);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+      gl.generateMipmap(gl.TEXTURE_2D);
+      gl.texParameteri(
+        gl.TEXTURE_2D,
+        gl.TEXTURE_MIN_FILTER,
+        gl.LINEAR_MIPMAP_LINEAR
+      );
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -334,18 +372,25 @@ export function IntegrationsCarousel() {
       canvas.width = Math.round(W * DPR);
       canvas.height = Math.round(H * DPR);
       gl.viewport(0, 0, canvas.width, canvas.height);
-      R = W / 2 / Math.sin(MAX_ANGLE);
       buildAtlas();
     }
 
     const ro = new ResizeObserver(resize);
     ro.observe(stage);
 
-    const onDarkChange = (e: MediaQueryListEvent) => {
-      dark = e.matches;
-      buildAtlas();
+    const retheme = () => {
+      const d = detectDark();
+      if (d !== dark) {
+        dark = d;
+        buildAtlas();
+      }
     };
-    darkMQ?.addEventListener("change", onDarkChange);
+    darkMQ?.addEventListener("change", retheme);
+    const mo = new MutationObserver(retheme);
+    mo.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "style"],
+    });
 
     /* ---------------- state ---------------- */
     const PERIOD = N * CELL;
@@ -371,13 +416,17 @@ export function IntegrationsCarousel() {
     };
 
     function cardAt(px: number, py: number) {
-      const th = Math.asin(Math.max(-0.999, Math.min(0.999, px / R)));
-      const s = 1 / (1 + K * (1 - Math.cos(th)));
-      const tx = R * th + off;
-      const ty = py / s;
+      const hw = W / 2;
+      const u = Math.abs(px) / hw;
+      const sc = 1 + EDGE_GAIN * u;
+      const tx =
+        Math.sign(px) * (hw / EDGE_GAIN) * Math.log(1 + EDGE_GAIN * u) + off;
+      const ty = py / sc;
       const cf = Math.floor(tx / CELL);
       const lx = tx - (cf + 0.5) * CELL;
-      return Math.abs(lx) < 75 && Math.abs(ty) < 46 ? ((cf % N) + N) % N : -1;
+      return Math.abs(lx) < 70 && Math.abs(ty) < 58
+        ? ((cf % N) + N) % N
+        : -1;
     }
 
     function setPointer(e: PointerEvent) {
@@ -484,8 +533,7 @@ export function IntegrationsCarousel() {
       gl.uniform1f(U.uT, now / 1000);
       gl.uniform1f(U.uOff, off);
       gl.uniform1f(U.uHT, ht);
-      gl.uniform1f(U.uK, K);
-      gl.uniform1f(U.uR, R);
+      gl.uniform1f(U.uA, EDGE_GAIN);
       gl.uniform1f(U.uDark, dark ? 1 : 0);
       gl.uniform1f(U.uRipple, reduce ? 0 : RIPPLE_PX);
       gl.uniform1fv(U.uHov, hov);
@@ -513,7 +561,7 @@ export function IntegrationsCarousel() {
     io.observe(stage);
 
     (document.fonts
-      ? document.fonts.load("500 12px Inter")
+      ? document.fonts.load("700 15px Inter")
       : Promise.resolve()
     ).finally(() => {
       resize();
@@ -525,7 +573,8 @@ export function IntegrationsCarousel() {
       cancelAnimationFrame(rafId);
       ro.disconnect();
       io.disconnect();
-      darkMQ?.removeEventListener("change", onDarkChange);
+      mo.disconnect();
+      darkMQ?.removeEventListener("change", retheme);
       canvas.removeEventListener("pointerenter", onPointerEnter);
       canvas.removeEventListener("pointerleave", onPointerLeave);
       canvas.removeEventListener("pointerdown", onPointerDown);
@@ -550,26 +599,21 @@ export function IntegrationsCarousel() {
   return (
     <section
       id="integrations-carousel"
-      className="relative w-full max-w-full overflow-hidden pt-10 sm:pt-14 pb-12 sm:pb-16 bg-white text-[#131316] select-none text-center"
+      className="relative w-full max-w-full overflow-hidden py-14 sm:py-18 bg-white text-[#131316] select-none text-center"
     >
-      {/* ── 1. TOP HEADLINE & BANNER ── */}
+      {/* ── 1. TOP HEADLINE ── */}
       <div className="max-w-4xl mx-auto px-4 z-10 shrink-0">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-3 shadow-2xs">
-          <Key className="size-3.5 text-neutral-800" />
-          <span>bring the AI models you already pay for &middot; zero API markup</span>
-        </div>
-
         <h2 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-neutral-900 leading-tight">
           integration is simple.
         </h2>
-        <p className="mt-2 text-sm sm:text-base text-neutral-500 font-light max-w-xl mx-auto">
+        <p className="mt-2.5 text-sm sm:text-base text-neutral-600 font-medium max-w-xl mx-auto">
           connect with the AI models you already love.
         </p>
       </div>
 
-      {/* ── 2. WEBGL2 CYLINDER LENS STAGE ── */}
+      {/* ── 2. WEBGL2 CYLINDER LENS STAGE (360PX HEIGHT, BOLD GLASS RAILS) ── */}
       <div
-        className="stage relative w-full h-[300px] sm:h-[320px] mt-4 touch-pan-y"
+        className="stage relative w-full h-[360px] mt-5 touch-pan-y"
         ref={stageRef}
       >
         <canvas
@@ -586,15 +630,15 @@ export function IntegrationsCarousel() {
         )}
       </div>
 
-      {/* ── 3. PREV / NEXT NAVIGATION CONTROLS ── */}
-      <div className="flex gap-3.5 justify-center mt-3 z-10">
+      {/* ── 3. PREV / NEXT NAVIGATION CONTROLS (BOLD 2PX BORDER) ── */}
+      <div className="flex gap-3.5 justify-center mt-2 z-10">
         <button
           onClick={handlePrev}
-          className="w-8.5 h-8.5 rounded-lg border border-neutral-200 hover:border-neutral-400 bg-white text-neutral-800 grid place-items-center cursor-pointer transition-all active:scale-95 shadow-2xs hover:shadow-xs"
+          className="w-[34px] h-[34px] rounded-lg border-2 border-[#3f3f46] hover:border-[#0a0a0a] bg-transparent text-[#0a0a0a] grid place-items-center cursor-pointer transition-all active:scale-94 shadow-2xs hover:shadow-xs"
           aria-label="Previous"
         >
           <svg
-            className="w-3.5 h-3.5 stroke-current fill-none stroke-[1.8] stroke-linecap-round stroke-linejoin-round"
+            className="w-[15px] h-[15px] stroke-current fill-none stroke-[2.6] stroke-linecap-round stroke-linejoin-round"
             viewBox="0 0 16 16"
           >
             <path d="M10 3L5 8l5 5" />
@@ -602,11 +646,11 @@ export function IntegrationsCarousel() {
         </button>
         <button
           onClick={handleNext}
-          className="w-8.5 h-8.5 rounded-lg border border-neutral-200 hover:border-neutral-400 bg-white text-neutral-800 grid place-items-center cursor-pointer transition-all active:scale-95 shadow-2xs hover:shadow-xs"
+          className="w-[34px] h-[34px] rounded-lg border-2 border-[#3f3f46] hover:border-[#0a0a0a] bg-transparent text-[#0a0a0a] grid place-items-center cursor-pointer transition-all active:scale-94 shadow-2xs hover:shadow-xs"
           aria-label="Next"
         >
           <svg
-            className="w-3.5 h-3.5 stroke-current fill-none stroke-[1.8] stroke-linecap-round stroke-linejoin-round"
+            className="w-[15px] h-[15px] stroke-current fill-none stroke-[2.6] stroke-linecap-round stroke-linejoin-round"
             viewBox="0 0 16 16"
           >
             <path d="M6 3l5 5-5 5" />
