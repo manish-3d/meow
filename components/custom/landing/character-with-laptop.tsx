@@ -385,11 +385,9 @@ export function CharacterWithLaptop({ className = "" }: CharacterWithLaptopProps
 
             {/* Meow Bot Mascot Logo Badge on the back of the laptop lid */}
             <g transform="translate(133, 72)">
-              {/* Circular black badge container */}
-              <circle cx="0" cy="0" r="14.5" fill="#000000" />
-              {/* White badge ring */}
-              <circle cx="0" cy="0" r="13.5" fill="#000000" stroke="#FFFFFF" strokeWidth="0.8" />
-              {/* Embedded Meow Bot Cat Mascot Silhouette */}
+              {/* Circular clean badge container */}
+              <circle cx="0" cy="0" r="14.5" fill="#FFFFFF" stroke="#c9f2b8" strokeWidth="1" />
+              {/* Embedded Meow Bot Cat Mascot */}
               <image
                 href="/logo.png"
                 x="-12.5"

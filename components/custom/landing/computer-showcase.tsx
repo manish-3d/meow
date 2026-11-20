@@ -111,12 +111,12 @@ export function ComputerShowcase() {
 
               {/* Bot Activity Card */}
               <div className="self-start rounded-xl border border-black/8 bg-neutral-50 p-3 flex items-center gap-2.5 font-sans text-xs text-neutral-700">
-                <div className="relative size-5 shrink-0 rounded-full overflow-hidden ring-1 ring-black/10 bg-black">
+                <div className="relative size-6 shrink-0 rounded-lg overflow-hidden ring-1 ring-black/10 bg-white shadow-2xs">
                   <Image
                     src="/logo.png"
                     alt="Milo"
-                    width={20}
-                    height={20}
+                    width={24}
+                    height={24}
                     className="size-full object-cover"
                   />
                 </div>

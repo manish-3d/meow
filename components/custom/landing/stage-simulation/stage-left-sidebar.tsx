@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import {
   Plus,
   LayoutGrid,
@@ -30,16 +31,15 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
       <div className="space-y-3.5">
         <div className="flex items-center justify-between pb-2 border-b border-black/[0.05]">
           <div className="flex items-center gap-2">
-            {/* Voxel Cat Icon in rounded black box */}
-            <div className="size-8 rounded-xl bg-black flex items-center justify-center text-white shadow-xs">
-              <svg className="size-4.5" viewBox="0 0 16 16" fill="currentColor">
-                <rect x="2" y="2" width="3" height="3" />
-                <rect x="11" y="2" width="3" height="3" />
-                <rect x="2" y="5" width="12" height="8" rx="1" />
-                <rect x="4" y="7" width="2" height="2" fill="#000000" />
-                <rect x="10" y="7" width="2" height="2" fill="#000000" />
-                <rect x="7" y="10" width="2" height="1" fill="#000000" />
-              </svg>
+            {/* Voxel Cat App Logo in rounded squircle box */}
+            <div className="size-8.5 rounded-xl overflow-hidden ring-1 ring-black/10 shadow-xs shrink-0 bg-white">
+              <Image
+                src="/logo.png"
+                alt="Meow Bot"
+                width={34}
+                height={34}
+                className="size-full object-cover"
+              />
             </div>
             <div>
               <h3 className="font-bold text-sm tracking-tight text-neutral-900 leading-none">Meow Bot</h3>

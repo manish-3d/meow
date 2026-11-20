@@ -20,18 +20,20 @@ export function LandingNavbar() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-        scrolled ? "bg-white/90 backdrop-blur-md border-b border-black/8 py-3 shadow-xs" : "bg-transparent py-4"
+        scrolled
+          ? "bg-[#eaf8d6]/95 backdrop-blur-md border-b border-[#c9f2b8] py-3 shadow-sm"
+          : "bg-[#eaf8d6]/90 backdrop-blur-md border-b border-[#c9f2b8]/70 py-3.5 shadow-2xs"
       }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="relative flex size-8 items-center justify-center rounded-full overflow-hidden ring-1 ring-black/10 shadow-xs group-hover:scale-105 transition-transform bg-black">
+          <div className="relative flex size-9 items-center justify-center rounded-xl overflow-hidden ring-1 ring-black/10 shadow-xs group-hover:scale-105 transition-transform bg-white">
             <Image
               src="/logo.png"
               alt="Meow Bot"
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               className="object-cover size-full"
               priority
             />
@@ -44,7 +46,7 @@ export function LandingNavbar() {
         </Link>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-8 text-xs font-mono text-neutral-600">
+        <nav className="hidden md:flex items-center gap-8 text-xs font-mono font-medium text-neutral-700">
           <Link href="/workspace" className="hover:text-black transition-colors">
             workspace
           </Link>
@@ -61,7 +63,7 @@ export function LandingNavbar() {
 
         {/* Action Button */}
         <div className="hidden sm:flex items-center gap-3">
-          <Link href="/sign-in" className="text-xs font-mono text-neutral-600 hover:text-black px-2 py-1">
+          <Link href="/sign-in" className="text-xs font-mono font-medium text-neutral-700 hover:text-black px-2 py-1">
             sign in
           </Link>
           <Link href="/workspace">
@@ -79,7 +81,7 @@ export function LandingNavbar() {
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="flex size-8 items-center justify-center rounded-lg border border-black/10 text-neutral-800 md:hidden hover:bg-neutral-100"
+          className="flex size-8 items-center justify-center rounded-lg border border-black/10 text-neutral-800 md:hidden hover:bg-black/5"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X className="size-4" /> : <Menu className="size-4" />}
@@ -88,7 +90,7 @@ export function LandingNavbar() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="mt-2 mx-4 rounded-2xl bg-white border border-black/10 p-4 shadow-xl flex flex-col gap-3 md:hidden font-mono text-xs text-neutral-800">
+        <div className="mt-2 mx-4 rounded-2xl bg-[#eaf8d6] border border-[#c9f2b8] p-4 shadow-xl flex flex-col gap-3 md:hidden font-mono text-xs text-neutral-800">
           <Link href="/workspace" onClick={() => setMobileOpen(false)} className="py-1">
             workspace
           </Link>

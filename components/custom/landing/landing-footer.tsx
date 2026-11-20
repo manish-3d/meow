@@ -13,12 +13,12 @@ export function LandingFooter() {
           {/* Brand */}
           <div className="flex flex-col gap-2">
             <Link href="/" className="flex items-center gap-2.5">
-              <div className="relative flex items-center justify-center size-8 rounded-full overflow-hidden ring-1 ring-black/10 bg-black">
+              <div className="relative flex items-center justify-center size-9 rounded-xl overflow-hidden ring-1 ring-black/10 bg-white shadow-2xs">
                 <Image
                   src="/logo.png"
                   alt="meow bot"
-                  width={32}
-                  height={32}
+                  width={36}
+                  height={36}
                   className="object-cover size-full"
                 />
               </div>
