@@ -198,9 +198,9 @@ interface OrbitConfig {
 }
 
 const ORBITS: OrbitConfig[] = [
-  { r: 0.22, tilt: 62, roll: -12, speed: 0.015, count: 6 },
-  { r: 0.33, tilt: 58, roll: 10, speed: -0.011, count: 8 },
-  { r: 0.44, tilt: 64, roll: -4, speed: 0.008, count: 10 },
+  { r: 0.24, tilt: 62, roll: -12, speed: 0.015, count: 7 },
+  { r: 0.36, tilt: 58, roll: 10, speed: -0.011, count: 9 },
+  { r: 0.48, tilt: 64, roll: -4, speed: 0.008, count: 11 },
 ];
 
 export function IntegrationsStrip() {
@@ -311,7 +311,7 @@ export function IntegrationsStrip() {
       CX = 0.5,
       CY = 0.5,
       U = 1,
-      half = 28;
+      half = 34;
 
     function project(o: OrbitConfig, a: number) {
       const R = o.r * U;
@@ -339,8 +339,8 @@ export function IntegrationsStrip() {
       H = stage!.clientHeight;
       CX = W / 2;
       CY = H / 2;
-      U = Math.min(W * 0.62, H * 0.82, 650);
-      half = W < 640 ? 17 : 21;
+      U = Math.min(W * 0.88, H * 0.94, 1100);
+      half = W < 640 ? 23 : 34;
 
       rings!.setAttribute("viewBox", `0 0 ${W} ${H}`);
       rings!.innerHTML = "";
@@ -470,9 +470,9 @@ export function IntegrationsStrip() {
         it.px = P.x;
         it.py = P.y;
 
-        const len = (12 + B * 55) * s;
+        const len = (18 + B * 80) * s;
         it.tail.style.opacity = String(reduce ? 0 : (0.18 + B * 0.8) * (0.5 + (0.5 * (P.z + 1)) / 2));
-        it.tail.style.transform = `translate(${P.x}px,${P.y - 3 * s}px) rotate(${it.ang + Math.PI}rad) scaleX(${len / 70}) scaleY(${s})`;
+        it.tail.style.transform = `translate(${P.x}px,${P.y - 4 * s}px) rotate(${it.ang + Math.PI}rad) scaleX(${len / 90}) scaleY(${s})`;
       }
 
       rafId = requestAnimationFrame(frame);
@@ -493,7 +493,7 @@ export function IntegrationsStrip() {
     <section
       id="integrations"
       ref={stageRef}
-      className="orbit-section relative w-full h-[68vh] min-h-[480px] max-h-[640px] overflow-hidden select-none"
+      className="orbit-section relative w-full h-[88vh] min-h-[780px] max-h-[1050px] overflow-hidden select-none"
       aria-labelledby="connect-title"
     >
       <style jsx>{`
@@ -503,17 +503,17 @@ export function IntegrationsStrip() {
           --muted: #6b6f6b;
           --lime: #8fdc78;
           --lime-soft: #c9f2b8;
-          --icon-size: 42px;
+          --icon-size: 68px;
           background: radial-gradient(
-              ellipse 42% 34% at 50% 50%,
-              rgba(143, 220, 120, 0.14),
-              transparent 70%
+              ellipse 55% 45% at 50% 50%,
+              rgba(143, 220, 120, 0.16),
+              transparent 72%
             ),
             var(--bg);
         }
         @media (max-width: 640px) {
           .orbit-section {
-            --icon-size: 34px;
+            --icon-size: 46px;
           }
         }
         :global(#rings) {
@@ -531,12 +531,12 @@ export function IntegrationsStrip() {
         }
         :global(.back) {
           stroke: #8fdc78;
-          stroke-width: 1;
+          stroke-width: 1.2;
           opacity: 0.28;
         }
         :global(.front) {
           stroke: #8fdc78;
-          stroke-width: 1.4;
+          stroke-width: 1.6;
           opacity: 0.75;
         }
         .center-content {
@@ -547,19 +547,19 @@ export function IntegrationsStrip() {
           text-align: center;
           z-index: 5;
           pointer-events: none;
-          width: min(90vw, 680px);
+          width: min(92vw, 880px);
         }
         :global(.mascot) {
           display: block;
-          margin: 0 auto 8px;
-          width: 74px;
+          margin: 0 auto 12px;
+          width: 120px;
           height: auto;
           animation: float 4s ease-in-out infinite;
           shape-rendering: crispEdges;
         }
         @media (max-width: 640px) {
           :global(.mascot) {
-            width: 54px;
+            width: 78px;
           }
         }
         @keyframes float {
@@ -568,29 +568,29 @@ export function IntegrationsStrip() {
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
           }
         }
         .center-heading {
           margin: 0;
           font-weight: 900;
-          font-size: clamp(30px, 4.4vw, 54px);
+          font-size: clamp(38px, 5.4vw, 80px);
           line-height: 1.02;
           letter-spacing: -0.035em;
           text-transform: uppercase;
           color: #0a0a0a;
         }
         .center-subtext {
-          margin: 12px auto 0;
-          font-size: clamp(13px, 1.2vw, 16px);
+          margin: 16px auto 0;
+          font-size: clamp(15px, 1.35vw, 22px);
           color: #6b6f6b;
           font-family: inherit;
-          max-width: 440px;
+          max-width: 600px;
         }
         .sp {
           position: absolute;
-          width: 5px;
-          height: 5px;
+          width: 7px;
+          height: 7px;
           background: #7fc063;
           opacity: 0.7;
           animation: tw 2.4s steps(2) infinite;
@@ -612,8 +612,8 @@ export function IntegrationsStrip() {
           height: var(--icon-size);
           border-radius: 50%;
           background: #ffffff;
-          box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08),
-            0 0 0 1px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.09),
+            0 0 0 1px rgba(0, 0, 0, 0.05);
           display: grid;
           place-items: center;
           will-change: transform, opacity;
@@ -622,20 +622,20 @@ export function IntegrationsStrip() {
           transition: filter 0.2s ease;
         }
         :global(.icon:hover) {
-          filter: drop-shadow(0 4px 12px rgba(143, 220, 120, 0.6));
+          filter: drop-shadow(0 6px 16px rgba(143, 220, 120, 0.65));
         }
         :global(.icon svg) {
-          width: 50%;
-          height: 50%;
+          width: 52%;
+          height: 52%;
           display: block;
         }
         :global(.tail) {
           position: absolute;
           left: 0;
           top: 0;
-          width: 70px;
-          height: 6px;
-          border-radius: 6px;
+          width: 90px;
+          height: 8px;
+          border-radius: 8px;
           transform-origin: 0 50%;
           pointer-events: none;
           visibility: hidden;
@@ -662,29 +662,29 @@ export function IntegrationsStrip() {
       <div className="center-content">
         <div style={{ position: "relative", display: "inline-block" }}>
           <svg className="mascot" ref={mascotRef} aria-hidden="true" />
-          <i className="sp" style={{ left: "-16px", top: "12px" }} />
+          <i className="sp" style={{ left: "-24px", top: "20px" }} />
           <i
             className="sp"
             style={{
-              left: "-4px",
-              top: "-6px",
+              left: "-8px",
+              top: "-10px",
               animationDelay: "0.6s",
-              width: "4px",
-              height: "4px",
+              width: "5px",
+              height: "5px",
             }}
           />
           <i
             className="sp"
-            style={{ right: "-16px", top: "10px", animationDelay: "1.1s" }}
+            style={{ right: "-24px", top: "18px", animationDelay: "1.1s" }}
           />
           <i
             className="sp"
             style={{
-              right: "-4px",
-              top: "48px",
+              right: "-8px",
+              top: "76px",
               animationDelay: "1.7s",
-              width: "4px",
-              height: "4px",
+              width: "5px",
+              height: "5px",
             }}
           />
         </div>
