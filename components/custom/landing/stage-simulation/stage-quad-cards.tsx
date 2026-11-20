@@ -166,9 +166,11 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
             </div>
           </div>
 
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#f0fdf4] text-[9.5px] font-medium text-[#16a34a] border border-[#bbf7d0] shadow-2xs">
-            <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse" />
-            <span>&bull; Live &bull; Active 12m</span>
+          {/* Horizontal Green Progress Bar */}
+          <div className="flex items-center gap-1.5">
+            <div className="w-16 sm:w-20 h-1.5 rounded-full bg-neutral-200 overflow-hidden">
+              <div className="w-3/4 h-full rounded-full bg-[#84cc16] animate-pulse" />
+            </div>
           </div>
         </div>
 
