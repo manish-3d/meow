@@ -88,74 +88,7 @@
     <rect x="1336" y="560" width="42" height="7" fill="#0b72b0" opacity="0.5" />
   </g>
 
-  <!-- ── 6. AUTHENTIC PIXEL-ART LOTUS BLOSSOMS & LILY PADS (PERFECTLY ANCHORED) ── -->
-  <!-- Lotus Pad 1 (Mid-Left River: x=38, y=424) -->
-  <g transform="translate(38, 424)">
-    <rect x="6" y="22" width="44" height="12" fill="#15803d" />
-    <rect x="0" y="25" width="56" height="8" fill="#16a34a" />
-    <rect x="8" y="20" width="40" height="4" fill="#22c55e" />
-    <rect x="22" y="24" width="8" height="6" fill="#14532d" />
-    <rect x="18" y="10" width="8" height="14" fill="#f472b6" />
-    <rect x="24" y="6" width="8" height="16" fill="#ec4899" />
-    <rect x="30" y="10" width="8" height="14" fill="#f472b6" />
-    <rect x="14" y="14" width="6" height="10" fill="#fbcfe8" />
-    <rect x="36" y="14" width="6" height="10" fill="#fbcfe8" />
-    <rect x="25" y="11" width="6" height="7" fill="#fde047" />
-    <rect x="27" y="13" width="2" height="3" fill="#ca8a04" />
-  </g>
 
-  <!-- Lotus Pad 2 (Bottom-Left River: x=48, y=552) -->
-  <g transform="translate(48, 552) scale(1.15)">
-    <rect x="8" y="24" width="50" height="13" fill="#15803d" />
-    <rect x="2" y="27" width="62" height="9" fill="#16a34a" />
-    <rect x="12" y="22" width="44" height="4" fill="#22c55e" />
-    <rect x="26" y="26" width="9" height="7" fill="#14532d" />
-    <rect x="22" y="11" width="9" height="16" fill="#f472b6" />
-    <rect x="29" y="6" width="9" height="19" fill="#ec4899" />
-    <rect x="36" y="11" width="9" height="16" fill="#f472b6" />
-    <rect x="16" y="16" width="8" height="11" fill="#fbcfe8" />
-    <rect x="43" y="16" width="8" height="11" fill="#fbcfe8" />
-    <rect x="30" y="13" width="7" height="8" fill="#fde047" />
-    <rect x="32" y="15" width="3" height="4" fill="#ca8a04" />
-  </g>
-
-  <!-- Standalone Green Lily Pad in Water (Center-Left: x=210, y=666) -->
-  <g transform="translate(210, 666) scale(1.15)">
-    <rect x="6" y="6" width="38" height="10" fill="#15803d" />
-    <rect x="0" y="9" width="50" height="7" fill="#16a34a" />
-    <rect x="10" y="4" width="32" height="4" fill="#4ade80" />
-    <rect x="18" y="7" width="8" height="6" fill="#14532d" />
-  </g>
-
-  <!-- Lotus Pad 3 (Bottom-Right River: x=1180, y=616) -->
-  <g transform="translate(1180, 616) scale(1.2)">
-    <rect x="8" y="24" width="50" height="13" fill="#15803d" />
-    <rect x="2" y="27" width="62" height="9" fill="#16a34a" />
-    <rect x="12" y="22" width="44" height="4" fill="#22c55e" />
-    <rect x="26" y="26" width="9" height="7" fill="#14532d" />
-    <rect x="22" y="11" width="9" height="16" fill="#f472b6" />
-    <rect x="29" y="6" width="9" height="19" fill="#ec4899" />
-    <rect x="36" y="11" width="9" height="16" fill="#f472b6" />
-    <rect x="16" y="16" width="8" height="11" fill="#fbcfe8" />
-    <rect x="43" y="16" width="8" height="11" fill="#fbcfe8" />
-    <rect x="30" y="13" width="7" height="8" fill="#fde047" />
-    <rect x="32" y="15" width="3" height="4" fill="#ca8a04" />
-  </g>
-
-  <!-- Lotus Pad 4 (Far-Right River Edge: x=1360, y=444) -->
-  <g transform="translate(1360, 444)">
-    <rect x="6" y="22" width="44" height="12" fill="#15803d" />
-    <rect x="0" y="25" width="56" height="8" fill="#16a34a" />
-    <rect x="8" y="20" width="40" height="4" fill="#22c55e" />
-    <rect x="22" y="24" width="8" height="6" fill="#14532d" />
-    <rect x="18" y="10" width="8" height="14" fill="#f472b6" />
-    <rect x="24" y="6" width="8" height="16" fill="#ec4899" />
-    <rect x="30" y="10" width="8" height="14" fill="#f472b6" />
-    <rect x="14" y="14" width="6" height="10" fill="#fbcfe8" />
-    <rect x="36" y="14" width="6" height="10" fill="#fbcfe8" />
-    <rect x="25" y="11" width="6" height="7" fill="#fde047" />
-    <rect x="27" y="13" width="2" height="3" fill="#ca8a04" />
-  </g>
 
   <!-- ── 7. CATTAIL REEDS ON LEFT & RIGHT BANKS ── -->
   <!-- Left Shoreline Reeds -->

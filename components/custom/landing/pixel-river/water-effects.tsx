@@ -17,32 +17,6 @@ export function WaterEffects() {
       <div className="absolute top-[68%] right-[12%] size-2 bg-sky-200/90 rounded-xs animate-[shimmerSparkle_2.6s_ease-in-out_infinite_1.5s]" />
       <div className="absolute top-[80%] right-[16%] size-1.5 bg-white/90 rounded-xs animate-[shimmerSparkle_3.4s_ease-in-out_infinite_0.9s]" />
       <div className="absolute top-[90%] right-[26%] size-2 bg-sky-100/90 rounded-xs animate-[shimmerSparkle_2.9s_ease-in-out_infinite_1.4s]" />
-
-      {/* --- FLOATING WATER LOTUS BOBBING OVERLAYS (Aligned to illustrated lotuses) --- */}
-      {/* Left Lotus Pad 1 */}
-      <div className="absolute top-[58%] left-[2.5%] w-8 h-6 pointer-events-none animate-[riverBob_3.4s_ease-in-out_infinite]">
-        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
-      </div>
-
-      {/* Left Lotus Pad 2 */}
-      <div className="absolute top-[80%] left-[7%] w-9 h-6 pointer-events-none animate-[riverBob_3.8s_ease-in-out_infinite_0.5s]">
-        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
-      </div>
-
-      {/* Right Lotus Pad 1 */}
-      <div className="absolute top-[62%] right-[2%] w-8 h-6 pointer-events-none animate-[riverBob_3.6s_ease-in-out_infinite_0.8s]">
-        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
-      </div>
-
-      {/* Right Lotus Pad 2 */}
-      <div className="absolute top-[78%] right-[8%] w-9 h-6 pointer-events-none animate-[riverBob_3.3s_ease-in-out_infinite_1.2s]">
-        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
-      </div>
-
-      {/* Right Lotus Pad 3 */}
-      <div className="absolute top-[88%] right-[23%] w-9 h-6 pointer-events-none animate-[riverBob_3.5s_ease-in-out_infinite_1.6s]">
-        <div className="w-full h-full rounded-full bg-pink-300/30 blur-[2px]" />
-      </div>
     </div>
   );
 }

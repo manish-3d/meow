@@ -27,7 +27,7 @@ export function PixelCatBot({
   staggerMs = 0,
   scale = 1,
 }: PixelCatBotProps) {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(isEmerged);
   const [splashing, setSplashing] = useState(false);
   const [blinking, setBlinking] = useState(false);
 
