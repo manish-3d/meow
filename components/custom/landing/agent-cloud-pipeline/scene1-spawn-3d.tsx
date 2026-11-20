@@ -342,7 +342,7 @@ function Scene1Mesh() {
 
 export function Scene1Spawn3D() {
   return (
-    <div className="w-full h-[260px] sm:h-[300px] relative select-none">
+    <div className="w-full h-[185px] sm:h-[205px] lg:h-[215px] relative select-none">
       <Canvas
         shadows
         dpr={[1, 1.5]}

@@ -15,7 +15,7 @@ const Scene1Spawn3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[260px] sm:h-[300px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
+      <div className="w-full h-[185px] sm:h-[205px] lg:h-[215px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
         <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
       </div>
     ),
@@ -27,7 +27,7 @@ const Scene2Provisioning3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[260px] sm:h-[300px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
+      <div className="w-full h-[185px] sm:h-[205px] lg:h-[215px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
         <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
       </div>
     ),
@@ -39,7 +39,7 @@ const Scene3Deploy3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[260px] sm:h-[300px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
+      <div className="w-full h-[185px] sm:h-[205px] lg:h-[215px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
         <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
       </div>
     ),
@@ -51,7 +51,7 @@ const Scene4Autonomous3D = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[260px] sm:h-[300px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
+      <div className="w-full h-[185px] sm:h-[205px] lg:h-[215px] flex items-center justify-center bg-neutral-50/50 rounded-2xl">
         <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
       </div>
     ),
@@ -91,18 +91,18 @@ export function AgentCloudPipelineSection() {
   return (
     <section
       id="cloud-architecture"
-      className="py-24 sm:py-32 bg-white text-[#131316] relative overflow-hidden select-none"
+      className="pt-0 pb-10 sm:pb-16 bg-white text-[#131316] relative overflow-hidden select-none"
     >
       {/* Background Subtle Gradient Ambience */}
       <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(56,189,248,0.06),transparent_75%)]" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── SECTION HEADER ── */}
-        <div className="max-w-3xl mx-auto text-center mb-16 sm:mb-24">
-          <h2 className="text-4xl sm:text-6xl lg:text-[68px] font-sans font-normal tracking-tight text-[#131316] leading-[1.05]">
+        <div className="max-w-2xl mx-auto text-center mb-4 sm:mb-6">
+          <h2 className="text-3xl sm:text-4xl lg:text-[46px] font-sans font-normal tracking-tight text-[#131316] leading-[1.08]">
             how each agent gets its own <span className="font-bold">cloud.</span>
           </h2>
-          <p className="mt-5 text-base sm:text-xl text-neutral-600 font-sans leading-relaxed">
+          <p className="mt-2 text-xs sm:text-sm md:text-base text-neutral-500 font-sans leading-relaxed max-w-xl mx-auto">
             Zero API limits, zero shared resources. Each AI agent is provisioned with its own
             dedicated, sandboxed cloud computer.
           </p>
@@ -113,58 +113,58 @@ export function AgentCloudPipelineSection() {
           {/* ── DESKTOP CONNECTING ARROWS & DASHED CURVES (Hidden on mobile) ── */}
           <div className="hidden lg:block absolute inset-0 pointer-events-none z-10">
             {/* Arrow 1 -> 2 */}
-            <div className="absolute left-[24%] top-[130px] -translate-x-1/2">
+            <div className="absolute left-[24%] top-[92px] -translate-x-1/2">
               <PixelMarchingArrow />
             </div>
             {/* Dashed Arc 1 -> 2 with Cat Chip */}
-            <div className="absolute left-[24%] top-[185px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
-              <svg width="100" height="40" viewBox="0 0 100 40" fill="none" className="overflow-visible">
+            <div className="absolute left-[24%] top-[134px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
+              <svg width="86" height="32" viewBox="0 0 86 32" fill="none" className="overflow-visible">
                 <path
-                  d="M 10 5 Q 50 38 90 5"
+                  d="M 8 4 Q 43 28 78 4"
                   stroke="#cbd5e1"
-                  strokeWidth="1.8"
+                  strokeWidth="1.6"
                   strokeDasharray="4 4"
                 />
               </svg>
-              <div className="-mt-3.5">
+              <div className="-mt-3">
                 <PixelCatChip />
               </div>
             </div>
 
             {/* Arrow 2 -> 3 */}
-            <div className="absolute left-[50%] top-[130px] -translate-x-1/2">
+            <div className="absolute left-[50%] top-[92px] -translate-x-1/2">
               <PixelMarchingArrow />
             </div>
             {/* Dashed Arc 2 -> 3 with Calico Cat Chip */}
-            <div className="absolute left-[50%] top-[185px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
-              <svg width="100" height="40" viewBox="0 0 100 40" fill="none" className="overflow-visible">
+            <div className="absolute left-[50%] top-[134px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
+              <svg width="86" height="32" viewBox="0 0 86 32" fill="none" className="overflow-visible">
                 <path
-                  d="M 10 5 Q 50 38 90 5"
+                  d="M 8 4 Q 43 28 78 4"
                   stroke="#cbd5e1"
-                  strokeWidth="1.8"
+                  strokeWidth="1.6"
                   strokeDasharray="4 4"
                 />
               </svg>
-              <div className="-mt-3.5">
+              <div className="-mt-3">
                 <PixelCatChip orangeEar />
               </div>
             </div>
 
             {/* Arrow 3 -> 4 */}
-            <div className="absolute left-[75%] top-[130px] -translate-x-1/2">
+            <div className="absolute left-[75%] top-[92px] -translate-x-1/2">
               <PixelMarchingArrow />
             </div>
             {/* Dashed Arc 3 -> 4 with CPU Chip */}
-            <div className="absolute left-[75%] top-[185px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
-              <svg width="100" height="40" viewBox="0 0 100 40" fill="none" className="overflow-visible">
+            <div className="absolute left-[75%] top-[134px] -translate-x-1/2 flex flex-col items-center pointer-events-auto">
+              <svg width="86" height="32" viewBox="0 0 86 32" fill="none" className="overflow-visible">
                 <path
-                  d="M 10 5 Q 50 38 90 5"
+                  d="M 8 4 Q 43 28 78 4"
                   stroke="#cbd5e1"
-                  strokeWidth="1.8"
+                  strokeWidth="1.6"
                   strokeDasharray="4 4"
                 />
               </svg>
-              <div className="-mt-3.5">
+              <div className="-mt-3">
                 <PixelCpuChip />
               </div>
             </div>
@@ -189,19 +189,19 @@ export function AgentCloudPipelineSection() {
                   </div>
 
                   {/* Step Description Cluster */}
-                  <div className="mt-3 flex flex-col items-center space-y-2.5 max-w-[240px]">
+                  <div className="mt-1.5 flex flex-col items-center space-y-1.5 max-w-[220px]">
                     {/* Step Number Badge */}
-                    <div className="size-8 rounded-full bg-black text-white font-mono font-bold text-xs flex items-center justify-center shadow-sm group-hover:scale-110 group-hover:bg-[#84cc16] group-hover:text-black transition-all">
+                    <div className="size-7 rounded-full bg-black text-white font-mono font-bold text-[11px] sm:text-xs flex items-center justify-center shadow-xs group-hover:scale-110 group-hover:bg-[#84cc16] group-hover:text-black transition-all">
                       {step.num}
                     </div>
 
                     {/* Step Title */}
-                    <h3 className="font-sans font-bold text-lg sm:text-xl text-neutral-900 tracking-tight leading-tight">
+                    <h3 className="font-sans font-bold text-base sm:text-lg text-neutral-900 tracking-tight leading-tight">
                       {step.title}
                     </h3>
 
                     {/* Step Description */}
-                    <p className="text-xs sm:text-[13px] text-neutral-600 font-sans leading-relaxed font-normal">
+                    <p className="text-xs sm:text-[13px] text-neutral-500 font-sans leading-snug font-normal">
                       {step.desc}
                     </p>
                   </div>
@@ -211,7 +211,7 @@ export function AgentCloudPipelineSection() {
           </div>
 
           {/* ── CORNER PIXEL CAT MASCOTS ── */}
-          <div className="hidden lg:flex items-center justify-between mt-6 px-4 pointer-events-none">
+          <div className="hidden lg:flex items-center justify-between mt-3 px-4 pointer-events-none">
             {/* Left Corner Cat */}
             <div className="flex items-center gap-2">
               <SittingPixelCat />

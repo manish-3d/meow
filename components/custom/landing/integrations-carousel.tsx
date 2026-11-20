@@ -360,13 +360,13 @@ export function IntegrationsCarousel() {
   return (
     <section
       id="integrations-carousel"
-      className="relative w-full max-w-full overflow-hidden overflow-x-clip py-20 sm:py-28 bg-white text-[#131316] select-none"
+      className="relative w-full max-w-full overflow-hidden overflow-x-clip pt-10 sm:pt-14 pb-0 bg-white text-[#131316] select-none"
       style={{ contain: "paint" }}
     >
       <div className="w-full max-w-full flex flex-col justify-center items-center overflow-hidden">
         {/* ── 1. TOP HEADLINE & BRING-YOUR-OWN-AI BANNER ── */}
-        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-4 sm:mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-3 shadow-2xs">
+        <div className="max-w-4xl mx-auto px-4 text-center z-10 shrink-0 mb-3 sm:mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 border border-neutral-200 text-xs font-medium text-neutral-700 mb-2.5 shadow-2xs">
             <Key className="size-3.5 text-neutral-800" />
             <span>bring the AI models you already pay for &middot; zero API markup</span>
           </div>
@@ -374,7 +374,7 @@ export function IntegrationsCarousel() {
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-neutral-900 leading-none">
             integration is simple.
           </h2>
-          <p className="mt-2.5 sm:mt-3 text-sm sm:text-base text-neutral-500 font-normal">
+          <p className="mt-2 text-sm sm:text-base text-neutral-500 font-normal">
             connect with the AI models you already love. swap models per bot anytime.
           </p>
         </div>
@@ -387,7 +387,7 @@ export function IntegrationsCarousel() {
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
           onPointerCancel={handlePointerUp}
-          className="relative w-full max-w-full h-[430px] sm:h-[470px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden overflow-x-clip my-auto"
+          className="relative w-full max-w-full h-[390px] sm:h-[420px] flex items-center justify-center cursor-grab active:cursor-grabbing overflow-hidden overflow-x-clip mb-0"
           style={{
             perspective: "1200px",
             perspectiveOrigin: "50% 50%",
