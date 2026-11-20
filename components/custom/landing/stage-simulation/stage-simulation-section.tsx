@@ -8,7 +8,6 @@ import {
   Search as SearchIcon, 
   Bell, 
   Sliders, 
-  RotateCcw, 
   Play, 
   Pause,
   Box,
@@ -109,21 +108,6 @@ export function StageSimulationSection() {
     runSequence();
   };
 
-  const handleSelectPhase = (p: SimPhase) => {
-    setIsPlaying(false);
-    if (timelineRef.current) clearTimeout(timelineRef.current);
-    setPhase(p);
-  };
-
-  const frameLabels: { phase: SimPhase; name: string; tag: string }[] = [
-    { phase: 1, name: "Frame 1: Base Start", tag: "F1 Base Start" },
-    { phase: 2, name: "Frame 2: Thanos-Style Dissolve", tag: "F2 Thanos Dissolve" },
-    { phase: 3, name: "Frame 3: Pop-Out Genesis", tag: "F3 Pop-Out Genesis" },
-    { phase: 4, name: "Frame 4: Outward Flight", tag: "F4 Outward Flight" },
-    { phase: 5, name: "Frame 5: Settle & Connect", tag: "F5 Settle & Connect" },
-    { phase: 6, name: "Frame 6: Live Simulation (\"Cooking\")", tag: "F6 Live Simulation (\"Cooking\")" },
-  ];
-
   return (
     <section
       id="simulation-section"
@@ -132,11 +116,6 @@ export function StageSimulationSection() {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center">
         {/* ── 1. SECTION HEADER ── */}
         <div className="max-w-2xl mx-auto text-center mb-4 sm:mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f7fee7] border border-[#d9f99d] text-xs font-mono font-medium text-[#65a30d] mb-2.5 shadow-2xs">
-            <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
-            <span>three.js procedural 3d agent simulation &bull; gen-to-work 6-frame</span>
-          </div>
-
           <h2 className="text-2xl sm:text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 leading-tight">
             see the bots at work.
           </h2>
@@ -202,52 +181,16 @@ export function StageSimulationSection() {
               {/* ── FLAT GROUND GRASS BORDER STRIP (ACROSS VIEWPORT BOTTOM) ── */}
               <div className="w-full h-1.5 bg-gradient-to-r from-[#bef264] via-[#a3e635] to-[#84cc16] border-t border-[#a3e635]/30 shrink-0 select-none pointer-events-none" />
 
-              {/* ── 3. BOTTOM TIMELINE SCRUBBER CONTROLLER ── */}
-              <div className="w-full px-3 py-1.5 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs font-mono select-none">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleTogglePlay}
-                    className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-neutral-900 text-white hover:bg-black transition-all active:scale-95 shadow-2xs font-semibold text-[11px]"
-                  >
-                    {isPlaying ? <Pause className="size-3" /> : <Play className="size-3" />}
-                    <span>{isPlaying ? "Pause" : "Play Sequence"}</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleRestart}
-                    className="p-1 rounded-lg border border-black/10 bg-white hover:bg-neutral-100 text-neutral-600 transition-colors"
-                    title="Restart Sequence from Frame 1"
-                  >
-                    <RotateCcw className="size-3.5" />
-                  </button>
-
-                  <span className="text-[10.5px] text-neutral-500 hidden sm:inline">
-                    Phase {phase}/6 &bull; {phase === 6 ? "Always Cooking (3D WebGL)" : "Transitioning..."}
-                  </span>
-                </div>
-
-                {/* Frame Pills (F1 to F6) */}
-                <div className="flex items-center gap-1 overflow-x-auto py-0.5">
-                  {frameLabels.map((f) => {
-                    const isActive = phase === f.phase;
-                    return (
-                      <button
-                        key={f.phase}
-                        type="button"
-                        onClick={() => handleSelectPhase(f.phase)}
-                        className={`px-2 py-0.8 rounded-md text-[10px] transition-all whitespace-nowrap ${
-                          isActive
-                            ? "bg-neutral-900 text-white font-bold shadow-2xs scale-105"
-                            : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
-                        }`}
-                      >
-                        {f.tag}
-                      </button>
-                    );
-                  })}
-                </div>
+              {/* ── 3. BOTTOM CONTROL BAR (ONLY PAUSE / PLAY OPTION) ── */}
+              <div className="w-full px-3 py-1.5 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex items-center justify-start select-none">
+                <button
+                  type="button"
+                  onClick={handleTogglePlay}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-900 text-white hover:bg-black transition-all active:scale-95 shadow-2xs font-semibold text-xs font-mono"
+                >
+                  {isPlaying ? <Pause className="size-3" /> : <Play className="size-3" />}
+                  <span>{isPlaying ? "Pause" : "Play"}</span>
+                </button>
               </div>
             </div>
           </div>
