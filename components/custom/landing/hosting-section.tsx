@@ -375,21 +375,22 @@ export function HostingSection() {
           gap: 6px;
         }
 
-        /* Success Box matched to Image 1: #DCFCE7 mint background, #15804D text */
+        /* Black background & white text for Card 1 success box */
         .ws-success-box {
           margin-top: 4px;
-          background: #dcfce7;
-          border: 1px solid #bbf7d0;
-          border-radius: 6px;
-          padding: 5px 10px;
+          background: #111111;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 9999px;
+          padding: 4px 12px;
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.68rem;
           font-weight: 500;
-          color: #15804d;
+          color: #ffffff;
           display: inline-flex;
           align-items: center;
-          gap: 5px;
+          gap: 6px;
           width: fit-content;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
         }
 
         /* ============================================================================
@@ -667,7 +668,7 @@ export function HostingSection() {
           box-shadow: 0 0 0 2px rgba(132, 204, 22, 0.4);
         }
 
-        /* Floating Status Pills: Exactly matched to Image 1 (#DCFCE7 & #15804D) */
+        /* Floating Status Pills: Black background and white text */
         .remote-floating-pills {
           position: absolute;
           bottom: 12px;
@@ -680,26 +681,27 @@ export function HostingSection() {
         }
 
         .remote-status-pill {
-          background: #e2e8f0;
-          color: #334155;
+          background: #111111;
+          color: #ffffff;
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.62rem;
           font-weight: 600;
-          padding: 3px 8px;
-          border-radius: 6px;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+          padding: 4px 10px;
+          border-radius: 9999px;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.35);
           animation: mbFadeIn 0.25s ease;
         }
 
         .remote-status-pill.pill-thread {
-          background: #dbeafe;
-          color: #1e40af;
+          background: #111111;
+          color: #ffffff;
         }
 
         .remote-status-pill.pill-sent {
-          background: #dcfce7;
-          border: 1px solid #bbf7d0;
-          color: #15804d;
+          background: #111111;
+          color: #ffffff;
+          border-color: rgba(132, 204, 22, 0.4);
         }
 
         @keyframes mbFadeIn {
@@ -748,19 +750,17 @@ export function HostingSection() {
           width: 100%;
         }
 
-        /* Matched to Image 4: Pure black pill (#111111), pure white text (#FFFFFF), monospace */
         .cloud-asleep-pill {
           background: #111111;
           color: #ffffff;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.68rem;
-          font-weight: 700;
-          padding: 7px 16px;
+          font-weight: 600;
+          padding: 7px 14px;
           border-radius: 9999px;
           white-space: nowrap;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
           flex-shrink: 0;
-          letter-spacing: -0.01em;
         }
 
         .cloud-middle-tasks {
@@ -839,7 +839,7 @@ export function HostingSection() {
         }
 
         /* ============================================================================
-           CARD 4: ISOLATED SANDBOXES
+           CARD 4: ISOLATED SANDBOXES (BLACK BACKGROUND & WHITE TEXT)
            ============================================================================ */
 
         .sandbox-widget {
@@ -853,18 +853,19 @@ export function HostingSection() {
           gap: 14px;
         }
 
-        /* Matched to Image 3: Pure white background (#FFFFFF), dashed border #CBD5E1, dark slate lock #1E293B */
+        /* Lock box: Black background and white icon */
         .sandbox-lock-box {
-          width: 50px;
-          height: 50px;
-          border: 1.5px dashed #cbd5e1;
-          border-radius: 12px;
+          width: 48px;
+          height: 48px;
+          border: 1.5px dashed rgba(255, 255, 255, 0.35);
+          border-radius: 10px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #ffffff;
+          background: #111111;
           flex-shrink: 0;
-          color: #1e293b;
+          color: #ffffff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .sandbox-rows {
@@ -895,29 +896,34 @@ export function HostingSection() {
           border-radius: 9999px;
         }
 
-        /* Matched to Image 2: Exact hex colors for RUNNING, EXEC, WIPED */
+        /* Status badges: Black background and crisp white text */
         .sandbox-badge {
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.58rem;
           font-weight: 700;
-          padding: 2px 6px;
-          border-radius: 4px;
+          padding: 2px 7px;
+          border-radius: 9999px;
+          background: #111111;
+          color: #ffffff;
+          border: 1px solid rgba(255, 255, 255, 0.14);
           letter-spacing: 0.02em;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         }
 
         .badge-running {
-          background: #bbf7d0;
-          color: #15803d;
+          background: #111111;
+          color: #ffffff;
+          border-color: rgba(132, 204, 22, 0.4);
         }
 
         .badge-exec {
-          background: #e2e8f0;
-          color: #475569;
+          background: #18181b;
+          color: #ffffff;
         }
 
         .badge-wiped {
-          background: #f1f5f9;
-          color: #94a3b8;
+          background: #27272a;
+          color: #e4e4e7;
         }
 
         .sandbox-footer-meta {
@@ -997,7 +1003,7 @@ export function HostingSection() {
                     </button>
                   </div>
 
-                  {/* Right Log Pane with Image 1 matched colors */}
+                  {/* Right Log Pane */}
                   <div className="ws-content-pane">
                     <MoreVertical className="ws-more-icon w-3.5 h-3.5" />
 
@@ -1009,9 +1015,10 @@ export function HostingSection() {
                       <span>&gt; Running vitest (14/14 passed)</span>
                     </div>
 
-                    {/* Matched to Image 1: #DCFCE7 mint background, #15804D deep teal-green text */}
+                    {/* Black background & white text */}
                     <div className="ws-success-box">
-                      <span>✓ Fixed OAuth callback &amp; opened PR #48</span>
+                      <span style={{ color: "#84cc16", fontWeight: 700 }}>✓</span>
+                      <span>Fixed OAuth callback &amp; opened PR #48</span>
                     </div>
                   </div>
                 </div>
@@ -1106,11 +1113,10 @@ export function HostingSection() {
                       </div>
                     </div>
 
-                    {/* Tweet Text Area */}
+                    {/* Tweet Text Area (No Duplicate Rendering) */}
                     <div className="remote-x-text-area">
                       <div className="remote-x-placeholder">What&apos;s happening?!</div>
                       <div>
-                        {typedText}
                         {typedText.includes("#AIAgents") ? (
                           <>
                             {typedText.split("#AIAgents")[0]}
@@ -1147,7 +1153,7 @@ export function HostingSection() {
                       </div>
                     </div>
 
-                    {/* Floating Status Pills (Matched to Image 1) */}
+                    {/* Floating Status Pills: Black background & white text */}
                     {(postPhase === "posting" || postPhase === "sent") && (
                       <div className="remote-floating-pills">
                         {postPhase === "posting" ? (
@@ -1157,7 +1163,8 @@ export function HostingSection() {
                           </>
                         ) : (
                           <span className="remote-status-pill pill-sent">
-                            ✓ Tweet posted to @meowbot_ai!
+                            <span style={{ color: "#84cc16", marginRight: 4, fontWeight: 700 }}>✓</span>
+                            Tweet posted to @meowbot_ai!
                           </span>
                         )}
                       </div>
@@ -1216,7 +1223,7 @@ export function HostingSection() {
 
               {/* Node diagram */}
               <div className="cloud-flow-wrap">
-                {/* Left: Laptop asleep (Matched to Image 4: Pure black pill with pure white monospace text) */}
+                {/* Left: Laptop asleep (Reference black background & white text) */}
                 <div className="cloud-asleep-pill">
                   Laptop asleep • {asleepTime}
                 </div>
@@ -1275,7 +1282,7 @@ export function HostingSection() {
             </div>
 
             {/* ──────────────────────────────────────────────────────────────── */}
-            {/* CARD 4: ISOLATED SANDBOXES                                       */}
+            {/* CARD 4: ISOLATED SANDBOXES (BLACK BACKGROUND & WHITE TEXT)       */}
             {/* ──────────────────────────────────────────────────────────────── */}
             <div className="bento-card bento-card-light bento-col-sandbox">
               <div>
@@ -1285,12 +1292,12 @@ export function HostingSection() {
 
               <div>
                 <div className="sandbox-widget">
-                  {/* Dashed lock box (Matched to Image 3: pure white background, #CBD5E1 dashed border, #1E293B dark lock) */}
+                  {/* Dashed lock box: Black background and white icon */}
                   <div className="sandbox-lock-box">
-                    <Lock className="w-5 h-5 stroke-[1.8]" />
+                    <Lock className="w-5 h-5 text-white stroke-[1.8]" />
                   </div>
 
-                  {/* VM status rows (Matched to Image 2: #BBF7D0 RUNNING, #E2E8F0 EXEC, #F1F5F9 WIPED) */}
+                  {/* VM status rows: Badges in Black background and white text */}
                   <div className="sandbox-rows">
                     <div className="sandbox-row-item">
                       <div className="sandbox-row-left">
