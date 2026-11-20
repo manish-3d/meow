@@ -115,8 +115,14 @@ export function StageLeftSidebar({ activeBotId = "research-bot", onSelectBot }: 
                 >
                   <div className="flex items-center gap-1.5 truncate">
                     {/* Voxel Cat Face Avatar */}
-                    <div className="size-4.5 rounded-sm bg-neutral-200 flex items-center justify-center text-[10px] shrink-0 overflow-hidden border border-black/5">
-                      🐱
+                    <div className="size-4.5 rounded-sm overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+                      <Image
+                        src="/logo.png"
+                        alt={agent.name}
+                        width={18}
+                        height={18}
+                        className="size-full object-cover"
+                      />
                     </div>
                     <span className="truncate">{agent.name}</span>
                   </div>

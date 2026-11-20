@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Image from "next/image";
 import { Canvas } from "@react-three/fiber";
 import { motion, AnimatePresence } from "motion/react";
 import { Bot3DResearcher } from "./three-stage/bot-3d-researcher";
@@ -59,8 +60,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
           {/* Header */}
           <div className="flex items-center justify-between pb-2 border-b border-black/[0.06] select-none">
             <div className="flex items-center gap-2.5">
-              <div className="size-7 rounded-lg bg-orange-100 border border-orange-200 flex items-center justify-center text-xs">
-                🐱
+              <div className="size-7 rounded-lg overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+                <Image
+                  src="/logo.png"
+                  alt="Milo The Mascot"
+                  width={28}
+                  height={28}
+                  className="size-full object-cover"
+                />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-neutral-900 leading-none">Milo The Mascot</h4>
@@ -140,8 +147,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         {/* Card Header (Matching Mockup) */}
         <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
           <div className="flex items-center gap-1.5">
-            <div className="size-5.5 sm:size-6 rounded-md bg-orange-100 border border-orange-200 flex items-center justify-center text-xs shadow-2xs">
-              🐱
+            <div className="size-5.5 sm:size-6 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+              <Image
+                src="/logo.png"
+                alt="Research Bot"
+                width={24}
+                height={24}
+                className="size-full object-cover"
+              />
             </div>
             <div>
               <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
@@ -190,8 +203,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         {/* Card Header (Matching Mockup) */}
         <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
           <div className="flex items-center gap-1.5">
-            <div className="size-5.5 sm:size-6 rounded-md bg-blue-100 border border-blue-200 flex items-center justify-center text-xs shadow-2xs">
-              🤖
+            <div className="size-5.5 sm:size-6 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+              <Image
+                src="/logo.png"
+                alt="Social Media Bot"
+                width={24}
+                height={24}
+                className="size-full object-cover"
+              />
             </div>
             <div>
               <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
@@ -256,8 +275,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         {/* Card Header (Matching Mockup) */}
         <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
           <div className="flex items-center gap-1.5">
-            <div className="size-5.5 sm:size-6 rounded-md bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs shadow-2xs">
-              💻
+            <div className="size-5.5 sm:size-6 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+              <Image
+                src="/logo.png"
+                alt="Coding Bot"
+                width={24}
+                height={24}
+                className="size-full object-cover"
+              />
             </div>
             <div>
               <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
@@ -306,8 +331,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         {/* Card Header (Matching Mockup with Horizontal Progress Bar) */}
         <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
           <div className="flex items-center gap-1.5">
-            <div className="size-5.5 sm:size-6 rounded-md bg-amber-100 border border-amber-200 flex items-center justify-center text-xs shadow-2xs">
-              💼
+            <div className="size-5.5 sm:size-6 rounded-md overflow-hidden ring-1 ring-black/10 bg-white shrink-0 shadow-2xs">
+              <Image
+                src="/logo.png"
+                alt="Job Bot"
+                width={24}
+                height={24}
+                className="size-full object-cover"
+              />
             </div>
             <div>
               <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
