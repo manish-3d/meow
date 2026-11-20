@@ -123,7 +123,7 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
   };
 
   return (
-    <div className="relative w-full h-full p-2.5 sm:p-3.5 grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 overflow-hidden select-none">
+    <div className="relative w-full h-full p-2 sm:p-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-2.5 overflow-hidden select-none">
       {/* ────────────────────────────────────────────────────────── */}
       {/* 1. TOP-LEFT: RESEARCH BOT                                 */}
       {/* ────────────────────────────────────────────────────────── */}
@@ -131,36 +131,36 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         key="card-research"
         {...getCardAnim("TL")}
         onClick={() => onSelectBot("research-bot")}
-        className={`rounded-2xl sm:rounded-3xl bg-white/95 border transition-all duration-300 p-2.5 sm:p-3.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
+        className={`rounded-xl sm:rounded-2xl bg-white/95 border transition-all duration-300 p-2 sm:p-2.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
           isSelected("research-bot")
             ? "border-[#84cc16] ring-2 ring-[#84cc16]/25"
             : "border-black/[0.07] hover:border-black/20"
         }`}
       >
         {/* Card Header (Matching Mockup) */}
-        <div className="flex items-center justify-between pb-1.5 border-b border-black/[0.04] z-10 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="size-6 sm:size-7 rounded-lg bg-orange-100 border border-orange-200 flex items-center justify-center text-xs shadow-2xs">
+        <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
+          <div className="flex items-center gap-1.5">
+            <div className="size-5.5 sm:size-6 rounded-md bg-orange-100 border border-orange-200 flex items-center justify-center text-xs shadow-2xs">
               🐱
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-tight">
+              <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
                 Research Bot
               </h4>
-              <p className="text-[10px] text-neutral-400 font-sans leading-none mt-0.5">
+              <p className="text-[9px] text-neutral-400 font-sans leading-none mt-0.5">
                 Live &bull; Active 12m
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[10px] font-medium text-[#16a34a] border border-[#bbf7d0] shadow-2xs">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#f0fdf4] text-[9.5px] font-medium text-[#16a34a] border border-[#bbf7d0] shadow-2xs">
             <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse" />
             <span>&bull; Live &bull; Active 12m</span>
           </div>
         </div>
 
         {/* 3D Viewport: Voxel Cat typing at laptop + "Browsing AI trends >" monitor */}
-        <div className="flex-1 w-full h-full relative min-h-[170px] sm:min-h-[190px]">
+        <div className="flex-1 w-full h-full relative min-h-[135px] sm:min-h-[150px]">
           <Canvas
             shadows
             camera={{ position: [4.4, 3.4, 4.8], fov: 42 }}
@@ -181,36 +181,36 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         key="card-social"
         {...getCardAnim("TR")}
         onClick={() => onSelectBot("social-bot")}
-        className={`rounded-2xl sm:rounded-3xl bg-white/95 border transition-all duration-300 p-2.5 sm:p-3.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
+        className={`rounded-xl sm:rounded-2xl bg-white/95 border transition-all duration-300 p-2 sm:p-2.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
           isSelected("social-bot")
             ? "border-[#84cc16] ring-2 ring-[#84cc16]/25"
             : "border-black/[0.07] hover:border-black/20"
         }`}
       >
         {/* Card Header (Matching Mockup) */}
-        <div className="flex items-center justify-between pb-1.5 border-b border-black/[0.04] z-10 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="size-6 sm:size-7 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center text-xs shadow-2xs">
+        <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
+          <div className="flex items-center gap-1.5">
+            <div className="size-5.5 sm:size-6 rounded-md bg-blue-100 border border-blue-200 flex items-center justify-center text-xs shadow-2xs">
               🤖
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-tight">
+              <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
                 Social Media Bot
               </h4>
-              <p className="text-[10px] text-neutral-400 font-sans leading-none mt-0.5">
+              <p className="text-[9px] text-neutral-400 font-sans leading-none mt-0.5">
                 Automated &bull; Queue active 3s
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neutral-100 text-[10px] font-medium text-neutral-600 border border-neutral-200 shadow-2xs">
-            <span className="size-1.5 rounded-full bg-neutral-400" />
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neutral-100 text-[9px] font-medium text-neutral-600 border border-neutral-200 shadow-2xs">
+            <span className="size-1 rounded-full bg-neutral-400" />
             <span>&bull; Automated &bull; Queue ac: 3s</span>
           </div>
         </div>
 
         {/* Floating Tooltip Checklist: Drafting posts... (Matching Mockup) */}
-        <div className="absolute top-11 right-3 z-20 pointer-events-none">
+        <div className="absolute top-10 right-2.5 z-20 pointer-events-none scale-90 origin-top-right">
           <div className="rounded-xl bg-white/95 backdrop-blur-sm border border-black/[0.08] shadow-lg p-2 text-left w-[122px] space-y-1">
             <div className="text-[10px] font-bold text-neutral-800 pb-0.5 border-b border-black/[0.04]">
               Drafting posts...
@@ -226,7 +226,7 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         </div>
 
         {/* 3D Viewport: Voxel Social Billboard with App Icons & Floating Emojis */}
-        <div className="flex-1 w-full h-full relative min-h-[170px] sm:min-h-[190px]">
+        <div className="flex-1 w-full h-full relative min-h-[135px] sm:min-h-[150px]">
           <Canvas
             shadows
             camera={{ position: [4.4, 3.4, 4.8], fov: 42 }}
@@ -247,36 +247,36 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         key="card-coding"
         {...getCardAnim("BL")}
         onClick={() => onSelectBot("coding-bot")}
-        className={`rounded-2xl sm:rounded-3xl bg-white/95 border transition-all duration-300 p-2.5 sm:p-3.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
+        className={`rounded-xl sm:rounded-2xl bg-white/95 border transition-all duration-300 p-2 sm:p-2.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
           isSelected("coding-bot")
             ? "border-[#84cc16] ring-2 ring-[#84cc16]/25"
             : "border-black/[0.07] hover:border-black/20"
         }`}
       >
         {/* Card Header (Matching Mockup) */}
-        <div className="flex items-center justify-between pb-1.5 border-b border-black/[0.04] z-10 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="size-6 sm:size-7 rounded-lg bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs shadow-2xs">
+        <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
+          <div className="flex items-center gap-1.5">
+            <div className="size-5.5 sm:size-6 rounded-md bg-emerald-100 border border-emerald-200 flex items-center justify-center text-xs shadow-2xs">
               💻
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-tight">
+              <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
                 Coding Bot
               </h4>
-              <p className="text-[10px] text-neutral-400 font-sans leading-none mt-0.5">
+              <p className="text-[9px] text-neutral-400 font-sans leading-none mt-0.5">
                 Code Branch &bull; Compiling...
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[10px] font-medium text-[#16a34a] border border-[#bbf7d0] shadow-2xs">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#f0fdf4] text-[9.5px] font-medium text-[#16a34a] border border-[#bbf7d0] shadow-2xs">
             <span className="size-1.5 rounded-full bg-[#22c55e] animate-pulse" />
             <span>&bull; Active compiling...</span>
           </div>
         </div>
 
         {/* 3D Viewport: Retro CRT PC with syntax code, mini terminals & GitHub Cubes */}
-        <div className="flex-1 w-full h-full relative min-h-[170px] sm:min-h-[190px]">
+        <div className="flex-1 w-full h-full relative min-h-[135px] sm:min-h-[150px]">
           <Canvas
             shadows
             camera={{ position: [4.4, 3.4, 4.8], fov: 42 }}
@@ -297,23 +297,23 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
         key="card-job"
         {...getCardAnim("BR")}
         onClick={() => onSelectBot("job-bot")}
-        className={`rounded-2xl sm:rounded-3xl bg-white/95 border transition-all duration-300 p-2.5 sm:p-3.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
+        className={`rounded-xl sm:rounded-2xl bg-white/95 border transition-all duration-300 p-2 sm:p-2.5 shadow-sm hover:shadow-md flex flex-col justify-between relative overflow-hidden group cursor-pointer ${
           isSelected("job-bot")
             ? "border-[#84cc16] ring-2 ring-[#84cc16]/25"
             : "border-black/[0.07] hover:border-black/20"
         }`}
       >
         {/* Card Header (Matching Mockup with Horizontal Progress Bar) */}
-        <div className="flex items-center justify-between pb-1.5 border-b border-black/[0.04] z-10 shrink-0">
-          <div className="flex items-center gap-2">
-            <div className="size-6 sm:size-7 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center text-xs shadow-2xs">
+        <div className="flex items-center justify-between pb-1 border-b border-black/[0.04] z-10 shrink-0">
+          <div className="flex items-center gap-1.5">
+            <div className="size-5.5 sm:size-6 rounded-md bg-amber-100 border border-amber-200 flex items-center justify-center text-xs shadow-2xs">
               💼
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-neutral-900 leading-tight">
+              <h4 className="text-xs sm:text-[13px] font-bold text-neutral-900 leading-tight">
                 Job Bot
               </h4>
-              <p className="text-[10px] text-neutral-400 font-sans leading-none mt-0.5">
+              <p className="text-[9px] text-neutral-400 font-sans leading-none mt-0.5">
                 Active pipeline &bull; 12 Matches
               </p>
             </div>
@@ -321,14 +321,14 @@ export function StageQuadCards({ phase, activeBotId, onSelectBot }: StageQuadCar
 
           {/* Horizontal Green Progress Bar (Matching Mockup) */}
           <div className="flex items-center gap-1.5">
-            <div className="w-18 sm:w-24 h-1.5 rounded-full bg-neutral-200 overflow-hidden">
+            <div className="w-16 sm:w-20 h-1.5 rounded-full bg-neutral-200 overflow-hidden">
               <div className="w-2/3 h-full rounded-full bg-[#84cc16] animate-pulse" />
             </div>
           </div>
         </div>
 
         {/* 3D Viewport: Winding dirt path + 3D Heart/Diamond signs "Search" & "Apply" */}
-        <div className="flex-1 w-full h-full relative min-h-[170px] sm:min-h-[190px]">
+        <div className="flex-1 w-full h-full relative min-h-[135px] sm:min-h-[150px]">
           <Canvas
             shadows
             camera={{ position: [4.4, 3.4, 4.8], fov: 42 }}

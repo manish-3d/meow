@@ -127,28 +127,28 @@ export function StageSimulationSection() {
   return (
     <section
       id="simulation-section"
-      className="relative w-full py-16 sm:py-24 overflow-hidden bg-white text-[#131316] select-none"
+      className="relative w-full py-10 sm:py-14 overflow-hidden bg-white text-[#131316] select-none"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col items-center">
         {/* ── 1. SECTION HEADER ── */}
-        <div className="max-w-3xl mx-auto text-center mb-6 sm:mb-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#f7fee7] border border-[#d9f99d] text-xs font-mono font-medium text-[#65a30d] mb-3.5 shadow-2xs">
+        <div className="max-w-2xl mx-auto text-center mb-4 sm:mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f7fee7] border border-[#d9f99d] text-xs font-mono font-medium text-[#65a30d] mb-2.5 shadow-2xs">
             <span className="size-2 rounded-full bg-[#84cc16] animate-ping" />
             <span>three.js procedural 3d agent simulation &bull; gen-to-work 6-frame</span>
           </div>
 
-          <h2 className="text-3xl sm:text-5xl md:text-6xl font-medium tracking-tight text-neutral-900 leading-none">
+          <h2 className="text-2xl sm:text-4xl md:text-5xl font-medium tracking-tight text-neutral-900 leading-tight">
             see the bots at work.
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-neutral-500 font-normal max-w-xl mx-auto">
+          <p className="mt-2 text-xs sm:text-sm text-neutral-500 font-normal max-w-lg mx-auto">
             watch the entire lifecycle: from a lone voxel mascot into a live, multi-agent autonomous cloud workspace built with real-time 3D code.
           </p>
         </div>
 
-        {/* ── 2. THE MAIN DESKTOP SHELL CONTAINER (MATCHING MOCKUP) ── */}
-        <div className="relative w-full rounded-3xl border border-black/[0.1] bg-white shadow-2xl overflow-hidden flex flex-col">
+        {/* ── 2. THE MAIN DESKTOP SHELL CONTAINER (MATCHING MOCKUP AT 70% BALANCED SCALE) ── */}
+        <div className="relative w-full rounded-2xl sm:rounded-3xl border border-black/[0.1] bg-white shadow-xl overflow-hidden flex flex-col">
           {/* Main App Body: Persistent Left Sidebar + The Simulation Workspace */}
-          <div className="flex flex-col md:flex-row h-[590px] sm:h-[640px] w-full overflow-hidden relative">
+          <div className="flex flex-col md:flex-row h-[450px] sm:h-[480px] w-full overflow-hidden relative">
             {/* 1. PERSISTENT LEFT SIDEBAR (Always 100% visible, matching mockup light green #84cc16) */}
             <StageLeftSidebar activeBotId={activeBotId} onSelectBot={setActiveBotId} />
 
@@ -158,11 +158,11 @@ export function StageSimulationSection() {
               <VoxelClouds />
 
               {/* ── TOP BAR (MATCHING MOCKUP DOWN TO THE PIXEL) ── */}
-              <div className="relative z-20 h-11 px-4 border-b border-black/[0.06] bg-white/75 backdrop-blur-md flex items-center justify-between gap-3 select-none">
+              <div className="relative z-20 h-9 px-3.5 border-b border-black/[0.06] bg-white/75 backdrop-blur-md flex items-center justify-between gap-3 select-none">
                 {/* Left Title: [|] + 📦 Simulation Workspace ● */}
                 <div className="flex items-center gap-2 text-xs font-bold text-neutral-900">
                   <PanelLeft className="size-3.5 text-neutral-500 cursor-pointer hover:text-neutral-900" />
-                  <div className="flex items-center gap-1.5 px-2 py-0.8 rounded-md bg-white/90 border border-black/[0.06] shadow-2xs">
+                  <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/90 border border-black/[0.06] shadow-2xs">
                     <Box className="size-3 text-neutral-700" />
                     <span>Simulation Workspace</span>
                     <span className="size-1.5 rounded-full bg-[#84cc16] animate-pulse ml-0.5" />
@@ -171,7 +171,7 @@ export function StageSimulationSection() {
 
                 {/* Right Utilities: Search, Bell, Hide Config, User */}
                 <div className="flex items-center gap-2">
-                  <div className="hidden sm:flex items-center gap-1 px-2 py-0.8 rounded-md bg-white/80 border border-black/[0.06] text-neutral-400 text-[10px] font-mono shadow-2xs">
+                  <div className="hidden sm:flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/80 border border-black/[0.06] text-neutral-400 text-[10px] font-mono shadow-2xs">
                     <SearchIcon className="size-2.5" />
                     <span>⌘ K</span>
                   </div>
@@ -180,13 +180,13 @@ export function StageSimulationSection() {
                     <Bell className="size-3.5" />
                   </button>
 
-                  <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/90 border border-black/[0.08] text-[10.5px] font-medium text-neutral-700 shadow-2xs">
+                  <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-white/90 border border-black/[0.08] text-[10.5px] font-medium text-neutral-700 shadow-2xs">
                     <Sliders className="size-3 text-neutral-500" />
                     <span>3D Live WebGL</span>
                   </div>
 
                   {/* Landscape User Avatar */}
-                  <div className="size-6 rounded-full bg-gradient-to-tr from-[#84cc16] to-sky-400 border border-white shadow-xs" />
+                  <div className="size-5.5 rounded-full bg-gradient-to-tr from-[#84cc16] to-sky-400 border border-white shadow-xs" />
                 </div>
               </div>
 
@@ -200,10 +200,10 @@ export function StageSimulationSection() {
               </div>
 
               {/* ── FLAT GROUND GRASS BORDER STRIP (ACROSS VIEWPORT BOTTOM) ── */}
-              <div className="w-full h-2 bg-gradient-to-r from-[#bef264] via-[#a3e635] to-[#84cc16] border-t border-[#a3e635]/30 shrink-0 select-none pointer-events-none" />
+              <div className="w-full h-1.5 bg-gradient-to-r from-[#bef264] via-[#a3e635] to-[#84cc16] border-t border-[#a3e635]/30 shrink-0 select-none pointer-events-none" />
 
               {/* ── 3. BOTTOM TIMELINE SCRUBBER CONTROLLER ── */}
-              <div className="w-full px-3.5 py-2 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2.5 text-xs font-mono select-none">
+              <div className="w-full px-3 py-1.5 border-t border-black/[0.06] bg-white/95 backdrop-blur-md flex flex-wrap items-center justify-between gap-2 text-xs font-mono select-none">
                 <div className="flex items-center gap-2">
                   <button
                     type="button"
