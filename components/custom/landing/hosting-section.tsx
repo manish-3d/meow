@@ -375,16 +375,17 @@ export function HostingSection() {
           gap: 6px;
         }
 
+        /* Success Box matched to Image 1: #DCFCE7 mint background, #15804D text */
         .ws-success-box {
           margin-top: 4px;
-          background: #ecfccb;
-          border: 1px solid #bef264;
+          background: #dcfce7;
+          border: 1px solid #bbf7d0;
           border-radius: 6px;
-          padding: 5px 9px;
+          padding: 5px 10px;
           font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.68rem;
           font-weight: 500;
-          color: #15803d;
+          color: #15804d;
           display: inline-flex;
           align-items: center;
           gap: 5px;
@@ -666,7 +667,7 @@ export function HostingSection() {
           box-shadow: 0 0 0 2px rgba(132, 204, 22, 0.4);
         }
 
-        /* Floating Status Pills (Matching screenshot bottom-left) */
+        /* Floating Status Pills: Exactly matched to Image 1 (#DCFCE7 & #15804D) */
         .remote-floating-pills {
           position: absolute;
           bottom: 12px;
@@ -697,7 +698,8 @@ export function HostingSection() {
 
         .remote-status-pill.pill-sent {
           background: #dcfce7;
-          color: #15803d;
+          border: 1px solid #bbf7d0;
+          color: #15804d;
         }
 
         @keyframes mbFadeIn {
@@ -746,17 +748,19 @@ export function HostingSection() {
           width: 100%;
         }
 
+        /* Matched to Image 4: Pure black pill (#111111), pure white text (#FFFFFF), monospace */
         .cloud-asleep-pill {
           background: #111111;
           color: #ffffff;
-          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           font-size: 0.68rem;
-          font-weight: 600;
-          padding: 7px 14px;
+          font-weight: 700;
+          padding: 7px 16px;
           border-radius: 9999px;
           white-space: nowrap;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
           flex-shrink: 0;
+          letter-spacing: -0.01em;
         }
 
         .cloud-middle-tasks {
@@ -849,17 +853,18 @@ export function HostingSection() {
           gap: 14px;
         }
 
+        /* Matched to Image 3: Pure white background (#FFFFFF), dashed border #CBD5E1, dark slate lock #1E293B */
         .sandbox-lock-box {
-          width: 48px;
-          height: 48px;
+          width: 50px;
+          height: 50px;
           border: 1.5px dashed #cbd5e1;
-          border-radius: 10px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          background: #f8fafc;
+          background: #ffffff;
           flex-shrink: 0;
-          color: #334155;
+          color: #1e293b;
         }
 
         .sandbox-rows {
@@ -890,11 +895,14 @@ export function HostingSection() {
           border-radius: 9999px;
         }
 
+        /* Matched to Image 2: Exact hex colors for RUNNING, EXEC, WIPED */
         .sandbox-badge {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
           font-size: 0.58rem;
           font-weight: 700;
-          padding: 1px 5px;
+          padding: 2px 6px;
           border-radius: 4px;
+          letter-spacing: 0.02em;
         }
 
         .badge-running {
@@ -989,7 +997,7 @@ export function HostingSection() {
                     </button>
                   </div>
 
-                  {/* Right Log Pane */}
+                  {/* Right Log Pane with Image 1 matched colors */}
                   <div className="ws-content-pane">
                     <MoreVertical className="ws-more-icon w-3.5 h-3.5" />
 
@@ -1001,6 +1009,7 @@ export function HostingSection() {
                       <span>&gt; Running vitest (14/14 passed)</span>
                     </div>
 
+                    {/* Matched to Image 1: #DCFCE7 mint background, #15804D deep teal-green text */}
                     <div className="ws-success-box">
                       <span>✓ Fixed OAuth callback &amp; opened PR #48</span>
                     </div>
@@ -1138,7 +1147,7 @@ export function HostingSection() {
                       </div>
                     </div>
 
-                    {/* Floating Status Pills */}
+                    {/* Floating Status Pills (Matched to Image 1) */}
                     {(postPhase === "posting" || postPhase === "sent") && (
                       <div className="remote-floating-pills">
                         {postPhase === "posting" ? (
@@ -1207,7 +1216,7 @@ export function HostingSection() {
 
               {/* Node diagram */}
               <div className="cloud-flow-wrap">
-                {/* Left: Laptop asleep */}
+                {/* Left: Laptop asleep (Matched to Image 4: Pure black pill with pure white monospace text) */}
                 <div className="cloud-asleep-pill">
                   Laptop asleep • {asleepTime}
                 </div>
@@ -1276,12 +1285,12 @@ export function HostingSection() {
 
               <div>
                 <div className="sandbox-widget">
-                  {/* Dashed lock box */}
+                  {/* Dashed lock box (Matched to Image 3: pure white background, #CBD5E1 dashed border, #1E293B dark lock) */}
                   <div className="sandbox-lock-box">
                     <Lock className="w-5 h-5 stroke-[1.8]" />
                   </div>
 
-                  {/* VM status rows */}
+                  {/* VM status rows (Matched to Image 2: #BBF7D0 RUNNING, #E2E8F0 EXEC, #F1F5F9 WIPED) */}
                   <div className="sandbox-rows">
                     <div className="sandbox-row-item">
                       <div className="sandbox-row-left">
