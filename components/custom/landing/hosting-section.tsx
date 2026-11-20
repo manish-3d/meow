@@ -1,7 +1,23 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Lock, Search, Folder, Grid, Share2, Star, User, MoreVertical } from "lucide-react";
+import {
+  Lock,
+  Folder,
+  Grid,
+  Share2,
+  Star,
+  User,
+  MoreVertical,
+  Bell,
+  Image as ImageIcon,
+  Smile,
+  BarChart2,
+  Calendar,
+  Plus
+} from "lucide-react";
+
+const FULL_TWEET = "Busy day managing 1,428 cloud tasks 🤖 All systems green! 🐾 #AIAgents";
 
 export function HostingSection() {
   // Card 1: Active Bot selection
@@ -9,15 +25,60 @@ export function HostingSection() {
 
   // Card 2: Remote desktop human mouse takeover state
   const [isTakeover, setIsTakeover] = useState(false);
-  const [takeoverPos, setTakeoverPos] = useState({ x: 235, y: 34 });
+  const [takeoverPos, setTakeoverPos] = useState({ x: 260, y: 120 });
   const remoteViewportRef = useRef<HTMLDivElement>(null);
+
+  // Card 2: Twitter typing & posting simulation loop
+  const [typedText, setTypedText] = useState("");
+  const [postPhase, setPostPhase] = useState<"typing" | "hovering" | "posting" | "sent">("typing");
+
+  useEffect(() => {
+    if (isTakeover) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    if (postPhase === "typing") {
+      if (typedText.length < FULL_TWEET.length) {
+        timeoutId = setTimeout(() => {
+          setTypedText(FULL_TWEET.slice(0, typedText.length + 1));
+        }, 42);
+      } else {
+        timeoutId = setTimeout(() => {
+          setPostPhase("hovering");
+        }, 600);
+      }
+    } else if (postPhase === "hovering") {
+      timeoutId = setTimeout(() => {
+        setPostPhase("posting");
+      }, 900);
+    } else if (postPhase === "posting") {
+      timeoutId = setTimeout(() => {
+        setPostPhase("sent");
+      }, 1400);
+    } else if (postPhase === "sent") {
+      timeoutId = setTimeout(() => {
+        setTypedText("");
+        setPostPhase("typing");
+      }, 4000);
+    }
+
+    return () => clearTimeout(timeoutId);
+  }, [typedText, postPhase, isTakeover]);
 
   const handleRemoteMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isTakeover || !remoteViewportRef.current) return;
     const rect = remoteViewportRef.current.getBoundingClientRect();
-    const x = Math.max(10, Math.min(rect.width - 20, e.clientX - rect.left));
-    const y = Math.max(10, Math.min(rect.height - 20, e.clientY - rect.top));
+    const x = Math.max(8, Math.min(rect.width - 20, e.clientX - rect.left));
+    const y = Math.max(8, Math.min(rect.height - 20, e.clientY - rect.top));
     setTakeoverPos({ x, y });
+  };
+
+  const handleUserPostClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPostPhase("posting");
+    setTimeout(() => {
+      setPostPhase("sent");
+    }, 900);
   };
 
   // Live timer for Card 3 "Laptop asleep" pill
@@ -68,12 +129,12 @@ export function HostingSection() {
         }
 
         .bento-col-ws {
-          flex: 1.05;
+          flex: 1;
           min-width: 0;
         }
 
         .bento-col-remote {
-          flex: 1.15;
+          flex: 1.25;
           min-width: 0;
         }
 
@@ -159,7 +220,7 @@ export function HostingSection() {
           background: #ffffff;
           overflow: hidden;
           box-shadow: 0 2px 10px rgba(15, 23, 42, 0.03);
-          height: 196px;
+          height: 204px;
           display: flex;
           flex-direction: column;
         }
@@ -202,7 +263,7 @@ export function HostingSection() {
         }
 
         .ws-sidebar {
-          width: 126px;
+          width: 124px;
           background: #111111;
           padding: 10px 8px;
           display: flex;
@@ -331,7 +392,7 @@ export function HostingSection() {
         }
 
         /* ============================================================================
-           CARD 2: REMOTE BROWSER DESKTOP
+           CARD 2: REMOTE BROWSER DESKTOP (TWITTER / X DRAFTING SIMULATION)
            ============================================================================ */
 
         .remote-top-bar {
@@ -367,14 +428,14 @@ export function HostingSection() {
           border-radius: 10px;
           background: #ffffff;
           overflow: hidden;
-          height: 200px;
+          height: 204px;
           display: flex;
           flex-direction: column;
           box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
         }
 
         .remote-tabs-bar {
-          height: 26px;
+          height: 27px;
           background: #f1f5f9;
           border-bottom: 1px solid #e2e8f0;
           padding: 0 8px;
@@ -384,28 +445,26 @@ export function HostingSection() {
         }
 
         .remote-tab {
-          background: #ffffff;
           border-radius: 5px 5px 0 0;
-          padding: 2px 8px;
+          padding: 3px 8px;
           font-size: 0.62rem;
           color: #334155;
           display: flex;
           align-items: center;
-          gap: 4px;
-          border: 1px solid #e2e8f0;
-          border-bottom: none;
+          gap: 5px;
         }
 
-        .remote-tab-dot-orange {
-          width: 5px;
-          height: 5px;
-          border-radius: 9999px;
-          background: #f97316;
+        .remote-tab.is-active {
+          background: #ffffff;
+          border: 1px solid #e2e8f0;
+          border-bottom: none;
+          color: #0f1419;
+          font-weight: 600;
         }
 
         .remote-tab-close {
           color: #94a3b8;
-          font-size: 0.6rem;
+          font-size: 0.65rem;
           margin-left: 2px;
         }
 
@@ -440,11 +499,12 @@ export function HostingSection() {
           color: #475569;
         }
 
+        /* Remote Viewport (Twitter Composer Layout) */
         .remote-viewport {
           flex: 1;
           position: relative;
           background: #ffffff;
-          padding: 10px 14px;
+          padding: 8px 12px;
           display: flex;
           overflow: hidden;
         }
@@ -453,67 +513,196 @@ export function HostingSection() {
           cursor: none;
         }
 
-        .remote-viewport-sidebar {
+        /* Left Rail with developer icons and X icons */
+        .remote-x-sidebar {
           display: flex;
-          flex-direction: column;
-          gap: 8px;
-          color: #94a3b8;
+          align-items: center;
+          gap: 10px;
           padding-right: 12px;
-          border-right: 1px solid #f8fafc;
+          border-right: 1px solid #f1f5f9;
+          flex-shrink: 0;
         }
 
-        .remote-viewport-content {
+        .remote-tool-col {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          color: #94a3b8;
+        }
+
+        .remote-nav-col {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          color: #0f1419;
+        }
+
+        /* Main Tweet Composer area */
+        .remote-x-composer {
           flex: 1;
           padding-left: 12px;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          justify-content: space-between;
+          position: relative;
         }
 
-        .remote-content-top {
+        .remote-x-author-row {
           display: flex;
           align-items: center;
-          justify-content: space-between;
           gap: 8px;
         }
 
-        .remote-search-box {
+        .remote-x-avatar {
+          width: 22px;
+          height: 22px;
+          border-radius: 9999px;
+          background: #f1f5f9;
+          border: 1px solid #e2e8f0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+        }
+
+        .remote-x-author-name {
+          font-size: 0.72rem;
+          font-weight: 700;
+          color: #0f1419;
+          line-height: 1.1;
+        }
+
+        .remote-x-author-handle {
+          font-size: 0.62rem;
+          color: #64748b;
+          margin-left: 4px;
+        }
+
+        .remote-x-text-area {
+          margin-top: 6px;
+          font-size: 0.73rem;
+          line-height: 1.45;
+          color: #0f1419;
+          font-weight: 500;
+          min-height: 48px;
+          word-break: break-word;
+        }
+
+        .remote-x-placeholder {
+          font-size: 0.7rem;
+          color: #94a3b8;
+          font-weight: 400;
+          margin-bottom: 2px;
+        }
+
+        .remote-x-hashtag {
+          color: #1d9bf0;
+          font-weight: 600;
+        }
+
+        .remote-x-cursor-blink {
+          display: inline-block;
+          width: 1.5px;
+          height: 12px;
+          background: #1d9bf0;
+          margin-left: 2px;
+          vertical-align: middle;
+          animation: mbBlink 0.8s infinite;
+        }
+
+        @keyframes mbBlink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0; }
+        }
+
+        .remote-x-bottom-bar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding-top: 6px;
+          border-top: 1px solid #f1f5f9;
+        }
+
+        .remote-x-tools {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #1d9bf0;
+        }
+
+        .remote-x-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .remote-x-plus-btn {
+          width: 18px;
+          height: 18px;
+          border-radius: 9999px;
+          border: 1px solid #cbd5e1;
+          color: #64748b;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 11px;
+        }
+
+        .remote-x-post-btn {
+          background: #0f1419;
+          color: #ffffff;
+          font-size: 0.68rem;
+          font-weight: 700;
+          padding: 5px 14px;
+          border-radius: 9999px;
+          border: none;
+          cursor: pointer;
+          transition: transform 0.15s ease, background 0.15s ease;
+        }
+
+        .remote-x-post-btn.is-active-btn {
+          background: #000000;
+          transform: scale(0.96);
+          box-shadow: 0 0 0 2px rgba(132, 204, 22, 0.4);
+        }
+
+        /* Floating Status Pills (Matching screenshot bottom-left) */
+        .remote-floating-pills {
+          position: absolute;
+          bottom: 12px;
+          left: 56px;
           display: flex;
           align-items: center;
           gap: 6px;
-          border: 1px solid #e2e8f0;
-          border-radius: 6px;
-          padding: 3px 8px;
-          font-size: 0.72rem;
-          color: #0f172a;
-          background: #ffffff;
+          z-index: 6;
+          pointer-events: none;
         }
 
-        .remote-export-btn {
-          background: #111111;
-          color: #ffffff;
-          font-size: 0.68rem;
+        .remote-status-pill {
+          background: #e2e8f0;
+          color: #334155;
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 0.62rem;
           font-weight: 600;
-          padding: 5px 12px;
+          padding: 3px 8px;
           border-radius: 6px;
-          white-space: nowrap;
-          border: none;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+          animation: mbFadeIn 0.25s ease;
         }
 
-        .remote-table-row {
-          height: 10px;
-          border-radius: 4px;
-          background: #f8fafc;
+        .remote-status-pill.pill-thread {
+          background: #dbeafe;
+          color: #1e40af;
         }
 
-        .remote-table-row.row-active {
-          background: #f1f5f9;
-          border-left: 3px solid #bef264;
-          width: 95%;
+        .remote-status-pill.pill-sent {
+          background: #dcfce7;
+          color: #15803d;
         }
 
-        .remote-table-row.row-muted {
-          width: 80%;
+        @keyframes mbFadeIn {
+          from { opacity: 0; transform: translateY(4px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         /* CURSOR POINTER */
@@ -523,10 +712,11 @@ export function HostingSection() {
           align-items: flex-start;
           pointer-events: none;
           z-index: 10;
+          transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
-        .remote-cursor-wrap.is-auto {
-          animation: remoteCursorGlide 6.5s cubic-bezier(0.45, 0, 0.25, 1) infinite;
+        .remote-cursor-wrap.is-manual {
+          transition: transform 0.04s ease-out;
         }
 
         .remote-cursor-tag {
@@ -539,27 +729,7 @@ export function HostingSection() {
           padding: 2px 7px;
           border-radius: 9999px;
           white-space: nowrap;
-          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        @keyframes remoteCursorGlide {
-          0%,
-          100% {
-            left: 78%;
-            top: 26%;
-          }
-          35% {
-            left: 28%;
-            top: 24%;
-          }
-          65% {
-            left: 55%;
-            top: 60%;
-          }
-          85% {
-            left: 78%;
-            top: 26%;
-          }
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
         }
 
         /* ============================================================================
@@ -840,7 +1010,7 @@ export function HostingSection() {
             </div>
 
             {/* ──────────────────────────────────────────────────────────────── */}
-            {/* CARD 2: REMOTE BROWSER DESKTOP (BLACK CARD)                      */}
+            {/* CARD 2: REMOTE BROWSER DESKTOP (TWITTER / X DRAFTING SIMULATION)  */}
             {/* ──────────────────────────────────────────────────────────────── */}
             <div className="bento-card bento-card-dark bento-col-remote">
               <div className="remote-top-bar">
@@ -868,12 +1038,18 @@ export function HostingSection() {
                     <span className="ws-dot" style={{ background: "#fde047" }} />
                     <span className="ws-dot" style={{ background: "#86efac" }} />
                   </div>
-                  <div className="remote-tab">
-                    <span className="remote-tab-dot-orange" />
-                    <span>Analytics - Analytics</span>
+                  {/* Tab 1 (Active) */}
+                  <div className="remote-tab is-active">
+                    <span className="font-bold text-[10px]">𝕏</span>
+                    <span>Post on X</span>
                     <span className="remote-tab-close">×</span>
                   </div>
-                  <span style={{ fontSize: 11, color: "#94a3b8", marginLeft: 4 }}>+</span>
+                  {/* Tab 2 (Background) */}
+                  <div className="remote-tab">
+                    <span className="font-bold text-[10px] text-slate-400">𝕏</span>
+                    <span className="text-slate-500">Home / X</span>
+                  </div>
+                  <span style={{ fontSize: 11, color: "#94a3b8", marginLeft: 2 }}>+</span>
                 </div>
 
                 {/* Nav / URL bar */}
@@ -883,7 +1059,7 @@ export function HostingSection() {
                   <span className="remote-nav-icon">↻</span>
                   <div className="remote-url-input">
                     <Lock className="w-2.5 h-2.5 text-slate-400" />
-                    <span>chromium.com/analytics</span>
+                    <span>x.com/home</span>
                   </div>
                   <Share2 className="w-2.5 h-2.5 text-slate-400" />
                   <Star className="w-2.5 h-2.5 text-slate-400" />
@@ -891,42 +1067,103 @@ export function HostingSection() {
                   <MoreVertical className="w-2.5 h-2.5 text-slate-400" />
                 </div>
 
-                {/* Viewport content */}
+                {/* Viewport content: X Post Composer */}
                 <div
                   ref={remoteViewportRef}
                   onMouseMove={handleRemoteMouseMove}
                   className={`remote-viewport ${isTakeover ? "is-human" : ""}`}
                 >
-                  {/* Left icons */}
-                  <div className="remote-viewport-sidebar">
-                    <Folder className="w-3.5 h-3.5" />
-                    <Grid className="w-3.5 h-3.5" />
+                  {/* Left Sidebar Rail */}
+                  <div className="remote-x-sidebar">
+                    <div className="remote-tool-col">
+                      <Folder className="w-3.5 h-3.5" />
+                      <Grid className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="remote-nav-col">
+                      <span className="font-bold text-xs">𝕏</span>
+                      <Bell className="w-3.5 h-3.5 text-slate-700" />
+                      <User className="w-3.5 h-3.5 text-slate-700" />
+                    </div>
                   </div>
 
-                  {/* Main stage */}
-                  <div className="remote-viewport-content">
-                    <div className="remote-content-top">
-                      <div className="remote-search-box">
-                        <Search className="w-3 h-3 text-slate-400" />
-                        <span>Q4 Revenue</span>
-                        <span className="text-slate-400">|</span>
+                  {/* Main Tweet Composer */}
+                  <div className="remote-x-composer">
+                    {/* User Profile Row */}
+                    <div className="remote-x-author-row">
+                      <div className="remote-x-avatar">🐱</div>
+                      <div>
+                        <span className="remote-x-author-name">Meow Bot</span>
+                        <span className="remote-x-author-handle">@meowbot_ai</span>
                       </div>
-                      <button type="button" className="remote-export-btn">
-                        Export CSV
-                      </button>
                     </div>
 
-                    <div className="remote-table-row row-active" />
-                    <div className="remote-table-row row-muted" />
+                    {/* Tweet Text Area */}
+                    <div className="remote-x-text-area">
+                      <div className="remote-x-placeholder">What&apos;s happening?!</div>
+                      <div>
+                        {typedText}
+                        {typedText.includes("#AIAgents") ? (
+                          <>
+                            {typedText.split("#AIAgents")[0]}
+                            <span className="remote-x-hashtag">#AIAgents</span>
+                          </>
+                        ) : (
+                          typedText
+                        )}
+                        <span className="remote-x-cursor-blink" />
+                      </div>
+                    </div>
+
+                    {/* Bottom Composer Toolbar & Post Button */}
+                    <div className="remote-x-bottom-bar">
+                      <div className="remote-x-tools">
+                        <ImageIcon className="w-3.5 h-3.5" />
+                        <span className="text-[9px] font-bold border border-[#1d9bf0] px-1 rounded">GIF</span>
+                        <BarChart2 className="w-3.5 h-3.5" />
+                        <Smile className="w-3.5 h-3.5" />
+                        <Calendar className="w-3.5 h-3.5" />
+                      </div>
+
+                      <div className="remote-x-actions">
+                        <span className="remote-x-plus-btn">
+                          <Plus className="w-2.5 h-2.5" />
+                        </span>
+                        <button
+                          type="button"
+                          className={`remote-x-post-btn ${postPhase === "posting" ? "is-active-btn" : ""}`}
+                          onClick={handleUserPostClick}
+                        >
+                          Post
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Floating Status Pills */}
+                    {(postPhase === "posting" || postPhase === "sent") && (
+                      <div className="remote-floating-pills">
+                        {postPhase === "posting" ? (
+                          <>
+                            <span className="remote-status-pill">Posting Tweet...</span>
+                            <span className="remote-status-pill pill-thread">Posting thread... 💬</span>
+                          </>
+                        ) : (
+                          <span className="remote-status-pill pill-sent">
+                            ✓ Tweet posted to @meowbot_ai!
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Cursor Pointer */}
                   <div
-                    className={`remote-cursor-wrap ${isTakeover ? "is-manual" : "is-auto"}`}
+                    className={`remote-cursor-wrap ${isTakeover ? "is-manual" : ""}`}
                     style={
                       isTakeover
                         ? { left: `${takeoverPos.x}px`, top: `${takeoverPos.y}px` }
-                        : undefined
+                        : postPhase === "typing"
+                        ? { left: "48%", top: "42%" }
+                        : { left: "82%", top: "66%" }
                     }
                   >
                     <svg
@@ -934,7 +1171,7 @@ export function HostingSection() {
                       height="15"
                       viewBox="0 0 16 16"
                       fill="none"
-                      style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.3))" }}
+                      style={{ filter: "drop-shadow(0 1px 3px rgba(0,0,0,0.35))" }}
                     >
                       <path
                         d="M2.5 1.5L6.5 14L8.8 8.8L14 6.5L2.5 1.5Z"
