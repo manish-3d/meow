@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { BrandIcon } from "./brand-logos";
+import { motion, AnimatePresence } from "framer-motion";
 
-// Dynamically import LiquidCircles with SSR disabled for Three.js canvas
+// Dynamically import LiquidCircles with SSR disabled for Three.js WebGL canvas
 const LiquidCircles = dynamic(
   () => import("./liquid-circles").then((mod) => mod.LiquidCircles),
   {
@@ -13,34 +14,147 @@ const LiquidCircles = dynamic(
   }
 );
 
-interface AppItem {
+interface AppAction {
   name: string;
   category: string;
-  iconChar: string;
   commandSnippet: string;
 }
 
-const APPS: AppItem[] = [
-  { name: "Gmail", category: "Email", iconChar: "✉️", commandSnippet: "Draft replies in your tone & float the urgent 3" },
-  { name: "Google Calendar", category: "Meetings", iconChar: "📅", commandSnippet: "Auto-resolve conflicts & decline optional late calls" },
-  { name: "Slack", category: "Channels", iconChar: "💬", commandSnippet: "Post daily project standup rollups to #team" },
-  { name: "Notion", category: "Notes", iconChar: "📝", commandSnippet: "Sync meeting action items directly into your wiki" },
-  { name: "GitHub", category: "Code", iconChar: "🐙", commandSnippet: "Review PR diffs, check CI runs, and fix lint errors" },
-  { name: "Spotify", category: "Audio", iconChar: "🎵", commandSnippet: "Start deep focus lo-fi playlist when coder bot starts" },
-  { name: "WhatsApp", category: "Chat", iconChar: "📱", commandSnippet: "Send WhatsApp alert only if critical server crashes" },
-  { name: "Chrome", category: "Browser", iconChar: "🌐", commandSnippet: "Read 40 tabs and extract product comparison table" },
-  { name: "Linear", category: "Issues", iconChar: "🎯", commandSnippet: "Triage customer bug reports into prioritized tickets" },
-  { name: "Figma", category: "Design", iconChar: "🎨", commandSnippet: "Export component assets and check icon spacing" },
-  { name: "Discord", category: "Community", iconChar: "🎮", commandSnippet: "Summarize community support questions daily" },
-  { name: "Zoom", category: "Video", iconChar: "📹", commandSnippet: "Prepare pre-call 3-bullet attendee briefing cards" },
+const APP_ACTIONS: Record<string, AppAction> = {
+  Gmail: {
+    name: "Gmail",
+    category: "Email",
+    commandSnippet: "Draft replies in your tone & float the urgent 3",
+  },
+  "Google Calendar": {
+    name: "Google Calendar",
+    category: "Meetings",
+    commandSnippet: "Auto-resolve conflicts & decline optional late calls",
+  },
+  Slack: {
+    name: "Slack",
+    category: "Channels",
+    commandSnippet: "Post daily project standup rollups to #team",
+  },
+  Notion: {
+    name: "Notion",
+    category: "Notes",
+    commandSnippet: "Sync meeting action items directly into your wiki",
+  },
+  GitHub: {
+    name: "GitHub",
+    category: "Code",
+    commandSnippet: "Review PR diffs, check CI runs, and fix lint errors",
+  },
+  Spotify: {
+    name: "Spotify",
+    category: "Audio",
+    commandSnippet: "Start deep focus lo-fi playlist when coder bot starts",
+  },
+  WhatsApp: {
+    name: "WhatsApp",
+    category: "Chat",
+    commandSnippet: "Send WhatsApp alert only if critical server crashes",
+  },
+  Chrome: {
+    name: "Chrome",
+    category: "Browser",
+    commandSnippet: "Read 40 tabs and extract product comparison table",
+  },
+  Linear: {
+    name: "Linear",
+    category: "Issues",
+    commandSnippet: "Triage customer bug reports into prioritized tickets",
+  },
+  Figma: {
+    name: "Figma",
+    category: "Design",
+    commandSnippet: "Export component assets and check icon spacing",
+  },
+  Discord: {
+    name: "Discord",
+    category: "Community",
+    commandSnippet: "Summarize community support questions daily",
+  },
+  Zoom: {
+    name: "Zoom",
+    category: "Video",
+    commandSnippet: "Prepare pre-call 3-bullet attendee briefing cards",
+  },
+  ChatGPT: {
+    name: "ChatGPT",
+    category: "Intelligence",
+    commandSnippet: "Run cross-model consensus and deep synthesis",
+  },
+  Claude: {
+    name: "Claude",
+    category: "Reasoning",
+    commandSnippet: "Architect system refactoring and catch edge cases",
+  },
+  Supabase: {
+    name: "Supabase",
+    category: "Database",
+    commandSnippet: "Run database migrations & test row level security",
+  },
+  Stripe: {
+    name: "Stripe",
+    category: "Payments",
+    commandSnippet: "Reconcile daily MRR and flag subscription churn risks",
+  },
+};
+
+const DEFAULT_CYCLE = [
+  "Slack",
+  "GitHub",
+  "Gmail",
+  "Linear",
+  "Figma",
+  "Spotify",
+  "Notion",
+  "WhatsApp",
 ];
 
 export function IntegrationsStrip() {
-  const [hoveredApp, setHoveredApp] = useState<AppItem | null>(null);
+  const [activeAppName, setActiveAppName] = useState<string>("Slack");
+  const [isManualHover, setIsManualHover] = useState(false);
+
+  // Auto-cycle through apps when user is not manually hovering
+  useEffect(() => {
+    if (isManualHover) return;
+    const interval = setInterval(() => {
+      setActiveAppName((prev) => {
+        const idx = DEFAULT_CYCLE.indexOf(prev);
+        const nextIdx = (idx + 1) % DEFAULT_CYCLE.length;
+        return DEFAULT_CYCLE[nextIdx];
+      });
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [isManualHover]);
+
+  const activeApp = APP_ACTIONS[activeAppName] || APP_ACTIONS["Slack"];
+
+  const handleCircleHover = (_idx: number, name: string) => {
+    if (name && APP_ACTIONS[name]) {
+      setIsManualHover(true);
+      setActiveAppName(name);
+    } else {
+      setIsManualHover(false);
+    }
+  };
+
+  const handleCircleClick = (_idx: number, name: string) => {
+    if (name && APP_ACTIONS[name]) {
+      setIsManualHover(true);
+      setActiveAppName(name);
+    }
+  };
 
   return (
-    <section className="relative w-full overflow-hidden py-20 sm:py-28 bg-[#f0fff6] text-[#131316]">
-      {/* ── Liquid Circles Background with Exact User Configuration ── */}
+    <section
+      id="integrations"
+      className="relative w-full h-[660px] sm:h-[720px] md:h-[780px] bg-[#f0fff6] overflow-hidden select-none flex items-center justify-center text-[#131316]"
+    >
+      {/* ── 3D Liquid Circles with Exact User Configuration & Continuous Orbit ── */}
       <div className="absolute inset-0 z-0">
         <LiquidCircles
           count={28}
@@ -56,59 +170,65 @@ export function IntegrationsStrip() {
           sizeVariance={0.17}
           depth={0.21}
           backgroundColor={"#f0fff6"}
-          wheel={false}
+          speed={12}
+          onCircleHover={handleCircleHover}
+          onCircleClick={handleCircleClick}
           className="w-full h-full"
         />
       </div>
 
-      {/* ── Content Foreground Overlay (Centered Heading & Interactive App Cards) ── */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pointer-events-none">
-        {/* Section Header Centered */}
-        <div className="max-w-3xl mb-12 sm:mb-16 pointer-events-auto">
-          <h2 className="text-4xl sm:text-6xl font-sans font-medium tracking-tight text-[#131316] leading-none drop-shadow-2xs">
-            you can call them too. and they plug into 60+ apps.
-          </h2>
-          <p className="mt-4 text-base sm:text-xl text-neutral-600 font-sans max-w-2xl mx-auto">
-            no need to learn new tools. meow bot connects directly to the apps already on your screen.
-          </p>
+      {/* ── Center Content Overlay (Dead Center Inside Orbit) ── */}
+      <div className="relative z-10 max-w-3xl mx-auto px-6 py-8 rounded-3xl flex flex-col items-center text-center pointer-events-none bg-radial from-[#f0fff6]/80 via-[#f0fff6]/40 to-transparent backdrop-blur-[2px]">
+        {/* Subtle pill tag */}
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono uppercase tracking-wider bg-emerald-100/90 text-emerald-800 border border-emerald-300/60 mb-4 shadow-2xs backdrop-blur-xs">
+          <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+          60+ Native Integrations
         </div>
 
-        {/* 12 App Pills Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4 w-full pointer-events-auto">
-          {APPS.map((app) => (
-            <div
-              key={app.name}
-              onMouseEnter={() => setHoveredApp(app)}
-              onMouseLeave={() => setHoveredApp(null)}
-              className="group cursor-pointer rounded-2xl border border-black/[0.08] bg-white/85 backdrop-blur-md p-3.5 flex flex-col items-center text-center hover:bg-white hover:border-black/20 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 shadow-2xs"
+        {/* Section Heading Centered */}
+        <h2 className="text-3xl sm:text-5xl md:text-6xl font-sans font-medium tracking-tight text-[#131316] max-w-2xl leading-[1.08] drop-shadow-2xs">
+          you can call them too. and they plug into 60+ apps.
+        </h2>
+
+        {/* Subtitle */}
+        <p className="mt-4 text-sm sm:text-base md:text-lg text-neutral-600 font-sans max-w-xl mx-auto leading-relaxed">
+          no need to learn new tools. meow bot connects directly to the apps already on your screen.
+        </p>
+
+        {/* Dynamic Prompt Pill corresponding to revolving apps */}
+        <div className="mt-6 pointer-events-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeApp.name}
+              initial={{ opacity: 0, y: 6, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.96 }}
+              transition={{ duration: 0.22, ease: "easeOut" }}
+              className="inline-flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-white/95 border border-black/[0.08] shadow-md backdrop-blur-md"
             >
-              <div className="flex size-10 items-center justify-center rounded-xl bg-white shadow-2xs border border-black/5 mb-2 group-hover:scale-110 transition-transform">
-                <BrandIcon name={app.name} size={22} />
+              <div className="flex size-7 items-center justify-center rounded-lg bg-neutral-50 border border-black/5 shadow-2xs shrink-0">
+                <BrandIcon name={activeApp.name} size={18} />
               </div>
-              <span className="font-sans font-bold text-xs text-neutral-900">
-                {app.name}
-              </span>
-              <span className="font-mono text-[9px] uppercase tracking-wider text-neutral-400 mt-0.5">
-                {app.category}
-              </span>
-            </div>
-          ))}
+              <div className="flex flex-col text-left">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-sans font-bold text-xs text-neutral-900">
+                    {activeApp.name}
+                  </span>
+                  <span className="font-mono text-[9px] uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/50">
+                    {activeApp.category}
+                  </span>
+                </div>
+                <span className="font-mono text-xs text-neutral-600 mt-0.5">
+                  &ldquo;{activeApp.commandSnippet}&rdquo;
+                </span>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        {/* Live Command Tooltip Preview */}
-        <div className="mt-8 min-h-[44px] flex items-center justify-center pointer-events-auto">
-          {hoveredApp ? (
-            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/95 backdrop-blur-md px-4 py-2 text-xs font-sans text-neutral-800 shadow-md animate-in fade-in zoom-in-95">
-              <BrandIcon name={hoveredApp.name} size={15} />
-              <span>
-                <strong>{hoveredApp.name}:</strong> "{hoveredApp.commandSnippet}"
-              </span>
-            </div>
-          ) : (
-            <span className="font-mono text-xs text-neutral-500 bg-white/70 backdrop-blur-xs px-3 py-1 rounded-full border border-black/[0.06] shadow-2xs">
-              hover any app to see a real automation prompt ↑
-            </span>
-          )}
+        {/* Orbit Interaction Hint */}
+        <div className="mt-4 text-[11px] font-mono tracking-wider text-neutral-400 uppercase pointer-events-none">
+          drag to spin 3d orbit • hover or click any app
         </div>
       </div>
     </section>

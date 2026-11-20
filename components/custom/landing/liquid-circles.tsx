@@ -5,38 +5,533 @@ import React, {
   useRef,
   useEffect,
   useImperativeHandle,
-  useSyncExternalStore,
 } from "react";
 import * as THREE from "three";
 import { cn } from "@/lib/utils";
 
-// Default app brand SVG icons rendered on circles
-const DEFAULT_ICONS = [
-  // Slack
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%234A154B"/><text x="50" y="68" font-size="52" font-family="sans-serif" font-weight="900" fill="%23ECB22E" text-anchor="middle">%23</text></svg>`,
-  // GitHub
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%2318181B"/><path fill="white" d="M50 20c-16.6 0-30 13.4-30 30 0 13.3 8.6 24.5 20.5 28.5 1.5.3 2-.7 2-1.5v-5.5c-8.3 1.8-10-4-10-4-1.4-3.5-3.4-4.4-3.4-4.4-2.7-1.8.2-1.8.2-1.8 3 .2 4.6 3.1 4.6 3.1 2.7 4.6 7 3.3 8.7 2.5.3-2 1.1-3.3 2-4-6.6-.8-13.6-3.3-13.6-14.8 0-3.3 1.2-6 3.1-8.1-.3-.8-1.4-3.8.3-8 0 0 2.5-.8 8.2 3.1 2.4-.7 5-1 7.5-1s5.1.3 7.5 1c5.7-3.9 8.2-3.1 8.2-3.1 1.7 4.2.6 7.2.3 8 2 2.1 3.1 4.8 3.1 8.1 0 11.5-7 14-13.7 14.7 1.1.9 2 2.7 2 5.5v8.1c0 .8.6 1.8 2.1 1.5C71.4 74.5 80 63.3 80 50c0-16.6-13.4-30-30-30z"/></svg>`,
-  // Figma
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230F172A"/><circle cx="35" cy="32" r="14" fill="%23F24E1E"/><circle cx="65" cy="32" r="14" fill="%23FF7262"/><circle cx="35" cy="50" r="14" fill="%23A259FF"/><circle cx="65" cy="50" r="14" fill="%231ABCFE"/><circle cx="35" cy="68" r="14" fill="%230ACF83"/></svg>`,
-  // Notion
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23FFFFFF"/><text x="50" y="72" font-size="64" font-family="serif" font-weight="900" fill="%23000000" text-anchor="middle">N</text></svg>`,
-  // Spotify
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%231DB954"/><path fill="white" d="M30 42c14-2.5 28 0 40 7m-38 12c11-2 23 0 34 5m-31 11c9-1.5 18 0 26 4" stroke="white" stroke-width="6" stroke-linecap="round" fill="none"/></svg>`,
-  // Chrome
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%2338BDF8"/><circle cx="50" cy="50" r="30" fill="%23EA4335"/><circle cx="50" cy="50" r="16" fill="%23FFFFFF"/><circle cx="50" cy="50" r="12" fill="%234285F4"/></svg>`,
-  // Gmail
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%23EA4335"/><text x="50" y="68" font-size="52" font-family="sans-serif" font-weight="900" fill="%23FFFFFF" text-anchor="middle">M</text></svg>`,
-  // Linear
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%235E6AD2"/><circle cx="50" cy="50" r="24" stroke="white" stroke-width="8" fill="none"/><line x1="30" y1="70" x2="70" y2="30" stroke="white" stroke-width="8"/></svg>`,
-  // Discord
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%235865F2"/><circle cx="38" cy="50" r="6" fill="white"/><circle cx="62" cy="50" r="6" fill="white"/></svg>`,
-  // Zoom
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%230B5CFF"/><rect x="25" y="36" width="34" height="28" rx="6" fill="white"/><polygon points="63,44 78,35 78,65 63,56" fill="white"/></svg>`,
-  // WhatsApp
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%2325D366"/><circle cx="50" cy="50" r="24" fill="white"/><text x="50" y="60" font-size="30" text-anchor="middle">📞</text></svg>`,
-  // Google Calendar
-  `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="%234285F4"/><rect x="25" y="32" width="50" height="46" rx="6" fill="white"/><text x="50" y="65" font-size="28" font-family="sans-serif" font-weight="900" fill="%234285F4" text-anchor="middle">31</text></svg>`,
+export const APP_NAMES = [
+  "Gmail",
+  "Google Calendar",
+  "Slack",
+  "Notion",
+  "GitHub",
+  "Spotify",
+  "WhatsApp",
+  "Chrome",
+  "Linear",
+  "Figma",
+  "Discord",
+  "Zoom",
+  "ChatGPT",
+  "Claude",
+  "Supabase",
+  "Stripe",
 ];
+
+// Helper to draw authentic brand app icons directly onto the atlas canvas
+export function drawAppIconToCanvas(
+  ctx: CanvasRenderingContext2D,
+  name: string,
+  x: number,
+  y: number,
+  size: number
+) {
+  ctx.save();
+  ctx.translate(x, y);
+
+  const pad = Math.round(size * 0.05);
+  const cardSize = size - pad * 2;
+  const radius = Math.round(cardSize * 0.22);
+  const cx = size / 2;
+  const cy = size / 2;
+
+  // Function to draw rounded rect path
+  const pathRoundedRect = (rx: number, ry: number, rw: number, rh: number, rad: number) => {
+    ctx.beginPath();
+    ctx.moveTo(rx + rad, ry);
+    ctx.lineTo(rx + rw - rad, ry);
+    ctx.quadraticCurveTo(rx + rw, ry, rx + rw, ry + rad);
+    ctx.lineTo(rx + rw, ry + rh - rad);
+    ctx.quadraticCurveTo(rx + rw, ry + rh, rx + rw - rad, ry + rh);
+    ctx.lineTo(rx + rad, ry + rh);
+    ctx.quadraticCurveTo(rx, ry + rh, rx, ry + rh - rad);
+    ctx.lineTo(rx, ry + rad);
+    ctx.quadraticCurveTo(rx, ry, rx + rad, ry);
+    ctx.closePath();
+  };
+
+  // Default white card background
+  pathRoundedRect(pad, pad, cardSize, cardSize, radius);
+
+  switch (name) {
+    case "Gmail": {
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, size * 0.015);
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.stroke();
+
+      // Draw official 4-color Google M
+      const s = cardSize * 0.52;
+      const left = cx - s / 2;
+      const top = cy - s / 2.3;
+      const w = s;
+      const h = s * 0.78;
+      const legW = w * 0.22;
+
+      // Left leg (Blue)
+      ctx.fillStyle = "#4285F4";
+      ctx.fillRect(left, top + h * 0.2, legW, h * 0.8);
+
+      // Right leg (Green)
+      ctx.fillStyle = "#34A853";
+      ctx.fillRect(left + w - legW, top + h * 0.2, legW, h * 0.8);
+
+      // Left fold (Red)
+      ctx.fillStyle = "#EA4335";
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left + legW, top);
+      ctx.lineTo(cx, top + h * 0.62);
+      ctx.lineTo(left, top + h * 0.25);
+      ctx.closePath();
+      ctx.fill();
+
+      // Right fold (Yellow)
+      ctx.fillStyle = "#FBBC05";
+      ctx.beginPath();
+      ctx.moveTo(left + w, top);
+      ctx.lineTo(left + w - legW, top);
+      ctx.lineTo(cx, top + h * 0.62);
+      ctx.lineTo(left + w, top + h * 0.25);
+      ctx.closePath();
+      ctx.fill();
+
+      // Top Red bar
+      ctx.fillStyle = "#EA4335";
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(cx, top + h * 0.56);
+      ctx.lineTo(left + w, top);
+      ctx.lineTo(left + w - legW * 0.4, top);
+      ctx.lineTo(cx, top + h * 0.45);
+      ctx.lineTo(left + legW * 0.4, top);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+
+    case "Google Calendar": {
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, size * 0.015);
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.stroke();
+
+      // Top blue header bar
+      ctx.save();
+      ctx.clip();
+      ctx.fillStyle = "#4285F4";
+      ctx.fillRect(pad, pad, cardSize, cardSize * 0.3);
+      ctx.restore();
+
+      // "31" in bold
+      ctx.fillStyle = "#4285F4";
+      ctx.font = `900 ${Math.round(cardSize * 0.42)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("31", cx, cy + cardSize * 0.14);
+      break;
+    }
+
+    case "Slack": {
+      ctx.fillStyle = "#4A154B"; // Authentic Slack dark aubergine
+      ctx.fill();
+
+      // 4 colored pills & dots
+      const r = cardSize * 0.26;
+      const lw = cardSize * 0.09;
+      // Top Yellow (#ECB22E)
+      ctx.fillStyle = "#ECB22E";
+      pathRoundedRect(cx - lw / 2, cy - r, lw, r * 0.8, lw / 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + r * 0.65, cy - r * 0.35, lw / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Right Green (#2EB67D)
+      ctx.fillStyle = "#2EB67D";
+      pathRoundedRect(cx, cy - lw / 2, r * 0.8, lw, lw / 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + r * 0.35, cy + r * 0.65, lw / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bottom Red (#E01E5A)
+      ctx.fillStyle = "#E01E5A";
+      pathRoundedRect(cx - lw / 2, cy, lw, r * 0.8, lw / 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx - r * 0.65, cy + r * 0.35, lw / 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Left Blue (#36C5F0)
+      ctx.fillStyle = "#36C5F0";
+      pathRoundedRect(cx - r * 0.8, cy - lw / 2, r * 0.8, lw, lw / 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx - r * 0.35, cy - r * 0.65, lw / 2, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Notion": {
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, size * 0.015);
+      ctx.strokeStyle = "rgba(0,0,0,0.12)";
+      ctx.stroke();
+
+      // Crisp bold serif 'N'
+      ctx.fillStyle = "#000000";
+      ctx.font = `900 ${Math.round(cardSize * 0.62)}px Georgia, serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("N", cx, cy);
+      break;
+    }
+
+    case "GitHub": {
+      ctx.fillStyle = "#18181B";
+      ctx.fill();
+
+      // White Octocat head
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(cx, cy, cardSize * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ears
+      ctx.beginPath();
+      ctx.moveTo(cx - cardSize * 0.22, cy - cardSize * 0.1);
+      ctx.lineTo(cx - cardSize * 0.28, cy - cardSize * 0.3);
+      ctx.lineTo(cx - cardSize * 0.08, cy - cardSize * 0.25);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + cardSize * 0.22, cy - cardSize * 0.1);
+      ctx.lineTo(cx + cardSize * 0.28, cy - cardSize * 0.3);
+      ctx.lineTo(cx + cardSize * 0.08, cy - cardSize * 0.25);
+      ctx.closePath();
+      ctx.fill();
+
+      // Dark face cutout
+      ctx.fillStyle = "#18181B";
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + cardSize * 0.05, cardSize * 0.18, cardSize * 0.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Spotify": {
+      ctx.fillStyle = "#1DB954";
+      ctx.fill();
+
+      // 3 white curved audio arcs
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineCap = "round";
+
+      ctx.lineWidth = cardSize * 0.08;
+      ctx.beginPath();
+      ctx.arc(cx - cardSize * 0.06, cy + cardSize * 0.18, cardSize * 0.35, -Math.PI * 0.42, -Math.PI * 0.08);
+      ctx.stroke();
+
+      ctx.lineWidth = cardSize * 0.07;
+      ctx.beginPath();
+      ctx.arc(cx - cardSize * 0.04, cy + cardSize * 0.18, cardSize * 0.26, -Math.PI * 0.42, -Math.PI * 0.08);
+      ctx.stroke();
+
+      ctx.lineWidth = cardSize * 0.06;
+      ctx.beginPath();
+      ctx.arc(cx - cardSize * 0.02, cy + cardSize * 0.18, cardSize * 0.17, -Math.PI * 0.42, -Math.PI * 0.08);
+      ctx.stroke();
+      break;
+    }
+
+    case "WhatsApp": {
+      ctx.fillStyle = "#25D366";
+      ctx.fill();
+
+      // White speech bubble
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(cx, cy - cardSize * 0.02, cardSize * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cx - cardSize * 0.2, cy + cardSize * 0.15);
+      ctx.lineTo(cx - cardSize * 0.26, cy + cardSize * 0.28);
+      ctx.lineTo(cx - cardSize * 0.08, cy + cardSize * 0.24);
+      ctx.closePath();
+      ctx.fill();
+
+      // Green phone handset icon
+      ctx.fillStyle = "#25D366";
+      ctx.font = `${Math.round(cardSize * 0.34)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("📞", cx + cardSize * 0.01, cy - cardSize * 0.01);
+      break;
+    }
+
+    case "Chrome": {
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.lineWidth = Math.max(1, size * 0.015);
+      ctx.strokeStyle = "rgba(0,0,0,0.08)";
+      ctx.stroke();
+
+      const outerR = cardSize * 0.32;
+      const innerR = cardSize * 0.14;
+
+      // Red sector (top)
+      ctx.fillStyle = "#EA4335";
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, -Math.PI * 0.85, Math.PI * 0.15);
+      ctx.lineTo(cx, cy);
+      ctx.closePath();
+      ctx.fill();
+
+      // Green sector (bottom-left)
+      ctx.fillStyle = "#34A853";
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, Math.PI * 0.15, Math.PI * 0.85);
+      ctx.lineTo(cx, cy);
+      ctx.closePath();
+      ctx.fill();
+
+      // Yellow sector (bottom-right)
+      ctx.fillStyle = "#FBBC05";
+      ctx.beginPath();
+      ctx.arc(cx, cy, outerR, Math.PI * 0.85, Math.PI * 1.15);
+      ctx.lineTo(cx, cy);
+      ctx.closePath();
+      ctx.fill();
+
+      // White ring
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR * 1.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Blue center
+      ctx.fillStyle = "#4285F4";
+      ctx.beginPath();
+      ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Linear": {
+      ctx.fillStyle = "#5E6AD2";
+      ctx.fill();
+
+      // Linear diagonal streak logo
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = cardSize * 0.08;
+      ctx.lineCap = "round";
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, cardSize * 0.26, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(cx - cardSize * 0.16, cy + cardSize * 0.16);
+      ctx.lineTo(cx + cardSize * 0.16, cy - cardSize * 0.16);
+      ctx.stroke();
+      break;
+    }
+
+    case "Figma": {
+      ctx.fillStyle = "#1E1E1E";
+      ctx.fill();
+
+      const dropR = cardSize * 0.13;
+      const ox = dropR * 0.95;
+      const oy = dropR * 1.7;
+
+      // Top-left Red (#F24E1E)
+      ctx.fillStyle = "#F24E1E";
+      ctx.beginPath();
+      ctx.arc(cx - ox, cy - oy, dropR, Math.PI * 0.5, Math.PI * 1.5);
+      ctx.lineTo(cx, cy - oy - dropR);
+      ctx.lineTo(cx, cy - oy + dropR);
+      ctx.closePath();
+      ctx.fill();
+
+      // Top-right Orange (#FF7262)
+      ctx.fillStyle = "#FF7262";
+      ctx.beginPath();
+      ctx.arc(cx + ox, cy - oy, dropR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Mid-left Purple (#A259FF)
+      ctx.fillStyle = "#A259FF";
+      ctx.beginPath();
+      ctx.arc(cx - ox, cy, dropR, Math.PI * 0.5, Math.PI * 1.5);
+      ctx.lineTo(cx, cy - dropR);
+      ctx.lineTo(cx, cy + dropR);
+      ctx.closePath();
+      ctx.fill();
+
+      // Mid-right Blue (#1ABCFE)
+      ctx.fillStyle = "#1ABCFE";
+      ctx.beginPath();
+      ctx.arc(cx + ox, cy, dropR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bottom-left Green (#0ACF83)
+      ctx.fillStyle = "#0ACF83";
+      ctx.beginPath();
+      ctx.arc(cx - ox, cy + oy, dropR, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Discord": {
+      ctx.fillStyle = "#5865F2";
+      ctx.fill();
+
+      // White controller shape
+      ctx.fillStyle = "#ffffff";
+      const w = cardSize * 0.58;
+      const h = cardSize * 0.42;
+      pathRoundedRect(cx - w / 2, cy - h / 2, w, h, h * 0.35);
+      ctx.fill();
+
+      // Controller eyes
+      ctx.fillStyle = "#5865F2";
+      ctx.beginPath();
+      ctx.arc(cx - w * 0.22, cy, h * 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(cx + w * 0.22, cy, h * 0.18, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Zoom": {
+      ctx.fillStyle = "#0B5CFF";
+      ctx.fill();
+
+      // White video camera
+      ctx.fillStyle = "#ffffff";
+      const camW = cardSize * 0.34;
+      const camH = cardSize * 0.28;
+      pathRoundedRect(cx - cardSize * 0.22, cy - camH / 2, camW, camH, camH * 0.25);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(cx + cardSize * 0.12, cy - camH * 0.25);
+      ctx.lineTo(cx + cardSize * 0.26, cy - camH * 0.45);
+      ctx.lineTo(cx + cardSize * 0.26, cy + camH * 0.45);
+      ctx.lineTo(cx + cardSize * 0.12, cy + camH * 0.25);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+
+    case "ChatGPT": {
+      ctx.fillStyle = "#10A37F"; // OpenAI teal
+      ctx.fill();
+
+      // White rosette spiral
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = cardSize * 0.055;
+      ctx.lineCap = "round";
+      for (let i = 0; i < 6; i++) {
+        const ang = (i / 6) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.arc(
+          cx + Math.cos(ang) * cardSize * 0.12,
+          cy + Math.sin(ang) * cardSize * 0.12,
+          cardSize * 0.16,
+          ang,
+          ang + Math.PI * 0.85
+        );
+        ctx.stroke();
+      }
+      break;
+    }
+
+    case "Claude": {
+      ctx.fillStyle = "#D97706"; // Anthropic terracotta / amber
+      ctx.fill();
+
+      // White Claude asterisk spark
+      ctx.strokeStyle = "#ffffff";
+      ctx.lineWidth = cardSize * 0.08;
+      ctx.lineCap = "round";
+      for (let i = 0; i < 8; i++) {
+        const ang = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(ang) * cardSize * 0.28, cy + Math.sin(ang) * cardSize * 0.28);
+        ctx.stroke();
+      }
+      ctx.fillStyle = "#ffffff";
+      ctx.beginPath();
+      ctx.arc(cx, cy, cardSize * 0.07, 0, Math.PI * 2);
+      ctx.fill();
+      break;
+    }
+
+    case "Supabase": {
+      ctx.fillStyle = "#171717";
+      ctx.fill();
+
+      // Emerald lightning bolt
+      ctx.fillStyle = "#3ECF8E";
+      ctx.beginPath();
+      ctx.moveTo(cx + cardSize * 0.08, cy - cardSize * 0.32);
+      ctx.lineTo(cx - cardSize * 0.22, cy + cardSize * 0.04);
+      ctx.lineTo(cx - cardSize * 0.02, cy + cardSize * 0.04);
+      ctx.lineTo(cx - cardSize * 0.08, cy + cardSize * 0.32);
+      ctx.lineTo(cx + cardSize * 0.22, cy - cardSize * 0.04);
+      ctx.lineTo(cx + cardSize * 0.02, cy - cardSize * 0.04);
+      ctx.closePath();
+      ctx.fill();
+      break;
+    }
+
+    case "Stripe": {
+      ctx.fillStyle = "#635BFF"; // Stripe blurple
+      ctx.fill();
+
+      // White italic 'S'
+      ctx.fillStyle = "#ffffff";
+      ctx.font = `italic 900 ${Math.round(cardSize * 0.62)}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("S", cx, cy);
+      break;
+    }
+
+    default: {
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+      ctx.fillStyle = "#18181b";
+      ctx.font = `800 ${Math.round(cardSize * 0.32)}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(name.slice(0, 3).toUpperCase(), cx, cy);
+      break;
+    }
+  }
+
+  ctx.restore();
+}
 
 // Shaders for Instanced Circles
 const VERTEX_SHADER = `
@@ -243,7 +738,8 @@ export interface LiquidCirclesProps {
   focus?: boolean;
   intro?: boolean;
   seed?: number;
-  onCircleClick?: (index: number, src: string) => void;
+  onCircleClick?: (index: number, name: string) => void;
+  onCircleHover?: (index: number, name: string) => void;
   className?: string;
   style?: React.CSSProperties;
   children?: React.ReactNode;
@@ -256,7 +752,7 @@ export interface LiquidCirclesHandle {
 
 export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>(function LiquidCircles(
   {
-    images = DEFAULT_ICONS,
+    images,
     count = 28,
     rings = 5,
     size = 0.24,
@@ -268,7 +764,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     tilt = 19,
     angle = 63,
     perspective = 70,
-    speed = 7,
+    speed = 12,
     refraction = 0,
     edge = 0.24,
     edges = "all",
@@ -282,6 +778,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     intro = true,
     seed = 3,
     onCircleClick,
+    onCircleHover,
     className = "",
     style,
     children,
@@ -295,8 +792,8 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
   const updatePropsRef = useRef<() => void>(() => {});
   const introFinishedRef = useRef(false);
 
-  const imageList = images.length ? images : DEFAULT_ICONS;
-  const imageKey = imageList.join("\n");
+  const appItems = images && images.length > 0 ? images : APP_NAMES;
+  const imageKey = appItems.join("\n");
 
   const propsRef = useRef({
     count,
@@ -323,7 +820,8 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     edges,
     seed,
     onCircleClick,
-    list: imageList,
+    onCircleHover,
+    list: appItems,
   });
 
   useEffect(() => {
@@ -352,9 +850,37 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       edges,
       seed,
       onCircleClick,
-      list: imageList,
+      onCircleHover,
+      list: appItems,
     };
-  });
+  }, [
+    count,
+    rings,
+    reach,
+    radius,
+    size,
+    sizeVariance,
+    spread,
+    depth,
+    tilt,
+    angle,
+    perspective,
+    speed,
+    refraction,
+    edge,
+    dispersion,
+    blur,
+    flow,
+    backgroundColor,
+    interactive,
+    wheel,
+    focus,
+    edges,
+    seed,
+    onCircleClick,
+    onCircleHover,
+    appItems,
+  ]);
 
   useImperativeHandle(ref, () => ({
     replay: () => replayRef.current(),
@@ -370,7 +896,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     const doc = container.ownerDocument;
     const win = doc.defaultView ?? window;
     const urlList = imageKey.split("\n").filter(Boolean);
-    const uniqueUrls = Array.from(new Set(urlList));
+    const uniqueItems = Array.from(new Set(urlList));
 
     try {
       renderer = new THREE.WebGLRenderer({
@@ -386,7 +912,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     // Build Atlas Texture for circles
-    const gridCols = Math.max(1, Math.ceil(Math.sqrt(uniqueUrls.length)));
+    const gridCols = Math.max(1, Math.ceil(Math.sqrt(uniqueItems.length)));
     const cellSize = clamp(Math.floor(1024 / gridCols), 64, 512);
     const atlasCanvas = doc.createElement("canvas");
     atlasCanvas.width = gridCols * cellSize;
@@ -413,7 +939,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     const circleUniforms = {
       uAtlas: { value: atlasTexture },
       uGrid: { value: gridCols },
-      uReady: { value: 0 },
+      uReady: { value: 1 },
       uBackground: { value: new THREE.Color() },
       uFallback: { value: new THREE.Color() },
     };
@@ -424,7 +950,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       uniforms: circleUniforms,
     });
 
-    let currentRadius = clamp(getNum(propsRef.current.radius, 0.5), 0, 0.5);
+    let currentRadius = clamp(getNum(propsRef.current.radius, 0.15), 0, 0.5);
     let circleGeom = createCircleGeometry(currentRadius);
 
     const maxCount = 64;
@@ -448,12 +974,12 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       uAspect: { value: 1 },
       uStart: { value: new THREE.Vector2(0.76, 0.76) },
       uReach: { value: 0.32 },
-      uStrength: { value: 1 },
-      uDispersion: { value: 0.35 },
+      uStrength: { value: 0 },
+      uDispersion: { value: 0.9 },
       uBlur: { value: 0.5 },
-      uFlow: { value: 0.5 },
+      uFlow: { value: 1.25 },
       uTime: { value: 0 },
-      uHalfWidth: { value: 1 },
+      uHalfWidth: { value: 100 },
       uBackground: { value: new THREE.Color() },
       uRound: { value: 6 },
     };
@@ -462,8 +988,6 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       vertexShader: POST_VERTEX_SHADER,
       fragmentShader: POST_FRAGMENT_SHADER,
       uniforms: postUniforms,
-      depthTest: false,
-      depthWrite: false,
     });
 
     const quadGeom = new THREE.BufferGeometry();
@@ -523,7 +1047,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     let introTime = 0;
     let isIntroPlaying = false;
     let isIntroPending = intro && !introFinishedRef.current;
-    let isAtlasLoaded = false;
+    let isAtlasLoaded = true;
     let isIntersecting = true;
     let isDisposed = false;
     let animFrameId = 0;
@@ -540,7 +1064,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       samples: [] as Array<{ t: number; a: number }>,
     };
 
-    const getBaseSpeed = () => THREE.MathUtils.degToRad(getNum(propsRef.current.speed, 7));
+    const getBaseSpeed = () => THREE.MathUtils.degToRad(getNum(propsRef.current.speed, 12));
 
     const projectToPlane = (px: number, py: number) => {
       projVector
@@ -548,15 +1072,15 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
         .multiplyScalar(px)
         .addScaledVector(axisX, py)
         .project(camera);
-      return projVector;
+      return { x: projVector.x, y: projVector.y };
     };
 
     const updateBoundsAndStart = () => {
       const p = propsRef.current;
-      const edgeFraction = clamp(getNum(p.edge, 0.24), 0.05, 0.8);
+      const ed = clamp(getNum(p.edge, 0.24), 0.05, 0.95);
       postUniforms.uStart.value.set(
-        1 - edgeFraction,
-        1 - edgeFraction * Math.min(1, width / height)
+        Math.max(1 - ed, 0.05),
+        Math.max(1 - ed / Math.max(width / height, 0.01), 0.05)
       );
       postUniforms.uRound.value = 6 * (p.edges !== "sides" ? 1 : 0);
     };
@@ -606,7 +1130,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
             theta: ((i + (ringIdx % 2) * 0.5) / ringCount) * Math.PI * 2,
             offset: (random() - 0.5) * 2,
             scale: 1 + (2 * random() - 1) * varianceVal,
-            cell: uniqueUrls.indexOf(urlList[idx % urlList.length]),
+            cell: uniqueItems.indexOf(urlList[idx % urlList.length]),
             delay: (ringsVal - 1 - ringIdx) * 0.16 + (i / ringCount) * 0.42,
             face: old ? old.face : 0,
             faceV: old ? old.faceV : 0,
@@ -739,7 +1263,10 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
         if (found !== hoveredIdx) {
           hoveredIdx = found;
           container.style.cursor =
-            found >= 0 && p.onCircleClick ? "pointer" : "grab";
+            found >= 0 && (p.onCircleClick || p.onCircleHover) ? "pointer" : "grab";
+          if (p.onCircleHover) {
+            p.onCircleHover(found, found >= 0 ? p.list[found % p.list.length] : "");
+          }
         }
       }
 
@@ -846,11 +1373,15 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       renderScenes();
       isRendering = false;
 
+      // Active revolving condition: as long as speed is active or user is dragging, keep looping!
+      const baseSpd = getBaseSpeed();
+      const hasMotion = Math.abs(baseSpd) > 1e-4 || Math.abs(rotSpeed) > 1e-4;
+
       if (
         !isDisposed &&
         isIntersecting &&
         !doc.hidden &&
-        (isIntroPlaying || dragInfo.active || deltaWheel !== 0 || needsMore)
+        (hasMotion || isIntroPlaying || dragInfo.active || deltaWheel !== 0 || needsMore)
       ) {
         animFrameId = win.requestAnimationFrame(onAnimFrame);
       } else {
@@ -874,65 +1405,20 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       }
     };
 
-    // Load Images onto Canvas Atlas
+    // Draw app icons directly into canvas atlas synchronously
     const ctx = atlasCanvas.getContext("2d");
-    Promise.all(
-      uniqueUrls.map(
-        (src) =>
-          new Promise<HTMLImageElement | null>((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.decoding = "async";
-            img.onload = () => resolve(img);
-            img.onerror = () => resolve(null);
-            img.src = src;
-          })
-      )
-    ).then((imagesArr) => {
-      if (isDisposed || !ctx) return;
-      const bg = parseColor(propsRef.current.backgroundColor, "#f0fff6");
-
-      imagesArr.forEach((img, idx) => {
+    if (ctx) {
+      uniqueItems.forEach((item, idx) => {
         const col = idx % gridCols;
         const row = Math.floor(idx / gridCols);
         const x = col * cellSize;
         const y = row * cellSize;
-
-        ctx.fillStyle = `rgb(${Math.round(240 * bg.r)}, ${Math.round(240 * bg.g)}, ${Math.round(240 * bg.b)})`;
-        ctx.fillRect(x, y, cellSize, cellSize);
-
-        if (!img) return;
-        const minDim = Math.min(img.naturalWidth, img.naturalHeight);
-        if (minDim) {
-          try {
-            ctx.drawImage(
-              img,
-              (img.naturalWidth - minDim) / 2,
-              (img.naturalHeight - minDim) / 2,
-              minDim,
-              minDim,
-              x,
-              y,
-              cellSize,
-              cellSize
-            );
-          } catch {
-            ctx.fillRect(x, y, cellSize, cellSize);
-          }
-        }
+        drawAppIconToCanvas(ctx, item, x, y, cellSize);
       });
-
       atlasTexture.needsUpdate = true;
       circleUniforms.uReady.value = 1;
       isAtlasLoaded = true;
-
-      if (isIntroPending && isIntersecting) startIntro();
-      requestFrame();
-      if (!isIntroPlaying) {
-        updatePhysicsAndMatrices(0);
-        renderScenes();
-      }
-    });
+    }
 
     // Pointer & Drag Interactions
     const screenToPlane = (clientX: number, clientY: number) => {
@@ -993,9 +1479,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
         dragInfo.angle = ang;
         dragInfo.moved = 0;
         dragInfo.samples = [{ t: e.timeStamp, a: rotAngle }];
-        rotSpeed = 0;
         container.setPointerCapture?.(e.pointerId);
-        container.style.cursor = "grabbing";
         requestFrame();
       }
     };
@@ -1026,7 +1510,10 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       const found = findCircleAtPoint(e.clientX, e.clientY);
       if (found !== hoveredIdx) {
         hoveredIdx = found;
-        container.style.cursor = found >= 0 && p.onCircleClick ? "pointer" : "grab";
+        container.style.cursor = found >= 0 && (p.onCircleClick || p.onCircleHover) ? "pointer" : "grab";
+        if (p.onCircleHover) {
+          p.onCircleHover(found, found >= 0 ? p.list[found % p.list.length] : "");
+        }
         requestFrame();
       }
     };
@@ -1059,6 +1546,9 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
       pointerPos.inside = false;
       if (hoveredIdx !== -1) {
         hoveredIdx = -1;
+        if (propsRef.current.onCircleHover) {
+          propsRef.current.onCircleHover(-1, "");
+        }
         requestFrame();
       }
     };
@@ -1089,7 +1579,7 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     };
 
     updatePropsRef.current = () => {
-      const newRad = clamp(getNum(propsRef.current.radius, 0.5), 0, 0.5);
+      const newRad = clamp(getNum(propsRef.current.radius, 0.15), 0, 0.5);
       if (newRad !== currentRadius) {
         currentRadius = newRad;
         const oldGeom = circleGeom;
@@ -1114,6 +1604,8 @@ export const LiquidCircles = forwardRef<LiquidCirclesHandle, LiquidCirclesProps>
     layoutCircles();
     updatePhysicsAndMatrices(0);
     renderScenes();
+
+    if (isIntroPending && isIntersecting) startIntro();
 
     const resizeObserver = new ResizeObserver(() => {
       handleResize();
