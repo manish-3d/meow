@@ -8,7 +8,6 @@ import { AgentCloudPipelineSection } from "@/components/custom/landing/agent-clo
 import { IntegrationsStrip } from "@/components/custom/landing/integrations-strip";
 import { HostingSection } from "@/components/custom/landing/hosting-section";
 import { PricingSection } from "@/components/custom/landing/pricing-section";
-import { OnboardingSteps } from "@/components/custom/landing/onboarding-steps";
 import { LandingFaq } from "@/components/custom/landing/landing-faq";
 import { LandingFooter } from "@/components/custom/landing/landing-footer";
 
@@ -43,10 +42,7 @@ export default function Home() {
         {/* 9. Pricing with the Sleeping Pixel Cat Mascot ($0 Free, Plus, Pro) */}
         <PricingSection />
 
-        {/* 10. Ready in under two minutes (4-Step Frictionless Onboarding) */}
-        <OnboardingSteps />
-
-        {/* 11. Plainspoken FAQ */}
+        {/* 10. Plainspoken FAQ */}
         <LandingFaq />
       </main>
 
