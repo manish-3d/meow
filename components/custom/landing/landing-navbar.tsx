@@ -101,16 +101,11 @@ export function LandingNavbar() {
           <Link href="#faq" onClick={() => setMobileOpen(false)} className="py-1">
             faq
           </Link>
-        </div>
-      )}
-          <Link href="#faq" onClick={() => setMobileOpen(false)} className="py-1">
-            faq
-          </Link>
           <div className="pt-2 border-t border-black/8 flex flex-col gap-2">
             <Link
               href="/workspace"
               onClick={() => setMobileOpen(false)}
-              className="w-full text-center rounded-full bg-black py-2.5 text-white font-semibold"
+              className="w-full text-center rounded-full bg-[#aed44e] py-2.5 text-[#131316] font-bold"
             >
               launch workspace
             </Link>
